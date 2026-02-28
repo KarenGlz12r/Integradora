@@ -2,10 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="cliente.css">
+    <link rel="stylesheet" href="./Navbar/Navbar.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 </head>
 <body>
+    <div id="navbar"></div>
+    <main class="main-content">
+        <!-- BIENVENIDA -->
+         <section class="welcome-section">
+            <div class="img-doctor">
+                <img src="./images/Dr.Luuk_Herssen.jpeg" alt="">
+            </div>
+            <div class="welcome-text">
+                 <h2>¡Bienvenido Dr.Luuk Herssen</h2>
+            <span>Fisioterapeuta</span>
+            </div>
+         </section>
+         <!-- TARJETAS DE ESTADISTICAS -->
+          <section class="stats-section">
+            <div class="stat-card">
+                <div class="bg">
+                    <div class="icon-text">
+                        <div class="icon">
+                            <img src="./images/group.png" alt="">
+                        </div>
+                        <div class="text">
+                           <p>Pacientes activos</p>
+                           <strong>30</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="blob"></div>
+            </div>
+            <div class="stat-card">
+                <div class="bg">
+                    <div class="icon-text">
+                        <div class="icon">
+                            <img src="./images/file.png" alt="">
+                        </div>
+                        <div class="text">
+                           <p>Rutinas asignadas</p>
+                           <strong>30</strong>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="blob"></div>
+               
+            </div>
+            <div class="stat-card">
+                <div class="bg">
+                    <div class="icon-text">
+                        <div class="icon">
+                            <img src="./images/graphic-progression.png" alt="">
+                        </div>
+                        <div class="text">
+                           <p>Pacientes con progreso</p>
+                           <strong>30</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="blob"></div>
+            </div>
+            <div class="stat-card">
+                <div class="bg">
+                    <div class="icon-text">
+                        <div class="icon">
+                            <img src="./images/message.png" alt="">
+                        </div>
+                        <div class="text">
+                           <p>Mensajes</p>
+                           <strong>30</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="blob"></div>
+            </div>
+          </section>
+          <!-- GRÁFICAS + PACIENTES PRIORITARIOS -->
+           <section class="middle-section">
+            <div class="chart-card">
+                
+            </div>
+            <div class="priority-card"></div>
+           </section>
+           <!-- SESIONES DEL DÍA + ALERTAS CLINICAS -->
+            <section class="bottom-section">
+                <div class="sessions-card"></div>
+                <div class="alerts-card"></div>
+            </section>
+    </main>
+
     
 </body>
+
+<script >
+    fetch('./Navbar/Navbar.html')
+.then(res => res.text())
+.then(html =>{
+    document.getElementById('navbar').innerHTML = html;
+
+    <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+    const script = document.createElement('script');
+    script.src='./Navbar/Navbar.js';
+    document.body.appendChild(script);
+
+})
+</script>
+
 </html>

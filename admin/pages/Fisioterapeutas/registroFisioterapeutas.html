@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Registro Fisioterapeuta</h2>
+
+    <input id="email" type="email" placeholder="Correo electrónico" required>
+
+    <input id="nombre" type="text" placeholder="Nombre" required>
+
+    <input id="apellido_paterno" type="text" placeholder="Apellido paterno" required>
+
+    <input id="apellido_materno" type="text" placeholder="Apellido materno (opcional)">
+
+    <input id="telefono" type="text" placeholder="Teléfono (opcional)">
+
+    <input id="cedula" type="text" placeholder="Cédula profesional" required>
+
+    <input id="especialidad" type="text" placeholder="Especialidad" required>
+
+    <input id="anios_experiencia" type="number" min="0" placeholder="Años de experiencia (opcional)">
+
+    <input id="institucion_egreso" type="text" placeholder="Institución de egreso (opcional)">
+
+    <label for="turno">Turno (opcional)</label>
+    <select id="turno">
+        <option value="">Seleccione turno (opcional)</option>
+        <option value="mañana">Mañana</option>
+        <option value="tarde">Tarde</option>
+        <option value="noche">Noche</option>
+    </select>
+
+    <br><br>
+    <button onclick="registrarFisioterapeuta()">Registrar</button>
+
+    <hr>
+
+    <script type="module">
+        import {
+            registrarFisioterapeuta
+        } from "./auth.js";
+
+        window.registrarFisioterapeuta = registrarFisioterapeuta;
+    </script>
+
+</body>
+
+</html>

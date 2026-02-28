@@ -1,0 +1,32 @@
+/* CCS DEL DASHBOARD DEL ADMIN Y DEMAS */
+
+.main-content{
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+}
+
+.stats-section{
+    border: 2px solid rgb(55, 0, 255);
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.charts-section{
+    border: 2px solid green;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.bottom-stats{
+    border: 2px solid red;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+
+}

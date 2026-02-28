@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="./Navbar/Navbar.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="main-content">
+        <!-- TARJETAS DE ESTADISTICAS -->
+         <section class="stats-section">
+            <!-- TARJETAS -->
+         </section>
+         <!-- GRÁFICAS -->
+          <section class="charts-section">
+            <div class="pie-chart-card"></div>
+            <div class="bar-chart-card"></div>
+          </section>
+          <!-- FOOTER DE STATS -->
+           <section class="bottom-stats">
+            <div></div>
+            <div></div>
+            <div></div>
+           </section>
+        
+    </main>
+
+    
+</body>
+
+<script >
+    fetch('./Navbar/Navbar.html')
+.then(res => res.text())
+.then(html =>{
+    document.getElementById('navbar').innerHTML = html;
+
+    <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+    const script = document.createElement('script');
+    script.src='./Navbar/Navbar.js';
+    document.body.appendChild(script);
+
+})
+</script>
+
+</html>
