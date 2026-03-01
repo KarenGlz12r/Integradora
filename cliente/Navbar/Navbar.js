@@ -1,4 +1,8 @@
 // TIENE COMO FUNCIONALIDAD HACER FUNCIONAR AL NAVBAR
+// <!-- PROTEGER LA RUTA -->
+
+import { protegerRuta } from "../../proteger.js";
+await protegerRuta("fisioterapeuta");
 
 import { supabase } from "../../auth.js";
 

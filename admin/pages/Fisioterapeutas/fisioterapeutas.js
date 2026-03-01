@@ -1,28 +1,29 @@
-    // PERMITE CARGAR LOS DATOS DE LOS FISIOTERAPEUTAS
+// PERMITE CARGAR LOS DATOS DE LOS FISIOTERAPEUTAS
 
 
-    import { supabase } from "./auth.js";
+import { supabase } from "./auth.js";
+import { protegerRuta } from "../../../proteger.js";
+await protegerRuta("admin");
 
+// CREAMOS UNA FUNCIÓN ASINCRONA PARA LLAMAR LOS DATOS DE LOS FISIOTERAPEUTAS
+async function cargarFisios() {
 
-    // CREAMOS UNA FUNCIÓN ASINCRONA PARA LLAMAR LOS DATOS DE LOS FISIOTERAPEUTAS
-    async function cargarFisios() {
-
-        const {data, error} = await supabase
+    const { data, error } = await supabase
         .from("fisioterapeutas")
         .select("id,nombre, apellido_paterno, especialidad, estado");
 
-        if(error){
-            console.error(error);
-            return;
-        }
+    if (error) {
+        console.error(error);
+        return;
+    }
 
-        // PARA PODER INSERTARLO
+    // PARA PODER INSERTARLO
 
-        const tbody = document.getElementById('tabla-fisioterapeutas');
-        tbody.innerHTML ="";
+    const tbody = document.getElementById('tabla-fisioterapeutas');
+    tbody.innerHTML = "";
 
-        data.forEach(fisio =>{
-            tbody.innerHTML+= `
+    data.forEach(fisio => {
+        tbody.innerHTML += `
                 <tr>
                     <td>${fisio.nombre} ${fisio.apellido_paterno}</td>
                     <td>${fisio.especialidad}</td>
@@ -37,27 +38,27 @@
                         <button class= "btn-editar" ">Editar</button>
                     </td>
                 </tr>`;
-        })
-        
-    }
-    cargarFisios();
+    })
 
-    // FUNCIÓN DE VER DETALLE
+}
+cargarFisios();
 
-    async function verDetalle(id) {
-        const {data: fisio, error} = await supabase
+// FUNCIÓN DE VER DETALLE
+
+async function verDetalle(id) {
+    const { data: fisio, error } = await supabase
         .from("fisioterapeutas")
         .select("id,nombre,apellido_paterno,telefono, cedula_profesional,especialidad, email_contacto, estado,turno,anios_experiencia")
         .eq("id", id)
         .single();
 
-        if(error){
-            console.error(error);
-            return;
-        }
+    if (error) {
+        console.error(error);
+        return;
+    }
 
-        const detalle = document.getElementById("fisio-detail");
-        detalle.innerHTML = `
+    const detalle = document.getElementById("fisio-detail");
+    detalle.innerHTML = `
             <div class="detail-header">
                 <div class="detail-avatar">
                     ${fisio.nombre.charAt(0)}${fisio.apellido_paterno.charAt(0)}
@@ -79,8 +80,8 @@
                 <p><strong>Turno:</strong> ${fisio.turno ?? "-"}</p>
                 <p>
                     <strong>Estado:</strong> 
-                    <span class="${fisio.estado ==='Activo'? 'badge-activo' : 'badge-inactivo'}">
-                        ${fisio.estado ==='Activo' ? 'Activo' : 'Inactivo'}
+                    <span class="${fisio.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'}">
+                        ${fisio.estado === 'Activo' ? 'Activo' : 'Inactivo'}
                     </span>
                 </p>
             </div>
@@ -91,27 +92,27 @@
                     ${fisio.estado === 'Activo' ? 'Desactivar' : 'Activar'}
                 </button>
             </div>  
-        `;  
-    }
+        `;
+}
 
-    // CAMBIAR ESTADO
+// CAMBIAR ESTADO
 
-    async function cambiarEstado(id, estadoActual) {
+async function cambiarEstado(id, estadoActual) {
 
-        const nuevoEstado = estadoActual === "Activo" ? "Inactivo" : "Activo";
-        const {error} = await supabase
+    const nuevoEstado = estadoActual === "Activo" ? "Inactivo" : "Activo";
+    const { error } = await supabase
         .from("fisioterapeutas")
-        .update({estado: nuevoEstado})
+        .update({ estado: nuevoEstado })
         .eq("id", id);
 
-        if(error){
-            console.error(error);
-            return;
-        }
-
-        cargarFisios();
-        verDetalle(id);  
+    if (error) {
+        console.error(error);
+        return;
     }
 
-    window.verDetalle = verDetalle;
-    window.cambiarEstado = cambiarEstado;
+    cargarFisios();
+    verDetalle(id);
+}
+
+window.verDetalle = verDetalle;
+window.cambiarEstado = cambiarEstado;
