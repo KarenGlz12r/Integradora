@@ -1,8 +1,5 @@
 
-// import { protegerRuta } from "../../proteger.js";
-// await protegerRuta("fisioterapeuta");
-
-import { supabase } from "../pages/Fisioterapeutas/auth.js";
+import { supabase } from "../auth.js";
 
 
 

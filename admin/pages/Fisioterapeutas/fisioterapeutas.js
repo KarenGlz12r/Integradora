@@ -1,9 +1,7 @@
 // PERMITE CARGAR LOS DATOS DE LOS FISIOTERAPEUTAS
-
-
-import { supabase } from "./auth.js";
-import { protegerRuta } from "../../../proteger.js";
-await protegerRuta("admin");
+// EN ADMIN/FISIOTERAPEUTAS
+// USADA EN MOSTRAR FISIOS
+import { supabase } from "../../auth.js";
 
 // CREAMOS UNA FUNCIÓN ASINCRONA PARA LLAMAR LOS DATOS DE LOS FISIOTERAPEUTAS
 async function cargarFisios() {

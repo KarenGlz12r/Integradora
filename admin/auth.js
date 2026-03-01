@@ -1,7 +1,5 @@
 
-// // PROTEGER RUTA
-// import { protegerRuta } from "../../../proteger.js";
-// await protegerRuta("admin");
+// CONFIGURACIÓN PARA EL REGISTRO, GENERAR CONTRASEÑA, CORREO, ETC
 
 // ===============================
 // SUPABASE CONFIG
