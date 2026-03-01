@@ -9,11 +9,11 @@ const serviceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
-const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey,{
+const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
     auth: {
-         autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
     }
 });
 
@@ -41,17 +41,39 @@ function generarPassword() {
     return password.split("").sort(() => Math.random() - 0.5).join("");
 }
 
+
+// ==============================
+// GENERAR CORREO
+// ==============================
+
+function generarEmail(nombre, apellido){
+
+    const n = nombre.toLowerCase()
+    .split(" ")[0]
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+    const a = apellido.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+    // AGREGAR NUMERO UNICO
+    const num = Math.floor(Math.random() * 999) + 1;
+
+
+    return `${n}.${a}${num}@motricare.com`;
+}
 // ===============================
 // REGISTRO FISIOTERAPEUTA
 // ===============================
 export async function registrarFisioterapeuta() {
     // Obligatorios
-    const email = document.getElementById("email").value.trim();
+    const emailContacto = document.getElementById("email").value.trim();
     const nombre = document.getElementById("nombre").value.trim();
     const apellidoPaterno = document.getElementById("apellido_paterno").value.trim();
     const cedula = document.getElementById("cedula").value.trim();
     const especialidad = document.getElementById("especialidad").value.trim();
-
+    const fechaNacimiento = document.getElementById("fecha_naci").value || null;
     // Opcionales
     const apellidoMaterno = document.getElementById("apellido_materno").value || null;
     const telefono = document.getElementById("telefono").value || null;
@@ -61,24 +83,57 @@ export async function registrarFisioterapeuta() {
         document.getElementById("institucion_egreso").value || null;
     const turno = document.getElementById("turno").value || null;
 
+
+  
     // Validación mínima
-    if (!email || !nombre || !apellidoPaterno || !cedula || !especialidad) {
-        alert("Completa todos los campos obligatorios.");
+    if (!emailContacto || !nombre || !apellidoPaterno || !cedula || !especialidad) {
+        mostrarAlerta("Completa todos los campos obligatorios.", "danger");
         return;
     }
 
+    // VALIDACIONES ESPECIFICAS
+    // EMAIL
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailContacto)) {
+        mostrarAlerta("El correo electronico no es valido", "warning");
+        return;
+    }
+
+    // Validat telefono
+    if (telefono) {
+        const telefonoRegex = /^\d{10}$/;
+        if (!telefonoRegex.test(telefono)) {
+            mostrarAlerta("El telefono debe tener 10 digitos", "warning");
+            return;
+        }
+    }
+      // VALIDACIÓN DE ESPECIALIDAD
+    if (!especialidad) {
+        mostrarAlerta('Selecciona una especialidad', "danger");
+        return;
+    }
+
+    // VALIDAR CEDULA PROFESIONAL
+    const cedulaRegex = /^\d{7,8}$/;
+    if (!cedulaRegex.test(cedula)) {
+        mostrarAlerta("La cedula profesional no es válida", "warning");
+        return;
+    }
+
+    // EMAIL GENERADO = PERMITE INICIAR SESION
+    const emailLogin = generarEmail(nombre, apellidoPaterno);
     const password = generarPassword();
 
     // 1. Crear usuario Auth
     const { data: authData, error: authError } =
         await supabaseAdmin.auth.admin.createUser({
-            email,
+            email: emailLogin,
             password,
             email_confirm: true
         });
 
     if (authError) {
-        alert(authError.message);
+        mostrarAlerta(authError.message, "danger");
         return;
     }
 
@@ -91,7 +146,7 @@ export async function registrarFisioterapeuta() {
     });
 
     if (perfilError) {
-        alert("Error al crear perfil: " + perfilError.message);
+        mostrarAlerta("Error al crear perfil: " + perfilError.message, "danger");
         return;
     }
 
@@ -106,17 +161,27 @@ export async function registrarFisioterapeuta() {
         especialidad,
         anios_experiencia: aniosExperiencia,
         institucion_egreso: institucionEgreso,
+        fecha_nacimiento: fechaNacimiento,
+        email_contacto: emailContacto,
         turno
     });
 
     if (fisioError) {
-        alert("Error al registrar fisioterapeuta: " + fisioError.message);
+        mostrarAlerta("Error al registrar fisioterapeuta" + fisioError.message, "danger")
         return;
     }
 
+    // ENVIAR CORREO CON CREDENCIALES
+    await emailjs.send("service_0qv66qh", "template_ngc3ezn",{
+        to_email: emailContacto,
+        to_name: nombre,
+        email_login:emailLogin,
+        password: password
+          });
+    
     //  4. Mostrar credenciales al admin
 
-    alert(`Fisioterapeuta registrado correctamente.\n\nCorreo:${email}\n Contraseña: ${password}`)
+    mostrarAlerta(`Fisioterapeuta registrado correctamente.\n\nCorreo:${emailLogin}\n Contraseña: ${password}`, "success")
 
     // LIMPIAR EL FORMULARIO
     document.getElementById("email").value = "";
@@ -129,7 +194,23 @@ export async function registrarFisioterapeuta() {
     document.getElementById("anios_experiencia").value = "";
     document.getElementById("institucion_egreso").value = "";
     document.getElementById("turno").value = "";
+    document.getElementById("especialidad").value = "";
+    document.getElementById("fecha_naci").value = "";
+
 }
 
+
+// FUNCIÓN DE ALERTA DE BOOTSTRAP
+
+function mostrarAlerta(mensaje, tipo = "warning") {
+    const container = document.getElementById("alert-container");
+    container.innerHTML = `
+    <div class="alert alert-${tipo}" alert-dismissible fade show role="alert">
+           ${mensaje}
+    </div>`;
+
+    // CERRAR AUTMATICAMENTE LUEGO DE 10 SEGUNDOS
+    setTimeout(() =>container.innerHTML ="", 10000);
+}
 
 

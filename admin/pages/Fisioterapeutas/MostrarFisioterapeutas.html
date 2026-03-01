@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="../../admin.css">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mostrar fisioterapeutas</title>
+</head>
+<body>
+    <main class="container">
+        <div id="navbar"></div>
+        <!-- CONTENIDO TABLA + DETALLES -->
+         <div class="fisio-content">
+            <!-- TABLA DE LOS FISIOS -->
+             <div class="fisio-table-container">
+                <table class="fisio-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Especialidad</th>
+                            <th>Pacientes asignados</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-fisioterapeutas"></tbody>
+                </table>
+             </div>
+
+             <!-- PANEL DE DETALLES -->
+              <div class="fisio-detail" id="fisio-detail">
+                <!-- SE LLENA AL HACER CLICK EN VER -->
+                 <p class="detail-placeholder">
+                    Seleccione un fisioterapeuta para ver sus detalles
+                 </p>
+              </div>
+         </div>
+    </main>
+        <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+
+                <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+                const script = document.createElement('script');
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+
+            })
+    </script>
+</body>
+</html>

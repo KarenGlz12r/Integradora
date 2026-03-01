@@ -1,21 +1,21 @@
 /* CCS DEL DASHBOARD DEL ADMIN Y DEMAS */
 
-.main-content{
+.main-content {
     margin-left: 4rem;
     margin-top: 3.5rem;
     padding: 1.5rem;
     transition: margin-left 0.3s ease;
 }
 
-.stats-section{
+.stats-section {
     border: 2px solid rgb(55, 0, 255);
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.charts-section{
+.charts-section {
     border: 2px solid green;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
@@ -23,10 +23,212 @@
     margin-bottom: 1rem;
 }
 
-.bottom-stats{
+.bottom-stats {
     border: 2px solid red;
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
 
+}
+
+/* ESTILOS PARA EL REGISTROFISIOTERAPEUTAS */
+
+/* CENTRAR CONTENIDO */
+/* ====== DASHBOARD LAYOUT ====== */
+
+.main-content {
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+}
+
+.stats-section {
+    border: 2px solid rgb(55, 0, 255);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.charts-section {
+    border: 2px solid green;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.bottom-stats {
+    border: 2px solid red;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+/* ====== FORMULARIO REGISTRO ====== */
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+}
+
+.container.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    position: relative;
+}
+
+/* ====== TÍTULO ====== */
+
+.title {
+    font-size: 28px;
+    color: rgb(27, 142, 50);
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+
+.title::before,
+.title::after {
+    position: absolute;
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    left: 0;
+    background-color: rgb(54, 164, 63);
+}
+
+.title::after {
+    animation: pulse 1s linear infinite;
+}
+
+/* ====== MENSAJE ====== */
+
+.message {
+    color: rgba(88, 87, 87, 0.822);
+    font-size: 14px;
+}
+
+/* ====== FLEX DOS COLUMNAS ====== */
+
+.flex {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+}
+
+/* ====== LABELS E INPUTS ====== */
+
+.form label {
+    position: relative;
+    display: block;
+}
+
+.form label .input {
+    width: 100%;
+    padding: 18px 10px 5px 10px;
+    outline: 0;
+    border: 1px solid rgba(105, 105, 105, 0.397);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.form label span {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: grey;
+    font-size: 0.7em;
+    cursor: text;
+    transition: 0.3s ease;
+    pointer-events: none;
+}
+
+.form label .input:focus+span,
+.form label .input:not(:placeholder-shown)+span {
+    top: 6px;
+    transform: none;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: royalblue;
+}
+
+.form label .input:valid:not(:placeholder-shown)+span {
+    color: green;
+}
+
+/* ====== SELECT ====== */
+
+.form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(105, 105, 105, 0.397);
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    color: grey;
+}
+
+/* ====== BOTÓN ====== */
+
+.submit {
+    border: none;
+    outline: none;
+    background-color: rgb(58, 143, 90);
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit:hover {
+    background-color: rgb(38, 172, 96);
+}
+
+/* ====== ANIMACIÓN ====== */
+
+@keyframes pulse {
+    from {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+/* CSS PARA LA ALERTA */
+#alert-container {
+    width: 100%;
+}
+
+#alert-container .alert {
+    margin: 0;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
 }

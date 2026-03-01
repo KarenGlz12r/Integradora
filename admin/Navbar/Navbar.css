@@ -172,13 +172,22 @@ header {
 .sidebar.menu-toggle{
     width: 18.75rem;
 }
+.sidebar ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sidebar li {
+    list-style: none !important;
+}
 .sidebar a {
    
     display: flex;
     align-items: center;
     gap: 1.3rem;
     padding: 0.9rem 0.7rem;
-    text-decoration: none;
+    text-decoration: none !important;
     margin: 0 0.5rem;
     border-radius: 0.5rem;
     white-space: nowrap;
