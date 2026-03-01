@@ -25,7 +25,7 @@ export async function login() {
   });
 
   if (error) {
-    alert(error.message);
+    mostrarAlerta("Credenciales incorrectas", "danger");
     return;
   }
 
@@ -49,7 +49,7 @@ export async function redirigirPorRol() {
     .single();
 
   if (error) {
-    alert("No se pudo obtener el rol");
+    mostrarAlerta("No se pudo obtener el rol", "danger");
     return;
   }
 
@@ -58,4 +58,17 @@ export async function redirigirPorRol() {
   } else {
     window.location.href = "./cliente/dashboard.html";
   }
+}
+
+// FUNCIÓN DE ALERTA DE BOOTSTRAP
+
+function mostrarAlerta(mensaje, tipo = "warning") {
+    const container = document.getElementById("alert-container");
+    container.innerHTML = `
+    <div class="alert alert-${tipo}" alert-dismissible fade show role="alert">
+           ${mensaje}
+    </div>`;
+
+    // CERRAR AUTMATICAMENTE LUEGO DE 10 SEGUNDOS
+    setTimeout(() =>container.innerHTML ="", 4000);
 }
