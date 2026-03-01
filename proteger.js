@@ -8,7 +8,7 @@ export async function protegerRuta(rolRequerido =null) {
 
     // SI NO HAY SESIÓN, REDIRIGE AL LOGIN
     if(!user){
-        window.location.href = "./Login.html";
+        window.location.href = "/Login.html";
         return;
     }
 
@@ -22,9 +22,34 @@ export async function protegerRuta(rolRequerido =null) {
         .single();
 
         if(!perfil || perfil.rol !==rolRequerido){
-            window.location.href = "./Login.html";
+            window.location.href = "/Login.html";
             return;
         }
+    }
+    
+}
+
+// FUNCIÓN PARA REDIRIGIR SEGÚN EL ROL SI HAY SESIÓNACTIVA
+
+export async function redirigirSesionActiva(){
+
+    const {data: {user}} = await supabase.auth.getUser();
+
+    // SI NO HAY SESIÓN NO HACE NADA
+
+    if(!user) return;
+
+    const {data: perfil} = await supabase.from("perfiles")
+    .select("rol")
+    .eq("id", user.id)
+    .single();
+
+    if(!perfil) return;
+
+    if(perfil.rol === "admin"){
+        window.location.href("/admin/dashboard.html");
+    }else if(perfil.rol === "fisioterapeuta"){
+        window.location.href("/cliente/dashboard.html");
     }
     
 }

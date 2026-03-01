@@ -1,7 +1,7 @@
 
-// PROTEGER RUTA
-import { protegerRuta } from "../../../proteger.js";
-await protegerRuta("admin");
+// // PROTEGER RUTA
+// import { protegerRuta } from "../../../proteger.js";
+// await protegerRuta("admin");
 
 // ===============================
 // SUPABASE CONFIG

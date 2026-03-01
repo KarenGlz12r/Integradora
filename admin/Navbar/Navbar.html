@@ -26,9 +26,25 @@
             <a href="#" class="icons-header">
                 <img src="/admin/icons/notification-13-svgrepo-com.svg" alt="usuario">
             </a>
-            <a href="#" class="icons-header">
-                <img src="/admin/icons/user-svgrepo-com.svg" alt="usuario">
-            </a>
+                <!-- DROPDOWN -->
+            <div class="user-menu">
+                <div class="user-avatar" onclick="toggleDropdown()">
+                    <img src="/cliente/icons/user-svgrepo-com.svg" alt="" id="user-foto">
+                </div>
+                <div class="dropdown" id="dropdown">
+                    <ul>
+                        <li onclick="abrirSelectorFoto()">
+                            <img src="/cliente/icons/user-svgrepo-com.svg" alt="">
+                            <span>Editar foto de perfil</span>
+                        </li>
+                        <li onclick="cerrarSesion()">
+                            <img src="/cliente/icons/logout-svgrepo-com.svg" alt="">
+                            <span>Cerrar sesión</span>
+                        </li>
+                    </ul>
+                </div>
+                <input type="file" name="" id="input-foto" accept="image/*" style="display: none;" onchange="subirFoto(event)">
+            </div>
         </div>
     </header>
     <div class="sidebar" id="sidebar">

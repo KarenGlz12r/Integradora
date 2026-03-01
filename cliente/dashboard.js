@@ -1,12 +1,10 @@
-// YA NO QUIEROOOO
-// <!-- PROTEGER LA RUTA -->
-
+// DASHBOARD.JS DEL CLIENTE
 import { protegerRuta } from "../proteger.js";
-await protegerRuta("fisioterapeuta");
 
 // PERMITE JALAR LA INFORMACION
 
 import { supabase } from "../auth.js";
+await protegerRuta("fisioterapeuta");
 
 export async function cargarDatosDashboard() {
 

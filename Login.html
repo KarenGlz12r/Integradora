@@ -35,6 +35,12 @@
         window.registrarFisioterapeuta = registrarFisioterapeuta;
         window.login = login;
     </script>
+    <script type="module">
+        import {redirigirSesionActiva} from "./proteger.js";
+        await redirigirSesionActiva();
+
+
+    </script>
 </body>
 
 </html>
