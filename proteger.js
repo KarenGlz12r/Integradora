@@ -47,9 +47,9 @@ export async function redirigirSesionActiva(){
     if(!perfil) return;
 
     if(perfil.rol === "admin"){
-        window.location.href("/admin/dashboard.html");
+        window.location ="/admin/dashboard.html";
     }else if(perfil.rol === "fisioterapeuta"){
-        window.location.href("/cliente/dashboard.html");
+        window.location ="/cliente/dashboard.html";
     }
     
 }
