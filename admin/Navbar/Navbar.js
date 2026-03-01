@@ -1,6 +1,3 @@
-// TIENE COMO FUNCIONALIDAD HACER FUNCIONAR AL NAVBAR
-import { protegerRuta } from "../../proteger.js";
-await protegerRuta("admin");
 
 const menu = document.getElementById('menu');
 const sidebar = document.getElementById('sidebar');

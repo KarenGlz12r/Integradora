@@ -39,7 +39,8 @@
 
     <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
     const script = document.createElement('script');
-    script.src='./Navbar/Navbar.js';
+    script.type = 'module';
+    script.src='/admin/Navbar/Navbar.js';
     document.body.appendChild(script);
 
 })
