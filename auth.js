@@ -117,7 +117,7 @@ export async function registrarFisioterapeuta() {
 // ===============================
 export async function login() {
   const email = document.getElementById("emailLogin").value.trim();
-  const password = document.getElementById("passwordLogin").value;
+  const password = document.getElementById("password").value;
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -154,8 +154,8 @@ export async function redirigirPorRol() {
   }
 
   if (data.rol === "admin") {
-    window.location.href = "admin.html";
+    window.location.href = "./admin/dashboard.html";
   } else {
-    window.location.href = "fisioterapeuta.html";
+    window.location.href = "./cliente/dashboard.html";
   }
 }

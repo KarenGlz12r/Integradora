@@ -1,0 +1,52 @@
+Date : 2026-02-28 22:00:49
+Directory : c:\Nueva carpeta\Integradora\cliente
+Total : 22 files,  786 codes, 44 comments, 97 blanks, all 927 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PostCSS    |          2 |        310 |         33 |         71 |        414 |
+| XML        |         11 |        274 |          1 |          3 |        278 |
+| HTML       |          7 |        189 |          8 |         20 |        217 |
+| JavaScript |          2 |         13 |          2 |          3 |         18 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                   |         22 |        786 |         44 |         97 |        927 |
+| . (Files)                                                                           |          8 |        239 |         16 |         37 |        292 |
+| Navbar                                                                              |          3 |        273 |         27 |         57 |        357 |
+| icons                                                                               |         11 |        274 |          1 |          3 |        278 |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                            | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Nueva carpeta\Integradora\cliente\Navbar\Navbar.css                              | PostCSS    |        177 |         23 |         49 |        249 |
+| c:\Nueva carpeta\Integradora\cliente\Navbar\Navbar.html                             | HTML       |         88 |          3 |          6 |         97 |
+| c:\Nueva carpeta\Integradora\cliente\Navbar\Navbar.js                               | JavaScript |          8 |          1 |          2 |         11 |
+| c:\Nueva carpeta\Integradora\cliente\cliente.css                                    | PostCSS    |        133 |         10 |         22 |        165 |
+| c:\Nueva carpeta\Integradora\cliente\dashboard.html                                 | HTML       |        101 |          5 |          9 |        115 |
+| c:\Nueva carpeta\Integradora\cliente\ejercicios.html                                | HTML       |          0 |          0 |          1 |          1 |
+| c:\Nueva carpeta\Integradora\cliente\icons\Motricare.svg                            | XML        |        219 |          0 |          2 |        221 |
+| c:\Nueva carpeta\Integradora\cliente\icons\activity-solid-svgrepo-com.svg           | XML        |         12 |          1 |          1 |         14 |
+| c:\Nueva carpeta\Integradora\cliente\icons\add-folder-svgrepo-com.svg               | XML        |          5 |          0 |          0 |          5 |
+| c:\Nueva carpeta\Integradora\cliente\icons\agenda-calendar-date-svgrepo-com.svg     | XML        |          4 |          0 |          0 |          4 |
+| c:\Nueva carpeta\Integradora\cliente\icons\home-1-svgrepo-com.svg                   | XML        |          4 |          0 |          0 |          4 |
+| c:\Nueva carpeta\Integradora\cliente\icons\message-square-lines-alt-svgrepo-com.svg | XML        |          4 |          0 |          0 |          4 |
+| c:\Nueva carpeta\Integradora\cliente\icons\money-svgrepo-com.svg                    | XML        |          5 |          0 |          0 |          5 |
+| c:\Nueva carpeta\Integradora\cliente\icons\notification-13-svgrepo-com.svg          | XML        |          5 |          0 |          0 |          5 |
+| c:\Nueva carpeta\Integradora\cliente\icons\people-svgrepo-com.svg                   | XML        |          9 |          0 |          0 |          9 |
+| c:\Nueva carpeta\Integradora\cliente\icons\user-svgrepo-com.svg                     | XML        |          5 |          0 |          0 |          5 |
+| c:\Nueva carpeta\Integradora\cliente\icons\videos-svgrepo-com.svg                   | XML        |          2 |          0 |          0 |          2 |
+| c:\Nueva carpeta\Integradora\cliente\mensajeria.html                                | HTML       |          0 |          0 |          1 |          1 |
+| c:\Nueva carpeta\Integradora\cliente\navbar.js                                      | JavaScript |          5 |          1 |          1 |          7 |
+| c:\Nueva carpeta\Integradora\cliente\rutinas.html                                   | HTML       |          0 |          0 |          1 |          1 |
+| c:\Nueva carpeta\Integradora\cliente\seguimiento.html                               | HTML       |          0 |          0 |          1 |          1 |
+| c:\Nueva carpeta\Integradora\cliente\sesiones.html                                  | HTML       |          0 |          0 |          1 |          1 |
+| Total                                                                               |            |        786 |         44 |         97 |        927 |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

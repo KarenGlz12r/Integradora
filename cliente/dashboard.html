@@ -13,11 +13,11 @@
         <!-- BIENVENIDA -->
          <section class="welcome-section">
             <div class="img-doctor">
-                <img src="./images/Dr.Luuk_Herssen.jpeg" alt="">
+                <img src="./images/Dr.Luuk_Herssen.jpeg" alt="" id="foto-doctor">
             </div>
             <div class="welcome-text">
-                 <h2>¡Bienvenido Dr.Luuk Herssen</h2>
-            <span>Fisioterapeuta</span>
+                 <h2 id="nombre-doctor">¡Bienvenido...</h2>
+            <span id="especialidad-doctor">Fisioterapeuta</span>
             </div>
          </section>
          <!-- TARJETAS DE ESTADISTICAS -->
@@ -106,10 +106,12 @@
 
     <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
     const script = document.createElement('script');
+     script.type = 'module';
     script.src='./Navbar/Navbar.js';
     document.body.appendChild(script);
 
 })
 </script>
+<script type="module" src="./dashboard.js"></script>
 
 </html>

@@ -1,0 +1,46 @@
+Date : 2026-02-28 21:58:08
+Directory : c:\Nueva carpeta\Integradora\admin
+Total : 14 files,  801 codes, 85 comments, 167 blanks, all 1053 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PostCSS    |          2 |        368 |         36 |         88 |        492 |
+| HTML       |          5 |        246 |         17 |         34 |        297 |
+| JavaScript |          2 |        155 |         31 |         44 |        230 |
+| XML        |          5 |         32 |          1 |          1 |         34 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                  | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                     |         14 |        801 |         85 |        167 |      1,053 |
+| . (Files)                                                                             |          2 |        219 |         18 |         45 |        282 |
+| Navbar                                                                                |          3 |        259 |         27 |         59 |        345 |
+| icons                                                                                 |          5 |         32 |          1 |          1 |         34 |
+| pages                                                                                 |          4 |        291 |         39 |         62 |        392 |
+| pages\Fisioterapeutas                                                                 |          4 |        291 |         39 |         62 |        392 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                              | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Nueva carpeta\Integradora\admin\Navbar\Navbar.css                                  | PostCSS    |        185 |         23 |         50 |        258 |
+| c:\Nueva carpeta\Integradora\admin\Navbar\Navbar.html                                 | HTML       |         64 |          3 |          7 |         74 |
+| c:\Nueva carpeta\Integradora\admin\Navbar\Navbar.js                                   | JavaScript |         10 |          1 |          2 |         13 |
+| c:\Nueva carpeta\Integradora\admin\admin.css                                          | PostCSS    |        183 |         13 |         38 |        234 |
+| c:\Nueva carpeta\Integradora\admin\dashboard.html                                     | HTML       |         36 |          5 |          7 |         48 |
+| c:\Nueva carpeta\Integradora\admin\icons\activity-solid-svgrepo-com.svg               | XML        |         12 |          1 |          1 |         14 |
+| c:\Nueva carpeta\Integradora\admin\icons\doctor-svgrepo-com.svg                       | XML        |          2 |          0 |          0 |          2 |
+| c:\Nueva carpeta\Integradora\admin\icons\home-1-svgrepo-com.svg                       | XML        |          4 |          0 |          0 |          4 |
+| c:\Nueva carpeta\Integradora\admin\icons\people-svgrepo-com.svg                       | XML        |          9 |          0 |          0 |          9 |
+| c:\Nueva carpeta\Integradora\admin\icons\user-svgrepo-com.svg                         | XML        |          5 |          0 |          0 |          5 |
+| c:\Nueva carpeta\Integradora\admin\pages\Fisioterapeutas\EditarFisios.html            | HTML       |          0 |          0 |          1 |          1 |
+| c:\Nueva carpeta\Integradora\admin\pages\Fisioterapeutas\MostrarFisioterapeutas.html  | HTML       |         46 |          5 |          4 |         55 |
+| c:\Nueva carpeta\Integradora\admin\pages\Fisioterapeutas\auth.js                      | JavaScript |        145 |         30 |         42 |        217 |
+| c:\Nueva carpeta\Integradora\admin\pages\Fisioterapeutas\registroFisioterapeutas.html | HTML       |        100 |          4 |         15 |        119 |
+| Total                                                                                 |            |        801 |         85 |        167 |      1,053 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

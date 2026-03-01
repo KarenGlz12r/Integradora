@@ -129,14 +129,6 @@ header {
     gap: 0.6rem;
 }
 
-/* .brand .name{
-    border: 2px solid orange;
-    font-size: 1.5 rem;
-    font-weight: 900;
-    color: var(--text-title-color);
-
-} */
-
 
 /* LEFT SECTION */
 
@@ -231,6 +223,7 @@ header {
 .sidebar.menu-toggle .sidebar-logo img{
     width: 6rem;
 }
+
 
 /* MEDIA QUERIES */
 
