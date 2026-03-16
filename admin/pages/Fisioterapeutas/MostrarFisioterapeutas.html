@@ -1,16 +1,19 @@
+<!-- MOSTRAR FISIOTERAPEUTAS -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="../../admin.css">
-    
+    <link rel="shortcut icon" href="../../icons/gojo satura.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mostrar fisioterapeutas</title>
 </head>
 <body>
+    <div id="navbar"></div>
     <main class="containerm">
-        <div id="navbar"></div>
+    
         <!-- TEXTO -->
          <div class="text">
            <p>Gestion de fisioterapeutas</p>
@@ -55,6 +58,7 @@
 
                 <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
                 const script = document.createElement('script');
+                script.type= 'module';
                 script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
 

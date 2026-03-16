@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../admin.css">
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Fisioterapeutas</title>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <main class="containerm">
+        <div class="text">
+            <p>Editar fisioterapeuta</p>
+        </div>
+
+        <div class="edit-form-container">
+            <form id="form-editar" class="form-grid">
+
+                <span>Información personal</span> <!-- fila completa -->
+
+                <div class="form-grupo">
+                    <label>Nombre</label>
+                    <input type="text" class="input" id="nombre" required>
+                </div>
+                <div class="form-grupo">
+                    <label>Apellido paterno</label>
+                    <input type="text" class="input" id="apellido_paterno">
+                </div>
+                <div class="form-grupo">
+                    <label>Email de contacto</label>
+                    <input type="text" class="input" id="email_contacto">
+                </div>
+                <div class="form-grupo">
+                    <label>Teléfono</label>
+                    <input type="text" class="input" id="telefono">
+                </div>
+
+                <span>Información profesional</span> <!-- fila completa -->
+
+                <div class="form-grupo">
+                    <label>Especialidad</label>
+                    <input type="text" class="input" id="especialidad">
+                </div>
+                <div class="form-grupo">
+                    <label>Cédula profesional</label>
+                    <input type="text" class="input" id="cedula_profesional">
+                </div>
+                <div class="form-grupo">
+                    <label>Años de experiencia</label>
+                    <input type="text" class="input" id="anios_experiencia">
+                </div>
+                <div class="form-grupo">
+                    <label>Turno</label>
+                    <select id="turno">
+                        <option value="Mañana">Mañana</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Noche">Noche</option>
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label>Estado</label>
+                    <select id="estado">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="form-actions"> <!-- fila completa via css -->
+                    <button class="btn-editarR" type="submit">Guardar cambios</button>
+                    <a href="./MostrarFisioterapeutas.html" class="btn-cancelar">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+            })
+    </script>
+    <script type="module" src="./EditarFisios.js"></script>
+    <script type="module" src="./fisioterapeutas.js"></script>
+
+
+
+</body>
+
+</html>

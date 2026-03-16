@@ -2,36 +2,6 @@
 /* LETRA NUNITO SANS */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
-.main-content {
-    margin-left: 4rem;
-    margin-top: 3.5rem;
-    padding: 1.5rem;
-    transition: margin-left 0.3s ease;
-}
-
-.stats-section {
-    border: 2px solid rgb(55, 0, 255);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.charts-section {
-    border: 2px solid green;
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.bottom-stats {
-    border: 2px solid red;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-
-}
 
 /* ESTILOS PARA EL REGISTROFISIOTERAPEUTAS */
 
@@ -55,69 +25,110 @@
     transition: margin-left 0.3s ease;
 }
 
+/* ESTADISTICAS */
 .stats-section {
-    border: 2px solid rgb(55, 0, 255);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 1rem;
+    margin-top: 1rem;
 }
-
+/* ── GRÁFICAS ── */
 .charts-section {
-    border: 2px solid green;
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 320px 1fr;  /* pie fijo, barras ocupa el resto */
     gap: 1rem;
     margin-bottom: 1rem;
+    align-items: start;
 }
 
-.bottom-stats {
-    border: 2px solid red;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+.pie-chart-card {
+    background: #fff;
+    border: 0.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.5rem;
 }
+
+.pie-chart-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pie-chart-card canvas {
+    max-width: 100%;
+}
+
+.bar-chart-card {
+    background: #fff;
+    border: 0.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: 320px;      /* misma altura que el pie */
+}
+
+.bar-chart-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bar-chart-card canvas {
+    max-width: 100%;
+    max-height: 260px;      /* evita que la barra crezca demasiado */
+}
+
 
 /* SECCION DE BIENVENIDA */
 
-/* SECCION DE BIENVENIDA */
 
-.welcome-section{
-   
+.welcome-section {
     display: flex;
     align-items: center;
     gap: 1.2rem;
-    
+    border-bottom: 2rem;
+
 }
-.welcome-text{
+
+.welcome-text {
     display: flex;
     flex-direction: column;
- 
+
 }
-.welcome-text h2{
+
+.welcome-text h2 {
     font-size: 1.2rem;
     margin: 0;
     color: rgb(31, 33, 32);
     font-family: "Ubuntu", sans-serif;
 }
-.welcome-section .img-doctor{
+
+.welcome-section .img-doctor {
     border-radius: 45%;
     width: 6rem;
     height: 6rem;
     overflow: hidden;
-    flex-shrink: 0; /*Evita que se deforme*/
+    flex-shrink: 0;
+    /*Evita que se deforme*/
     color: black;
 }
-.img-doctor img{
+
+.img-doctor img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
 /* ====== FORMULARIO REGISTRO ====== */
-.page-header{
+.page-header {
     display: flex;
-    align-items:flex-start;
+    align-items: flex-start;
     justify-content: center;
     gap: 1rem;
     flex-direction: column;
@@ -140,7 +151,7 @@
 }
 
 
-.container.menu-toggle {
+.main-content.menu-toggle {
     margin-left: 18.75rem;
 }
 
@@ -158,6 +169,70 @@
     box-shadow: 4px 6px 6px 9px rgba(0, 0, 0, 0.393);
 }
 
+/* TARJETAS DE ESTADISTICAS */
+
+.stats-section .card {
+ width: 100%;
+ height: 150px;
+ margin: 0 auto;
+ background-color: #c9ecd3be;
+ border-radius: 8px;
+ z-index: 1;
+}
+
+.tools {
+ display: flex;
+ align-items: center;
+ padding: 9px;
+}
+
+.circle {
+ padding: 0 4px;
+}
+
+.box {
+ display: inline-block;
+ align-items: center;
+ width: 10px;
+ height: 10px;
+ padding: 1px;
+ border-radius: 50%;
+}
+
+.red {
+ background-color: #036030;
+}
+
+.yellow {
+ background-color: #0bb563;
+}
+
+.green {
+ background-color: #00ca4e;
+}
+.card__content {
+    padding: 1rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+}
+.stat-label {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-valor {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c2c2a;
+    margin: 0;
+    line-height: 1;
+}
 /* ====== TÍTULO ====== */
 
 .title {
@@ -311,7 +386,8 @@
     transition: margin-left 0.3s ease;
 
 }
-.containerm.menu-toggle{
+
+.containerm.menu-toggle {
     margin-left: 18.75rem;
 }
 
@@ -482,3 +558,108 @@
 .btn-registrar:hover {
     background-color: #4F7F6A;
 }
+
+/* PARA EL DE EDITAR FISIOS */
+/* ── CONTENEDOR GENERAL ── */
+.edit-form-container {
+    max-width: 760px;
+    margin: 2rem auto;
+    background: #fff;
+    border: 0.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+/* ── GRID DEL FORM ── */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem 1.5rem;
+}
+
+/* ── SPANS (títulos de sección) ── */
+.form-grid span {
+    grid-column: 1 / -1;          /* ocupa todo el ancho */
+    font-size: 13px;
+    font-weight: 500;
+    color: #0e6120;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1.5px solid #08512b;
+    padding-bottom: 4px;
+    margin-top: 0.5rem;
+}
+
+/* ── GRUPOS DE CAMPO ── */
+.form-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-grupo label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    margin-left: 2px;
+}
+
+/* ── INPUTS ── */
+.form-grupo .input,
+.form-grupo select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1.5px solid #ccc;
+    border-radius: 0;
+    background: #f5f5f5;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.form-grupo .input:focus,
+.form-grupo select:focus {
+    border-bottom: 2px solid #4ab763;
+    background: #eeebff;
+}
+
+/* ── ACCIONES ── */
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 0.5rem;
+}
+
+.btn-editarR {
+    padding: 10px 24px;
+    background: #127326;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-editarR:hover { background: #34893d; }
+
+.btn-cancelar {
+    padding: 10px 24px;
+    background: transparent;
+    color: #666;
+    border: 0.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.btn-cancelar:hover { background: #f0f0f0; }

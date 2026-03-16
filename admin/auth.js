@@ -216,4 +216,4 @@ function mostrarAlerta(mensaje, tipo = "warning") {
     setTimeout(() =>container.innerHTML ="", 10000);
 }
 
-
+window.registrarFisioterapeuta = registrarFisioterapeuta;

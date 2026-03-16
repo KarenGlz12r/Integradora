@@ -1,61 +1,123 @@
+<!-- DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="admin.css">
+    <link rel="shortcut icon" href="./icons/Icon.png" type="image/png">
     <link rel="stylesheet" href="./Navbar/Navbar.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 </head>
+
 <body>
     <div id="navbar"></div>
     <main class="main-content">
-          <!-- BIENVENIDA -->
-         <section class="welcome-section">
+        <!-- BIENVENIDA -->
+        <section class="welcome-section">
             <div class="img-doctor">
                 <img src="./images/Dr.Luuk_Herssen.jpeg" alt="" id="foto-doctor">
             </div>
             <div class="welcome-text">
-                 <h2 id="nombre-doctor">¡Bienvenido...</h2>
-            <span id="especialidad-doctor">Administrador</span>
+                <h2 id="nombre-doctor">¡Bienvenido...</h2>
+                <span id="especialidad-doctor">Administrador</span>
             </div>
-         </section>
+        </section>
         <!-- TARJETAS DE ESTADISTICAS -->
-         <section class="stats-section">
+        <section class="stats-section">
             <!-- TARJETAS -->
-         </section>
-         <!-- GRÁFICAS -->
-          <section class="charts-section">
-            <div class="pie-chart-card"></div>
-            <div class="bar-chart-card"></div>
-          </section>
-          <!-- FOOTER DE STATS -->
-           <section class="bottom-stats">
+            <div class="card">
+                <div class="tools">
+                    <div class="circle">
+                        <span class="red box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="yellow box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="green box"></span>
+                    </div>
+                </div>
+                <div class="card__content">
+                    <p class="stat-label">Total de usuarios</p>
+                    <h2 class="stat-valor" id="total-usuarios">---</h2>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tools">
+                    <div class="circle">
+                        <span class="red box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="yellow box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="green box"></span>
+                    </div>
+                </div>
+                <div class="card__content">
+                    <p class="stat-label">Fisioterapeutas</p>
+                    <h2 class="stat-valor" id="total-fisios">---</h2>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tools">
+                    <div class="circle">
+                        <span class="red box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="yellow box"></span>
+                    </div>
+                    <div class="circle">
+                        <span class="green box"></span>
+                    </div>
+                </div>
+                <div class="card__content">
+                    <p class="stat-label">Total de pacientes</p>
+                    <h2 class="stat-valor" id="total-pac">---</h2>
+                </div>
+            </div>
+        </section>
+        <!-- GRÁFICAS -->
+        <section class="charts-section">
+            <div class="pie-chart-card">
+                <h3>Distribución de usuarios</h3>
+                <canvas id="grafica-usuarios"></canvas>
+            </div>
+            <div class="bar-chart-card">
+                <h3>Registros por mes</h3>
+                <canvas id="grafica-registros"></canvas>
+            </div>
+        </section>
+        <!-- FOOTER DE STATS -->
+        <section class="bottom-stats">
             <div></div>
             <div></div>
             <div></div>
-           </section>
-        
+        </section>
+
     </main>
 
-    
+
 </body>
-
-<script >
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
     fetch('./Navbar/Navbar.html')
-.then(res => res.text())
-.then(html =>{
-    document.getElementById('navbar').innerHTML = html;
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('navbar').innerHTML = html;
 
-    <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src='/admin/Navbar/Navbar.js';
-    script.defer = true;
-    document.body.appendChild(script);
+            <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = '/admin/Navbar/Navbar.js';
+            script.defer = true;
+            document.body.appendChild(script);
 
-})
+        })
 </script>
+
 <script type="module" src="./dashboard.js"></script>
 
 </html>

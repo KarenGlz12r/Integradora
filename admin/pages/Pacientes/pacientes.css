@@ -1,0 +1,186 @@
+
+/* MOSTRAR FISIOTERAPEUTAS */
+
+
+.containerm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+
+}
+
+.containerm.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+.text {
+    color: #106e49;
+    font-size: 25px;
+    font-family: 'Segoe UI';
+    font-weight: 900;
+}
+
+.fisio-content {
+    display: grid;
+    grid-template-columns: 5fr 2.5fr;
+    /*TABLA MÁS ANCHA QUE DETALLE*/
+    gap: 1.5rem;
+}
+
+.fisio-table-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    overflow-x: auto;
+}
+
+/* TABLA DE FISIOTERAPEUTA */
+.fisio-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fisio-table th {
+    text-align: left;
+    padding: 0.75rem;
+    color: #666;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #e6e9ed;
+}
+
+.fisio-table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.fisio-table tr:hover {
+    background-color: #f8f8f8;
+}
+
+/* ESTADOS BADGES */
+
+.badge-activo {
+    background-color: #d4e8e0;
+    color: #275e42;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.badge-inactivo {
+    background-color: #f0f0f0;
+    color: #888;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* BOTONES DE ACCION */
+.btn-ver {
+    padding: 4px 8px;
+    margin: 3px 4px;
+    border: none;
+    border-radius: 10px;
+    background-color: #106e49;
+    color: #cceada;
+}
+
+.btn-editar {
+    padding: 4px 8px;
+    margin: 3px 4px;
+    border-radius: 10px;
+    border: none;
+    background-color: #b8c868;
+    color: #454545;
+}
+
+/* PANEL DE DE DETALLE */
+.fisio-detail {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    height: fit-content;
+}
+
+.detail-placeholder {
+    color: #aaa;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* DETALLES */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: #275e42;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.detail-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #275e42;
+}
+
+.detail-header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.detail-info p {
+    font-size: 0.9rem;
+    margin: 0.4rem 0;
+    color: #444;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-estado {
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #275e42;
+    color: white;
+    font-size: 0.85rem;
+}
+
+/* REGISTRAR */
+.btn-registrar {
+    background-color: #275e42;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-registrar:hover {
+    background-color: #4F7F6A;
+}
