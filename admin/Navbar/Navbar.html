@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="Navbar.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navbar</title>
 </head>
@@ -23,6 +24,10 @@
             </div>
         </div>
         <div class="right">
+            <div class="user-name">
+                  <h2 id="name-user" class="nombre"></h2>
+            </div>
+          
                 <!-- DROPDOWN -->
             <div class="user-menu">
                 <div class="user-avatar" onclick="toggleDropdown()">
@@ -52,31 +57,25 @@
             <ul>
                 <li>
                   
-                    <a href="/admin/dashboard.html" class="selected">
-                        <img src="/admin/icons/home-1-svgrepo-com.svg" alt="">
-                        <span>Inicio</span>
+                    <a href="/admin/dashboard.html">
+                        <i class="fa-solid fa-house"></i><span>Inicio</span>
                     </a>
                 </li>
                 <li>
                     <a href="/admin/pages/Fisioterapeutas/MostrarFisioterapeutas.html">
-                        <img src="/admin/icons/doctor-svgrepo-com.svg" alt="">
-                        <span>Fisioterapeutas</span>
+                        <i class="fa-solid fa-book-medical"></i><span>Fisioterapeutas</span>
                     </a>
                 </li>
                 <li>
                     <a href="/admin/pages/Pacientes/MostrarPacientes.html">
-                        <img src="/admin/icons/people-svgrepo-com.svg" alt="">
-                        <span>Pacientes</span>
+                        <i class="fa-solid fa-users"></i><span>Pacientes</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <img src="/admin/icons/activity-solid-svgrepo-com.svg" alt="">
-                        <span>Reportes</span>
+                    <a href="/admin/Reportes/reportes.html">
+                        <i class="fa-solid fa-chart-line" ></i><span>Reportes</span>
                     </a>
                 </li>
-<!-- 
-              <script type="module" src="./Navbar.js"></script> -->
             </ul>
         </nav>
     </div>

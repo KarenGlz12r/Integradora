@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./reportes.css">
+    <link rel="stylesheet" href="../Navbar/Navbar.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes</title>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="containerm">
+        <!-- ENCABEZADO -->
+        <div class="page-header">
+            <div class="text">
+                <p>Reportes</p>
+            </div>
+            <div class="report-actions">
+                <!-- ACCIONES DE EXPORTACIÓN -->
+                <button class="btn-export" onclick="exportarPDF()">Exportar PDF</button>
+                <button class="btn-export btn-excel" onclick="exportarExcel()">Exportar Excel</button>
+            </div>
+        </div>
+
+        <div class="report-group">
+            <h2 class="group-title">Análisis de crecimiento</h2>
+            <!-- TARJETA INGRESO TOTAL -->
+            <section class="report-section">
+                <h2 class="section-title">Resumen financiero</h2>
+                <div class="stats-section" style="margin-bottom: 0;">
+                    <div class="card">
+                        <div class="tools">
+                            <div class="circle"><span class="red box"></span></div>
+                            <div class="circle"><span class="yellow box"></span></div>
+                            <div class="circle"><span class="green box"></span></div>
+                        </div>
+                        <div class="card__content">
+                            <p class="stat-label">Ingreso total acumulado</p>
+                            <h2 class="stat-valor" id="ingreso-total">--</h2>
+                            <div id="crec-ingresos"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="tools">
+                            <div class="circle"><span class="red box"></span></div>
+                            <div class="circle"><span class="yellow box"></span></div>
+                            <div class="circle"><span class="green box"></span></div>
+                        </div>
+                        <div class="card__content">
+                            <p class="stat-label">Total de citas</p>
+                            <h2 class="stat-valor" id="total-citas">--</h2>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="tools">
+                            <div class="circle"><span class="red box"></span></div>
+                            <div class="circle"><span class="yellow box"></span></div>
+                            <div class="circle"><span class="green box"></span></div>
+                        </div>
+                        <div class="card__content">
+                            <p class="stat-label">Pagos pendientes</p>
+                            <h2 class="stat-valor" id="pagos-pendientes">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- CRECIEMIENTO MENSUAL -->
+            <section class="report-section" id="seccion-grafica">
+                <h2 class="section-title">Crecimiento mensual</h2>
+                <div class="chart-container">
+                    <canvas id="grafica-crecimiento"></canvas>
+                </div>
+            </section>
+            <!-- SECCION DE TENDENCIA -->
+            <section class="report-section" id="seccion-grafica">
+                <h2 class="section-title">Tendencia de crecimiento vs mes anterior</h2>
+                <div class="chart-container">
+                    <canvas id="grafica-tendencia"></canvas>
+                </div>
+            </section>
+            <!-- INGRESOS POR MES -->
+            <section class="report-section">
+                <h2 class="section-title">Ingresos por mes</h2>
+                <div class="chart-container">
+                    <canvas id="grafica-ingresos"></canvas>
+                </div>
+            </section>
+        </div>
+<!-- GRUPO REGISTROS -->
+<div class="report-group">
+    <h2 class="group-title">Registros del sistema</h2>
+
+    <!-- CITAS POR FISIOTERAPEUTA -->
+    <div class="graficas-grid">
+        <div class="graficas-col">
+            <section class="report-section">
+                <h2 class="section-title">Citas por fisioterapeuta</h2>
+                <div class="chart-container">
+                    <canvas id="grafica-citas-fisio"></canvas>
+                </div>
+            </section>
+        </div>
+        <div class="resumen-col">
+            <div class="resumen-card">
+                <p class="resumen-label">Citas confirmadas</p>
+                <h2 class="resumen-valor" id="citas-confirmadas">--</h2>
+            </div>
+            <div class="resumen-card">
+                <p class="resumen-label">Citas pendientes</p>
+                <h2 class="resumen-valor" id="citas-pendientes">--</h2>
+            </div>
+            <div class="resumen-card">
+                <p class="resumen-label">Fisios activos</p>
+                <h2 class="resumen-valor" id="fisios-activos">--</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- FISIOTERAPEUTAS -->
+    <section class="report-section" id="seccion-fisios">
+        <div class="section-header">
+            <h2 class="section-title">Fisioterapeutas registrados</h2>
+            <span class="badge-count" id="count-fisios">---</span>
+        </div>
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th>Cédula</th>
+                    <th>Turno</th>
+                    <th>Experiencia</th>
+                    <th>Estado</th>
+                    <th>Registrado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-fisios"></tbody>
+        </table>
+    </section>
+
+    <!-- USUARIOS -->
+    <section class="report-section" id="seccion-usuarios">
+        <div class="section-header">
+            <h2 class="section-title">Usuarios registrados</h2>
+            <span class="badge-count" id="count-usuarios">---</span>
+        </div>
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Registrado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-usuarios"></tbody>
+        </table>
+    </section>
+
+</div>
+
+    </main>
+
+    <!-- SCRIPTS PARA GRÁGICAS Y PARA EXPORTAR -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        fetch('../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+
+                <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../Navbar/Navbar.js';
+                script.defer = true;
+                document.body.appendChild(script);
+
+            })
+    </script>
+
+    <!-- SCRIPT  PARA TRAER LAS FUNCIONES -->
+    <script type="module" src="./reportes.js"></script>
+</body>
+
+</html>

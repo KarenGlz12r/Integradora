@@ -113,7 +113,7 @@ async function cargarGraficaRegistros() {
     hace6Meses.setMonth(hace6Meses.getMonth() - 5);
     hace6Meses.setDate(1);
     hace6Meses.setHours(0, 0, 0, 0);
-    const desde = hace6Meses.toISOString(); // ✅ faltaban los paréntesis
+    const desde = hace6Meses.toISOString(); 
 
     const [
         { data: dataUsuarios, error: errorUsu },
@@ -170,9 +170,9 @@ async function cargarGraficaRegistros() {
                 {
                     label: "Usuarios",
                     data: totalesUsuarios,
-                    backgroundColor: "#1D9E75",
-                    borderColor: "#0F6E56",
-                    borderWidth: 1,
+                    backgroundColor: "#1527CB",
+                    borderColor: "#3174AA",
+                    borderWidth: 2,
                     borderRadius: 6
                 },
                 {

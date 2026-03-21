@@ -1,5 +1,6 @@
 /* LETRA NUNITO SANS */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+/* NAVBAR */
 
 /*  COLORES*/
 
@@ -222,6 +223,7 @@ header {
 .sidebar.menu-toggle .sidebar-logo img{
     width: 6rem;
 }
+
 /* MENU DROPDOWN */
 
 .user-menu{
@@ -231,6 +233,7 @@ header {
 .user-avatar{
     border-radius: 45%;
     display: flex;
+    border: 2px solid rgb(94, 95, 95);
     justify-content: center;
     align-items: center;
     width: 3rem;
@@ -250,12 +253,13 @@ header {
     position: absolute;
     right: 0;
     top: 2.8rem;
-    background: white;
+    background: rgba(48, 117, 60, 0.697);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     width: 200px;
     z-index: 999;
+    color: #c5d9d2;
 }
 
 .dropdown.active{
@@ -277,7 +281,8 @@ header {
 }
 
 .dropdown ul li:hover{
-    background-color: var(--background-hover);
+    background-color: #a4ee76de;
+    color: #000;
 }
 
 .dropdown ul li img{

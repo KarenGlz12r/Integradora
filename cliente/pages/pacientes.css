@@ -1,0 +1,198 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.main-content{
+    margin-top: 3.5rem;
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+    margin-left: 4rem;
+}
+
+.main-content.menu-toggle{
+    margin-left: 18.75rem;
+}
+
+/* CARDS */
+
+.cards-info{
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0.5rem;
+
+}
+.card-info{
+
+    width: 100%;
+    height: 120px;
+    background-color: #fafffa;
+    border-radius: 20px;
+    z-index: 1;
+    border: 1px solid #C8E6C9;
+    box-shadow: 3px 3px 9px 2px #2c2c2a;
+}
+
+.card-content{
+    padding: 1rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+}
+.stat-label {
+    font-size: 14px;
+    color: #303a33;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-valor {
+    font-size: 25px;
+    font-weight: 600;
+    color: #242420;
+    margin: 0;
+    line-height: 1;
+    gap: 1rem;
+}
+
+/* PARA LA INFORMACION DE LOS PACIENTES */
+.cards-info-pac{
+   
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card-pac{
+    height: 150px;
+    width: 100%;
+    background-color: rgb(247, 255, 248);
+    border-radius: 20px;
+    z-index: 1;
+    border: 1px solid #C8E6C9;
+    box-shadow: 3px 3px 9px 2px #2c2c2a;
+    
+}
+.text {
+    color: #106e49;
+    font-size: 25px;
+    font-family: 'Segoe UI';
+    font-weight: 900;
+    display: flex;
+    gap: 1rem;
+}
+
+/* ICONOS */
+.bi-people {
+  font-size: 30px;
+  color: rgb(17, 173, 17);
+}
+
+.bi-calendar2-check{
+    color: #1e721e;
+    font-size: 28px;
+}
+.bi-calendar2-week{
+     color: #1e721e;
+    font-size: 28px;
+
+}
+.bi-person-lines-fill{
+    color: #1e721e;
+    font-size: 28px;
+
+    
+}
+
+/* SEPARACION DE LAS SECCIONES */
+.seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1rem;
+  margin: 2rem 0 1rem;
+  justify-content: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #add6af;
+}
+
+.seccion-header h2 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #233124;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin: 0;
+}
+
+.total-badge {
+  font-size: 15px;
+  color: #273327;
+  border: 1px solid #C8E6C9;
+ background-color: #E8F5E9;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+/* BARRA DE BUSQUEDA */
+.input-wrapper {
+  position: relative;
+  width: 250px;
+  height: 50px;
+}
+
+/* INPUT */
+.input {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  background-color: #139143;
+  color: white;
+  padding: 10px 40px 10px 10px;
+  box-shadow: 0px 0px 3px #f3f3f3;
+  position: absolute;
+  transition: all 500ms cubic-bezier(0, 0.110, 0.35, 2);
+}
+
+/* ICONO */
+.icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  color: white;
+}
+
+
+.input:focus,
+.icon:focus ~ .input {
+  width: 250px;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 3px solid #177c48;
+  padding-left: 15px;
+  padding-right: 50px;
+}
+
+
+/* COLOR DEL ICONO */
+.input:focus ~ .icon i,
+.icon:focus i {
+  color: #22aa32;
+  padding-left: 400px;
+}

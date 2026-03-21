@@ -1,0 +1,370 @@
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", sans-serif;
+}
+/* ── REPORTES ── */
+.report-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-export {
+    padding: 8px 18px;
+    background: #534AB7;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-export:hover  { background: #3C3489; }
+.btn-excel         { background: #1D9E75; }
+.btn-excel:hover   { background: #0F6E56; }
+
+.report-section {
+    background: #fff;
+    border: 0.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #036a1d;
+    margin: 0 0 1rem;
+     font-family: 'Segoe UI';
+}
+
+.badge-count {
+    background: #f0eeff;
+    color: #534AB7;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.chart-container {
+    max-height: 300px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 600px;
+}
+
+.report-table th {
+    text-align: left !important;
+    padding: 10px 12px;
+    border-bottom: 1.5px solid #e0e0e0;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+     font-family: 'Segoe UI';
+}
+
+.report-table td {
+    padding: 10px 12px;
+    border-bottom: 0.5px solid #f0f0f0;
+    color: #333;
+    text-align: left;
+}
+
+.report-table tr:last-child td {
+    border-bottom: none;
+}
+
+.report-table tr:hover td {
+    background: #fafafa;
+}
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+    flex-direction: column;
+    margin-left: 4rem;
+    width: 100%;
+    padding: 0;
+}
+.text {
+    color: #106e49;
+    font-size: 25px;
+    font-family: 'Segoe UI';
+    font-weight: 900;
+}
+.containerm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+    box-sizing: border-box;
+    width: calc(100%-4rem);
+    overflow-x: hidden;
+
+}
+
+.containerm.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+.stats-section .card {
+ width: 100%;
+ height: 150px;
+ margin: 0 auto;
+ background-color: #eef0efbe;
+ border-radius: 8px;
+ z-index: 1;
+}
+
+.tools {
+ display: flex;
+ align-items: center;
+ padding: 9px;
+}
+
+.circle {
+ padding: 0 4px;
+}
+
+.box {
+ display: inline-block;
+ align-items: center;
+ width: 10px;
+ height: 10px;
+ padding: 1px;
+ border-radius: 50%;
+}
+
+.red {
+ background-color: #036030;
+}
+
+.yellow {
+ background-color: #0bb563;
+}
+
+.green {
+ background-color: #00ca4e;
+}
+.card__content {
+    padding: 1rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+}
+.stat-label {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-valor {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c2c2a;
+    margin: 0;
+    line-height: 1;
+}
+/* ── LAYOUT GRÁFICAS + TARJETAS ── */
+.graficas-grid {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: start;
+   
+}
+
+.graficas-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.resumen-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: sticky;
+    top: 1rem;        /* se queda fijo mientras scrolleas */
+}
+
+/* ── TARJETAS DE RESUMEN ── */
+.resumen-card {
+    background: #f9fff9;
+    border: 0.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.resumen-label {
+    font-size: 12px;
+    color: #6f6f6f;
+    margin: 0 0 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.resumen-valor {
+    font-size: 25px;
+    font-weight: 700;
+    color: #0c4514;
+    margin: 0;
+    line-height: 1;
+}
+
+.resumen-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 28px;
+    opacity: 0.15;
+}
+
+
+/* ── GRUPO DE SECCIONES ── */
+.report-group {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    text-align: center;
+
+}
+
+.group-title {
+    color: #057a55;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #0dcc6a;
+    display: inline-block;
+    font-size: 25px;
+    font-family: 'Segoe UI';
+    font-weight: 900;
+}
+/* ── GRÁFICAS CENTRADAS Y ANCHO COMPLETO ── */
+.chart-container {
+    width: 100%;
+    max-height: 350px;
+    display: flex;
+    justify-content: center;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    max-height: 350px;
+}
+/* ── SEPARADOR ENTRE GRUPOS ── */
+.report-group + .report-group {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1rem;
+}
+/* ── RESPONSIVE MÓVIL ── */
+@media (max-width: 768px) {
+
+    .containerm {
+        margin-left: auto;
+        width: 90%;
+        padding: 1rem;
+        margin-top: 5rem;
+    }
+
+    /* TARJETAS FINANCIERAS */
+    .stats-section {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-section .card {
+        height: auto;
+        min-height: 100px;
+    }
+
+    /* BOTONES EXPORTAR */
+    .report-actions {
+        flex-direction: column;
+
+    }
+
+    .btn-export {
+        text-align: center;
+    }
+
+    /* PÁGINA HEADER */
+    .page-header {
+        margin-left: 0;
+        width: 90%;
+    }
+
+    /* GRÁFICAS */
+    .graficas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .resumen-col {
+        flex-direction: row;
+        flex-wrap: wrap;
+        position: static;
+    }
+
+    .resumen-card {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    /* TABLAS */
+    .report-table {
+        font-size: 11px;
+        min-width: unset;
+    }
+
+    .report-table th:nth-child(3),
+    .report-table td:nth-child(3),
+    .report-table th:nth-child(4),
+    .report-table td:nth-child(4),
+    .report-table th:nth-child(5),
+    .report-table td:nth-child(5) {
+        display: none;
+    }
+}
+
+
+

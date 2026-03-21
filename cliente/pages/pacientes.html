@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../Navbar/Navbar.css">
+    <link rel="stylesheet" href="./pacientes.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes</title>
+</head>
+
+<body>
+
+    <div id="navbar"></div>
+    <main class="main-content">
+        <div class="text">
+            <i class="bi bi-people"></i>
+            <p>Mis pacientes</p>
+
+        </div>
+
+        <section class="cards-info">
+            <div class="card-info">
+                <div class="card-content">
+                    <p class="stat-label">Total pacientes:</p>
+                    <h2 class="stat-valor" id="pacientes">
+                        <i class="bi bi-person-lines-fill"></i>
+                        3
+                    </h2>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-content">
+                    <p class="stat-label">Citas este mes:</p>
+                    <h2 class="stat-valor" id="citas">
+                        <i class="bi bi-calendar2-week"></i>
+                        3
+                    </h2>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-content">
+                    <p class="stat-label">Próxima cita:</p>
+                    <h2 class="stat-valor" id="fecha">
+                        <i class="bi bi-calendar2-check"></i>
+                        20 Mar
+                    </h2>
+                </div>
+            </div>
+        </section>
+        <div class="seccion-header">
+            <h2>Pacientes registrados</h2>
+            <span class="total-badge" id="cantidad-pacientes">3 pacientes</span>
+        </div>
+        <section class="pacientes-info">
+            <div class="input-wrapper">
+                <input id="search" placeholder="Buscar paciente..." class="input" type="text">
+
+                <label for="search" class="icon">
+                    <i class="bi bi-search" style="font-size: 18px;"></i>
+                </label>
+            </div>
+            <div class="cards-info-pac">
+                <div class="card-pac">
+                    <div class="card-content">
+                        Hola
+                        <div class="cita"></div>
+                        <div class="motivo">Dolor</div>
+                        <div class="estado"></div>
+
+                    </div>
+                </div>
+                <div class="card-pac">
+                    <div class="card-content">
+                        Hola
+                        <div class="cita"></div>
+                        <div class="motivo">Dolor</div>
+                        <div class="estado"></div>
+                    </div>
+                </div>
+                <div class="card-pac">
+                    <div class="card-content">
+                        Hola
+                        <div class="cita"></div>
+                        <div class="motivo">Dolor</div>
+                        <div class="estado"></div>
+                    </div>
+                </div>
+                <div class="card-pac">
+                    <div class="card-content">
+                        Hola
+                        <div class="cita"></div>
+                        <div class="motivo">Dolor</div>
+                        <div class="estado"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        fetch('../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+
+                <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../Navbar/Navbar.js';
+                document.body.appendChild(script);
+
+            })
+    </script>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
