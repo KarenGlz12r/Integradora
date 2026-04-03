@@ -1,19 +1,13 @@
-/* LETRA NUNITO SANS */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
 :root {
-    --background-color: #9b1b6e;        /* fucsia oscuro — navbar/sidebar */
-    --text-title-color: #6d0f4e;        /* fucsia muy oscuro — títulos */
-    --text-color: #ffffff;              /* blanco puro — texto sobre fucsia */
-    --icon-color: #6d0f4e;
-    --icon-menu-color: #3d0030;
-    --menu-color: #ffffff;              /* líneas del menú hamburguesa */
-
-    --text-select-color: #8b1560;       /* fucsia medio — texto seleccionado */
-    --background-selected: #fce4f3;    /* rosa muy pálido — fondo seleccionado */
-    --background-hover: #f7c9e8;       /* rosa suave — hover */
-
-    --border-color: #e8a0d0;           /* rosa claro — bordes */
+    --background-color: #9b1b6e;
+    --text-color: #ffffff;
+    --menu-color: #ffffff;
+    --text-select-color: #8b1560;
+    --background-selected: #fce4f3;
+    --background-hover: #f7c9e8;
+    --border-color: #e8a0d0;
 }
 
 * {
@@ -28,9 +22,12 @@ body {
     height: 100vh;
 }
 
+/* ── HEADER ── */
 header {
     width: 100%;
     display: flex;
+    height: 3.5rem;
+    align-items: center;
     justify-content: space-between;
     padding: 0.45rem 2rem 0.45rem 1.27rem;
     border-bottom: 1px solid var(--border-color);
@@ -41,42 +38,20 @@ header {
     z-index: 200;
 }
 
-.sidebar ul,
-.sidebar ul li {
-    list-style: none !important;
-    padding-left: 0 !important;
-    margin: 0 !important;
-}
-
-.right {
+.left {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 1.6rem;
+    gap: 1.4rem;
 }
 
-.right a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s ease;
+.brand {
+    color: #fce4f3;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 1px;
 }
 
-.right a:hover {
-    background-color: var(--background-hover);
-}
-
-.right img {
-    width: 1.5rem;
-    margin: 0.5rem;
-}
-
-.right .user {
-    width: 2.1rem;
-    border-radius: 50%;
-}
-
+/* ── MENÚ HAMBURGUESA ── */
 .menu-container {
     height: 100%;
     display: flex;
@@ -109,26 +84,99 @@ header {
     transform: rotate(40deg) translate(-30%, -150%);
 }
 
-.brand {
+/* ── RIGHT ── */
+.right {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.6rem;
+    gap: 1.6rem;
 }
 
-.left {
+.user-name h2 {
+    color: #fce4f3;
+    font-size: 16px;
+    font-style: oblique;
+}
+
+/* ── AVATAR Y DROPDOWN ── */
+.user-menu {
+    position: relative;
+    cursor: pointer;
+    display: flex;         /* Agregado */
+    align-items: center;   /* Agregado */
+    flex-shrink: 0;
+}
+
+.user-avatar {
+    border-radius: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.5rem;
+    height: 3.3rem;
+    min-height: 3em;
+    min-width: 3rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 3.2rem;
+    background: #7a1254;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    z-index: 999;
+}
+
+.dropdown.active {
+    display: block;
+}
+
+.dropdown ul {
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+.dropdown ul li {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 1.4rem;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.brand .logo {
-    width: 2rem;
+.dropdown ul li:hover {
+    background-color: var(--background-hover);
+    color: #3d0030;
 }
 
+.dropdown ul li img {
+    width: 1.2rem;
+    filter: brightness(0) invert(1); /* los iconos se ven blancos */
+}
+
+.dropdown ul li:hover img {
+    filter: none; /* al hacer hover vuelven a color normal */
+}
+
+/* ── SIDEBAR ── */
 .sidebar {
-    margin-top: 3rem;
+    margin-top: 3.5rem;
     width: 4rem;
     height: 100%;
     position: fixed;
@@ -138,12 +186,22 @@ header {
     padding: 1.1rem 0;
     border-right: 1px solid var(--border-color);
     overflow-y: auto;
-    background-color: #85155d;          /* fucsia ligeramente más claro que el header */
+    background-color: #85155d;
     transition: width 0.3s ease;
 }
 
 .sidebar.menu-toggle {
     width: 18.75rem;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    list-style: none;
 }
 
 .sidebar a {
@@ -162,18 +220,29 @@ header {
 
 .sidebar a:hover {
     background-color: var(--background-hover);
-    color: #3d0030;                     /* fucsia muy oscuro para legibilidad */
+    color: #3d0030;
 }
 
-.sidebar img {
-    width: 1.6rem;
+.sidebar a:hover .fa-solid {
+    color: #3d0030;
 }
 
 .sidebar a.selected {
-    color: var(--text-select-color);
     background-color: var(--background-selected);
+    color: var(--text-select-color);
 }
 
+.sidebar a.selected .fa-solid {
+    color: var(--text-select-color);
+}
+
+.fa-solid {
+    font-size: 20px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+/* ── LOGO SIDEBAR ── */
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -185,7 +254,7 @@ header {
 }
 
 .sidebar-logo img {
-    width: 3rem;
+    width: 2.5rem;
     transition: width 0.3s ease;
 }
 
@@ -193,84 +262,48 @@ header {
     width: 7rem;
 }
 
-.user-menu {
-    position: relative;
-    cursor: pointer;
+/* ── FIX Bootstrap conflict ── */
+
+#navbar .user-avatar {
+    width: 3.3rem !important;
+    height: 3.3rem !important;
+    min-width: 3rem !important;
+    min-height: 3rem !important;
+    max-width: 2.8rem !important;
+    max-height: 2.8rem !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    border-radius: 45% !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
 }
 
-.user-avatar {
-    border-radius: 45%;
-    display: flex;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    justify-content: center;
-    align-items: center;
-    width: 3rem;
-    height: 3rem;
-    overflow: hidden;
-    flex-shrink: 0;
-    color: black;
+#navbar .user-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;     /* cancela Bootstrap reboot */
+    object-fit: cover !important;
+    display: block !important;
+    flex-shrink: 0 !important;
 }
 
-.user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+#navbar header {
+    height: 3.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
 }
 
-.dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 2.8rem;
-    background: #7a1254;               /* fucsia oscuro semisólido */
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    width: 200px;
-    z-index: 999;
-    color: #ffffff;
+#navbar .right {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    gap: 1rem !important;
 }
 
-.dropdown.active {
-    display: block;
-}
-
-.dropdown ul {
-    list-style: none;
-    padding: 0.5rem 0;
-    margin: 0;
-}
-
-.dropdown ul li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: var(--text-color);
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.dropdown ul li:hover {
-    background-color: var(--background-hover);
-    color: #3d0030;
-}
-
-.dropdown ul li img {
-    width: 1.2rem;
-}
-
-/* ICONOS */
-/* ICONOS */
-.fa-solid{
-    font-size: 20px;
-}
-
+/* ── RESPONSIVE ── */
 @media (max-width: 500px) {
-    .right .icons-header {
-        display: none;
-    }
-
     .sidebar {
         width: 0;
     }
@@ -287,5 +320,36 @@ header {
     .menu.menu-toggle div:last-child {
         width: 100%;
         transform: rotate(50deg) translate(-0.3rem, -0.4rem);
+    }
+
+    .right {
+        width: auto;         
+        gap: 0.5rem;
+        margin-left: 0;       
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    #navbar .user-avatar {
+        width: 2rem !important;
+        height: 2rem !important;
+        min-width: 2rem !important;
+        min-height: 2rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #navbar header {
+        padding: 0 1rem 0 0.75rem;
+    }
+
+    .user-name h2 {
+        font-size: 13px;
+    }
+
+    .sidebar.menu-toggle {
+        width: 14rem;
     }
 }

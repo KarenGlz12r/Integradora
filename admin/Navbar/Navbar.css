@@ -109,6 +109,8 @@ header {
     align-items: center;
     width: 3.2rem;
     height: 3.2rem;
+    min-height: 3rem;
+    min-width: 3rem;
     overflow: hidden;
     flex-shrink: 0;
     border: 2px solid rgba(255, 255, 255, 0.35);
@@ -255,10 +257,7 @@ header {
     width: 7rem;
 }
 
-/* ICONOS */
-.sidebar .fa-solid{
-    font-size: 90px;
-}
+
 
 /* ── RESPONSIVE ── */
 @media (max-width: 500px) {
