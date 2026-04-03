@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* REGISTRAR */
+.btn-registrar {
+    background-color: #275e42;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    white-space: nowrap; /*  evita que el texto se rompa */
+}
+
+.btn-registrar:hover {
+    background-color: #4F7F6A;
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+    margin-left: 4.5rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0; /*  permite que el contenido se encoja */
+    overflow: hidden; /*  evita desbordamiento */
+}
+
+.main-content.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+/* ENCABEZADO */
+.page-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0;
+    flex-wrap: nowrap; /*  mantiene en una sola fila */
+    gap: 1rem; /*  espacio entre texto y botón */
+    min-width: 0; /*  permite encogerse */
+}
+
+.page-header .text {
+    min-width: 0; /*  permite que el texto se encoja */
+    overflow: hidden;
+    text-overflow: ellipsis; /*  agrega ... si no cabe */
+    white-space: nowrap;
+}
+
+.page-header .button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0; /*  el botón nunca se encoge ni desaparece */
+}
+
+.text {
+    color: #106e49;
+    font-size: 25px;
+    font-family: 'Segoe UI';
+    font-weight: 900;
+}
+/* ================================= */
+/* CARDS DONDE SE MUESTRAN LOS VIDEOS */
+
+.card h5 {
+    color: rgb(3, 25, 7);
+    font-size: 14px;
+    font-family: 'Lucida Sans';
+    letter-spacing: 2px;
+}
+
+/* ICONOS */
+.bi {
+    font-size: 30px;
+}
+
+.card {
+    width: 17.5rem !important;
+    min-height: 480px !important;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 5px 9px 10px 8px rgb(120, 119, 120);
+}
+#videos-disponibles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+}
+
+/*  Imagen uniforme */
+.card-img-top {
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: cover !important;
+}
+
+
+.card-body {
+    width: 100%;
+    padding: 1rem;  
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-text {
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+/* Botones siempre al fondo */
+.btn-accion {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+}
+.objetivo-text {
+    background-color: #9f367e;
+    color: rgb(255, 255, 255);
+    width: fit-content;
+    padding: 3px 10px;
+    border-radius: 30px;
+}
+
+.no-result {
+    margin-top: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+
+}

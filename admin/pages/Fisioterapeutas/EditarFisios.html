@@ -1,76 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../admin.css">
-    <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Fisioterapeutas</title>
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="../../admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Editar Fisioterapeuta</title>
 </head>
-
 <body>
+
     <div id="navbar"></div>
+
     <main class="containerm">
-        <div class="text">
-            <p>Editar fisioterapeuta</p>
+        <div class="page-header">
+            <div class="text">
+                <p>Editar fisioterapeuta</p>
+            </div>
+            <div class="button">
+                <a href="./MostrarFisioterapeutas.html" class="btn-registrar">← Ver fisioterapeutas</a>
+            </div>
         </div>
 
         <div class="edit-form-container">
             <form id="form-editar" class="form-grid">
+                <div id="alert-container"></div>
 
-                <span>Información personal</span> <!-- fila completa -->
+                <p class="form-section-title">Información personal</p>
+                
 
                 <div class="form-grupo">
-                    <label>Nombre</label>
+                    <label for="nombre">Nombre</label>
                     <input type="text" class="input" id="nombre" required disabled>
                 </div>
                 <div class="form-grupo">
-                    <label>Apellido paterno</label>
+                    <label for="apellido_paterno">Apellido paterno</label>
                     <input type="text" class="input" id="apellido_paterno" disabled>
                 </div>
                 <div class="form-grupo">
-                    <label>Email de contacto</label>
-                    <input type="text" class="input" id="email_contacto">
+                    <label for="email_contacto">Email de contacto</label>
+                    <input type="email" class="input" id="email_contacto">
                 </div>
                 <div class="form-grupo">
-                    <label>Teléfono</label>
+                    <label for="telefono">Teléfono</label>
                     <input type="text" class="input" id="telefono">
                 </div>
 
-                <span>Información profesional</span> <!-- fila completa -->
+                <p class="form-section-title">Información profesional</p>
 
                 <div class="form-grupo">
-                    <label>Especialidad</label>
+                    <label for="especialidad">Especialidad</label>
                     <input type="text" class="input" id="especialidad" disabled>
                 </div>
                 <div class="form-grupo">
-                    <label>Cédula profesional</label>
+                    <label for="cedula_profesional">Cédula profesional</label>
                     <input type="text" class="input" id="cedula_profesional" disabled>
                 </div>
                 <div class="form-grupo">
-                    <label>Años de experiencia</label>
-                    <input type="text" class="input" id="anios_experiencia">
+                    <label for="anios_experiencia">Años de experiencia</label>
+                    <input type="number" min="0" class="input" id="anios_experiencia">
                 </div>
                 <div class="form-grupo">
-                    <label>Turno</label>
-                    <select id="turno">
+                    <label for="turno">Turno</label>
+                    <select id="turno" class="field-select">
                         <option value="Mañana">Mañana</option>
                         <option value="Tarde">Tarde</option>
                         <option value="Noche">Noche</option>
                     </select>
                 </div>
                 <div class="form-grupo">
-                    <label>Estado</label>
-                    <select id="estado">
+                    <label for="estado">Estado</label>
+                    <select id="estado" class="field-select">
                         <option value="Activo">Activo</option>
                         <option value="Inactivo">Inactivo</option>
                     </select>
                 </div>
 
-                <div class="form-actions"> <!-- fila completa via css -->
-                    <button class="btn-editarR" type="submit">Guardar cambios</button>
+                <div class="form-actions">
                     <a href="./MostrarFisioterapeutas.html" class="btn-cancelar">Cancelar</a>
+                    <button class="btn-editarR" type="submit">Guardar cambios</button>
                 </div>
 
             </form>
@@ -86,13 +94,12 @@
                 script.type = 'module';
                 script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
-            })
+            });
     </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./EditarFisios.js"></script>
     <script type="module" src="./fisioterapeutas.js"></script>
 
-
-
 </body>
-
 </html>

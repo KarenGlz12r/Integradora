@@ -160,7 +160,7 @@ cargarNombre();
 
 async function cerrarSesion() {
     await supabase.auth.signOut();
-    window.location.href = "../Login.html";
+    window.location.href = "../../../Login.html";
 }
 
 window.toggleDropdown = toggleDropdown;

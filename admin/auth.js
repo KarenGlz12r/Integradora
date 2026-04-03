@@ -212,8 +212,8 @@ function mostrarAlerta(mensaje, tipo = "warning") {
            ${mensaje}
     </div>`;
 
-    // CERRAR AUTMATICAMENTE LUEGO DE 10 SEGUNDOS
-    setTimeout(() =>container.innerHTML ="", 10000);
+    // CERRAR AUTMATICAMENTE LUEGO DE 5 SEGUNDOS
+    setTimeout(() =>container.innerHTML ="", 5000);
 }
 
 window.registrarFisioterapeuta = registrarFisioterapeuta;

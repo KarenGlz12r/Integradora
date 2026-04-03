@@ -1,0 +1,729 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+/* ══════════════════════════════════════════
+   VARIABLES
+══════════════════════════════════════════ */
+:root {
+    --color-primary:    #9b1b6e;
+    --color-primary-dk: #7a1254;
+    --color-primary-lt: #fce4f3;
+    --color-hover:      #f7c9e8;
+    --color-text-dark:  #3d0030;
+    --color-border:     #e8a0d0;
+    --color-white:      #ffffff;
+}
+
+/* ══════════════════════════════════════════
+   GLOBALES
+══════════════════════════════════════════ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+/* ══════════════════════════════════════════
+   LAYOUT PRINCIPAL
+══════════════════════════════════════════ */
+.main-content {
+    margin-left: 4rem;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+    transition: margin-left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-content.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+/* ══════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════ */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.page-header .button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.text {
+    color: var(--color-primary);
+    font-size: 25px;
+    font-weight: 900;
+}
+
+/* ══════════════════════════════════════════
+   BOTÓN REGISTRAR
+══════════════════════════════════════════ */
+.btn-registrar {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-registrar:hover {
+    background-color: var(--color-primary-dk);
+    color: var(--color-white);
+}
+
+/* ══════════════════════════════════════════
+   BARRA DE BÚSQUEDA Y FILTROS
+══════════════════════════════════════════ */
+.content {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.filtros {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 5px;
+    margin-top: 0.5rem;
+}
+
+.barra {
+    position: relative;
+    width: 90%;
+}
+
+.input {
+    background-color: #fafafa;
+    border: 1px solid var(--color-border);
+    border-radius: 15px;
+    font-size: 16px;
+    padding: 10px 40px 10px 15px;
+    width: 100%;
+    height: 50px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.input:focus {
+    border: 2px solid var(--color-primary);
+    background-color: #fff;
+}
+
+.input:disabled {
+    background-color: #f5f0f0;
+    color: #a3a3a3;
+}
+
+.input:read-only {
+    background-color: #fafafa;
+    color: #a3a3a3;
+    cursor: not-allowed;
+}
+
+.barra .bi-search {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--color-primary);
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   CHIPS DE FILTRO
+══════════════════════════════════════════ */
+.lista-filtros {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    align-items: center;
+}
+
+.filtro {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
+    font-size: 13px;
+    background-color: var(--color-primary-lt);
+    color: var(--color-primary-dk);
+    border: 1px solid var(--color-border);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.filtro:hover {
+    transform: scale(1.02);
+    background-color: var(--color-hover);
+}
+
+.filtro.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: transparent;
+}
+
+/* ══════════════════════════════════════════
+   TÍTULO DE SECCIÓN
+══════════════════════════════════════════ */
+.titulo-seccion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.titulo {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--color-primary-dk);
+    text-align: center;
+}
+
+.titulo::after {
+    content: "";
+    display: block;
+    width: 320px;
+    height: 3px;
+    background-color: var(--color-primary);
+    margin: 6px auto 0;
+}
+
+/* ══════════════════════════════════════════
+   CARDS DE RUTINAS
+══════════════════════════════════════════ */
+.rutinas-disponibles {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+#rutinas-dis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+}
+
+.card {
+    width: 16rem !important;
+    min-height: 480px !important;
+    border: 1px solid var(--color-border) !important;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.03);
+}
+
+.card-img-top {
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: cover !important;
+}
+
+.card-body {
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.card h5 {
+    color: var(--color-primary-dk);
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+.card-text {
+    font-size: 0.875rem;
+}
+
+.btn-accion {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    margin: 0;
+    width: fit-content;
+}
+.btn-warning{
+    background-color: #af0b8c !important;
+    color: #f5f0f0 !important;
+    border-color: #9b1b6e !important;
+}
+
+/* ══════════════════════════════════════════
+   BADGES / ETIQUETAS
+══════════════════════════════════════════ */
+.info {
+    font-size: 13px;
+    background-color: var(--color-primary-lt);
+    color: var(--color-primary-dk);
+    border-radius: 30px;
+    width: fit-content;
+    padding: 4px 10px;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+}
+
+.objetivo-text {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    width: fit-content;
+    padding: 3px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+}
+
+/* ══════════════════════════════════════════
+   SIN RESULTADOS
+══════════════════════════════════════════ */
+.no-result {
+    margin-top: 1rem;
+    color: var(--color-primary-dk);
+}
+
+/* ══════════════════════════════════════════
+   FORMULARIO (CREAR / EDITAR)
+══════════════════════════════════════════ */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    width: 100%;
+    background-color: var(--color-white);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    box-shadow: 4px 6px 16px rgba(155, 27, 110, 0.12);
+}
+
+.title {
+    font-size: 28px;
+    color: var(--color-primary);
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+
+.title::before,
+.title::after {
+    position: absolute;
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    left: 0;
+    background-color: var(--color-primary);
+}
+
+.title::after {
+    animation: pulse 1s linear infinite;
+}
+
+@keyframes pulse {
+    0%   { transform: scale(1);   opacity: 1; }
+    50%  { transform: scale(1.4); opacity: 0.5; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+.message {
+    color: rgba(88, 87, 87, 0.822);
+    font-size: 20px;
+}
+
+.flex {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+}
+
+/* Labels flotantes */
+.form label {
+    position: relative;
+    display: block;
+}
+
+.form label .input {
+    width: 100%;
+    padding: 18px 10px 5px 10px;
+    outline: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form label span {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: grey;
+    font-size: 0.7em;
+    cursor: text;
+    transition: 0.3s ease;
+    pointer-events: none;
+}
+
+.form label .input:focus + span,
+.form label .input:not(:placeholder-shown) + span {
+    top: 6px;
+    transform: none;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.form label .input:valid:not(:placeholder-shown) + span {
+    color: var(--color-primary-dk);
+}
+
+/* Select */
+.form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Botón submit */
+.submit {
+    border: none;
+    outline: none;
+    background-color: var(--color-primary);
+    padding: 10px;
+    border-radius: 10px;
+    color: var(--color-white);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit:hover {
+    background-color: var(--color-primary-dk);
+}
+
+/* Upload de archivo */
+.separador-img {
+    text-align: center;
+    color: grey;
+    font-size: 13px;
+}
+
+.label-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px dashed var(--color-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: grey;
+    transition: border-color 0.3s;
+}
+
+.label-file:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.input-file {
+    display: none;
+}
+
+/* ══════════════════════════════════════════
+   ICONOS
+══════════════════════════════════════════ */
+.bi-pencil-square {
+    font-size: 30px;
+}
+.bi-arrow-left{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ══════════════════════════════════════════
+   FORM — EDITAR / CREAR
+══════════════════════════════════════════ */
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0.5rem;
+}
+
+.form-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: var(--color-primary-lt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.form-header-icon .bi {
+    font-size: 22px;
+    color: var(--color-primary);
+}
+
+.form .title {
+    font-size: 20px;
+    color: var(--color-primary-dk);
+    font-weight: 700;
+    padding-left: 0;
+    letter-spacing: 0;
+}
+
+/* quita el círculo animado cuando se usa con form-header */
+.form-header ~ * .title::before,
+.form-header ~ * .title::after,
+.form .form-header ~ .title::before,
+.form .form-header ~ .title::after,
+.form-header + div .title::before,
+.form-header + div .title::after {
+    display: none;
+}
+
+.form .title::before,
+.form .title::after {
+    display: none;
+}
+
+.form .message {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+
+/* ── Filas de dos columnas ── */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ── Grupo de campo ── */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-primary-dk);
+    letter-spacing: 0.3px;
+}
+
+.field-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background-color: #fafafa;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-input:focus {
+    border-color: var(--color-primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(155, 27, 110, 0.08);
+}
+
+.field-textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.field-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background-color: #fafafa;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%239b1b6e' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+}
+
+.field-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(155, 27, 110, 0.08);
+}
+
+/* ── Label file mejorado ── */
+.label-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 2px dashed var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    background-color: #fdf5fb;
+}
+
+.label-file .bi {
+    font-size: 28px;
+    color: var(--color-primary);
+}
+
+.label-file span {
+    font-size: 14px;
+    color: #888;
+}
+
+.label-file:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-lt);
+}
+
+.label-file:hover span {
+    color: var(--color-primary-dk);
+}
+
+/* ── Botones del form ── */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-cancelar {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1.5px solid var(--color-border);
+    background-color: transparent;
+    color: var(--color-primary-dk);
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: var(--color-hover);
+}
+
+.submit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+}
+
+/* ── Responsive form-row ── */
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancelar,
+    .submit {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* ══════════════════════════════════════════
+   RESPONSIVE — TABLET
+══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .main-content { margin-left: 4rem; padding: 1rem; }
+    .card { width: 14rem !important; }
+    .content, .barra { width: 100%; }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MÓVIL GRANDE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .main-content { margin-left: 3.5rem; margin-top: 4rem; padding: 0.8rem; }
+    .main-content.menu-toggle { margin-left: 1rem; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .page-header .button { width: 100%; justify-content: flex-start; }
+    .card { width: 100% !important; max-width: 320px; }
+    .rutinas-disponibles { flex-direction: column; align-items: center; }
+    .filtro { width: 85px; font-size: 12px; padding: 6px 8px; }
+    .titulo { font-size: 20px; }
+    .titulo::after { width: 220px; }
+    .form { max-width: 100%; padding: 12px; }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MÓVIL PEQUEÑO
+══════════════════════════════════════════ */
+@media (max-width: 576px) {
+    .main-content { margin-left: 0.5rem; margin-top: 4.5rem; padding: 0.5rem; }
+    .text { font-size: 18px; }
+    .input { font-size: 14px; height: 42px; }
+    .filtro { width: 75px; font-size: 11px; }
+    .card { width: 100% !important; max-width: 280px; }
+    .titulo { font-size: 18px; letter-spacing: 1px; }
+    .titulo::after { width: 160px; }
+    .form { padding: 10px; box-shadow: 2px 3px 8px rgba(155, 27, 110, 0.15); }
+    .submit { font-size: 14px; padding: 8px; }
+}

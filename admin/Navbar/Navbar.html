@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="Navbar.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Navbar</title>
 </head>
-
 <body>
+
     <header>
         <div class="left">
             <div class="menu-container">
@@ -19,19 +18,17 @@
                     <div></div>
                 </div>
             </div>
-            <div class="brand">
-                MOTRICARE
-            </div>
+            <div class="brand">MOTRICARE</div>
         </div>
+
         <div class="right">
             <div class="user-name">
-                  <h2 id="name-user" class="nombre"></h2>
+                <h2 id="name-user" class="nombre"></h2>
             </div>
-          
-                <!-- DROPDOWN -->
+
             <div class="user-menu">
                 <div class="user-avatar" onclick="toggleDropdown()">
-                    <img src="/cliente/icons/user-svgrepo-com.svg" alt="" id="user-foto">
+                    <img src="/cliente/icons/user-svgrepo-com.svg" alt="Avatar" id="user-foto">
                 </div>
                 <div class="dropdown" id="dropdown">
                     <ul>
@@ -45,40 +42,44 @@
                         </li>
                     </ul>
                 </div>
-                <input type="file" name="" id="input-foto" accept="image/*" style="display: none;" onchange="subirFoto(event)">
+                <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="subirFoto(event)">
             </div>
         </div>
     </header>
+
     <div class="sidebar" id="sidebar">
         <nav>
             <div class="sidebar-logo">
-                <img src="/admin/icons/motricare.png" alt="icon-motricare" class="logo">
+                <img src="/admin/images/Logo2-Motricare.jpeg" alt="Motricare">
             </div>
             <ul>
                 <li>
-                  
                     <a href="/admin/dashboard.html">
-                        <i class="fa-solid fa-house"></i><span>Inicio</span>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Inicio</span>
                     </a>
                 </li>
                 <li>
                     <a href="/admin/pages/Fisioterapeutas/MostrarFisioterapeutas.html">
-                        <i class="fa-solid fa-book-medical"></i><span>Fisioterapeutas</span>
+                        <i class="fa-solid fa-book-medical"></i>
+                        <span>Fisioterapeutas</span>
                     </a>
                 </li>
                 <li>
                     <a href="/admin/pages/Pacientes/MostrarPacientes.html">
-                        <i class="fa-solid fa-users"></i><span>Pacientes</span>
+                        <i class="fa-solid fa-users"></i>
+                        <span>Pacientes</span>
                     </a>
                 </li>
                 <li>
                     <a href="/admin/Reportes/reportes.html">
-                        <i class="fa-solid fa-chart-line" ></i><span>Reportes</span>
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Reportes</span>
                     </a>
                 </li>
             </ul>
         </nav>
     </div>
-</body>
 
+</body>
 </html>

@@ -63,7 +63,7 @@ async function verDetalle(id) {
                     ${fisio.estado === 'Activo' ? 'Activo' : 'Inactivo'}
                 </span>
             </p>
-        </div>
+        </div> 
         <div class="detail-actions">
             <button class="btn-editar" onclick="editarFisio('${fisio.id}')">Editar perfil</button>
             <button class="btn-estado" onclick="cambiarEstado('${fisio.id}', '${fisio.estado}')">

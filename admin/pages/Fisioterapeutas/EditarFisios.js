@@ -48,12 +48,25 @@ document.getElementById("form-editar").addEventListener("submit", async (e) => {
 
     if (error) {
         console.error(error);
-        alert("Error al guardar los cambios");
+        mostrarAlerta("Error al guardar los cambios");
         return;
     }
 
-    alert("Fisioterapeuta actualizado correctamente");
-    window.location.href = "./MostrarFisioterapeutas.html";
+    mostrarAlerta("Fisioterapeuta actualizado correctamente", "success");
+    // window.location.href = "./MostrarFisioterapeutas.html";
 });
+// FUNCIÓN DE ALERTA DE BOOTSTRAP
 
+function mostrarAlerta(mensaje, tipo = "warning") {
+    const container = document.getElementById("alert-container");
+    container.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+
+    setTimeout(() => {
+        window.location.href = "./MostrarFisioterapeutas.html";
+    }, 2500);
+}
 cargarDatos();

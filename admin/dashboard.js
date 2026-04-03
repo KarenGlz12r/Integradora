@@ -75,8 +75,8 @@ async function cargarGrafica() {
             ],
             datasets: [{
                 data: [totalFisios, totalUsuarios],
-                backgroundColor: ["#534AB7", "#1D9E75"],
-                borderColor: ["#3C3489", "#0F6E56"],
+                backgroundColor: ["#B74AA9", "#911D9E"],
+                borderColor: ["#89347C", "#6E0F5B"],
                 borderWidth: 2
             }]
         },
@@ -170,16 +170,16 @@ async function cargarGraficaRegistros() {
                 {
                     label: "Usuarios",
                     data: totalesUsuarios,
-                    backgroundColor: "#1527CB",
-                    borderColor: "#3174AA",
+                    backgroundColor: "#821182",
+                    borderColor: "#AA3194",
                     borderWidth: 2,
                     borderRadius: 6
                 },
                 {
                     label: "Fisioterapeutas",
                     data: totalesFisios,
-                    backgroundColor: "#534AB7",
-                    borderColor: "#3C3489",
+                    backgroundColor: "#B74AB3",
+                    borderColor: "#89347C",
                     borderWidth: 1,
                     borderRadius: 6
                 }

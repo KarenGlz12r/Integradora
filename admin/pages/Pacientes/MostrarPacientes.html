@@ -1,27 +1,23 @@
-<!-- MOSTRAR FISIOTERAPEUTAS -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="../../admin.css">
-    <link rel="shortcut icon" href="../../icons/gojo satura.ico" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostrar Pacientes</title>
+    <title>Pacientes</title>
 </head>
 <body>
+
     <div id="navbar"></div>
+
     <main class="containerm">
-    
-        <!-- TEXTO -->
-         <div class="text">
-           <p>Visualización de pacientes</p>
-         </div>
-        <!-- CONTENIDO TABLA + DETALLES -->
-         <div class="fisio-content">
-            <!-- TABLA DE LOS FISIOS -->
-             <div class="fisio-table-container">
+        <div class="page-header">
+            <div class="text"><p>Visualización de pacientes</p></div>
+        </div>
+
+        <div class="fisio-content">
+            <div class="fisio-table-container">
                 <table class="fisio-table">
                     <thead>
                         <tr>
@@ -34,30 +30,24 @@
                     </thead>
                     <tbody id="tabla-fisioterapeutas"></tbody>
                 </table>
-             </div>
+            </div>
 
-             <!-- PANEL DE DETALLES -->
-              <div class="fisio-detail" id="fisio-detail">
-                <!-- SE LLENA AL HACER CLICK EN VER -->
-                 <p class="detail-placeholder">
-                    Seleccione un paciente para ver sus detalles
-                 </p>
-              </div>
-         </div>
+            <div class="fisio-detail" id="fisio-detail">
+                <p class="detail-placeholder">Selecciona un paciente para ver sus detalles</p>
+            </div>
+        </div>
     </main>
-        <script>
+
+    <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
-
-                <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
                 const script = document.createElement('script');
-                script.type= 'module';
+                script.type = 'module';
                 script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
-
-            })
+            });
     </script>
     <script type="module" src="./pacientes.js"></script>
 

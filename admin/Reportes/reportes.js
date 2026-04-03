@@ -1,6 +1,7 @@
 // Comentario: Este es el script que contiene las funciones para generar reportes en la aplicación.
 // SCRIPT QUE CONTIENE LAS FUNCIONES PARA LOS REPORTES
-
+import { protegerRuta } from "../../proteger.js";
+await protegerRuta("admin");
 // Comentario: Importa la instancia de Supabase desde el archivo de autenticación para interactuar con la base de datos.
 import { supabase } from "../../auth.js";
 
@@ -117,7 +118,7 @@ async function cargarGraficaCrecimiento() {
                     // Comentario: Datos contados por mes para usuarios.
                     data: contarPorMes(dataUsuarios, "created_at"),
                     // Comentario: Color de fondo para las barras de usuarios.
-                    backgroundColor: "#1D9E75",
+                    backgroundColor: "#8B1D9E",
                     // Comentario: Radio de borde para las barras.
                     borderRadius: 6
                 },
@@ -127,7 +128,7 @@ async function cargarGraficaCrecimiento() {
                     // Comentario: Datos contados por mes para fisioterapeutas.
                     data: contarPorMes(dataFisios, "creado_en"),
                     // Comentario: Color de fondo para las barras de fisioterapeutas.
-                    backgroundColor: "#534AB7",
+                    backgroundColor: "#B74AB2",
                     // Comentario: Radio de borde para las barras.
                     borderRadius: 6
                 }
@@ -343,11 +344,11 @@ async function cargarGraficaTendencia() {
                     // Comentario: Datos de cambio porcentual para usuarios.
                     data: cambioUsu,
                     // Comentario: Color del borde para usuarios.
-                    borderColor: "#1D9E75",
+                    borderColor: "#620C6D",
                     // Comentario: Color de fondo con transparencia.
                     backgroundColor: "rgba(29,158,117,0.08)",
                     // Comentario: Color de los puntos basado en el cambio.
-                    pointBackgroundColor: cambioUsu.map(v => v > 0 ? "#1D9E75" : v < 0 ? "#E24B4A" : "#aaa"),
+                    pointBackgroundColor: cambioUsu.map(v => v > 0 ? "#9E1D98" : v < 0 ? "#E24ABE" : "#aaa"),
                     // Comentario: Radio de los puntos.
                     pointRadius: 6,
                     // Comentario: Curvatura de la línea.
@@ -363,11 +364,11 @@ async function cargarGraficaTendencia() {
                     // Comentario: Datos de cambio porcentual para fisioterapeutas.
                     data: cambioFisio,
                     // Comentario: Color del borde para fisioterapeutas.
-                    borderColor: "#534AB7",
+                    borderColor: "#AF3C9E",
                     // Comentario: Color de fondo con transparencia.
                     backgroundColor: "rgba(83,74,183,0.08)",
                     // Comentario: Color de los puntos basado en el cambio.
-                    pointBackgroundColor: cambioFisio.map(v => v > 0 ? "#534AB7" : v < 0 ? "#E24B4A" : "#aaa"),
+                    pointBackgroundColor: cambioFisio.map(v => v > 0 ? "#5A1B4F" : v < 0 ? "#E24AC9" : "#aaa"),
                     // Comentario: Radio de los puntos.
                     pointRadius: 6,
                     // Comentario: Curvatura de la línea.
@@ -576,9 +577,9 @@ async function cargarGraficaIngresos() {
                 // Comentario: Datos de ingresos por mes.
                 data: ingresosPorMes,
                 // Comentario: Color de fondo.
-                backgroundColor: "#1D9E75",
+                backgroundColor: "#9E1D6F",
                 // Comentario: Color del borde.
-                borderColor: "#0F6E56",
+                borderColor: "#680F6E",
                 // Comentario: Ancho del borde.
                 borderWidth: 1,
                 // Comentario: Radio de borde.
@@ -654,7 +655,7 @@ async function cargarGraficaCitasFisio() {
     const ordenado = Object.entries(conteo).sort((a, b) => b[1] - a[1]);
     const nombres = ordenado.map(([n]) => n);
     const cantidades = ordenado.map(([, c]) => c);
-    const colores = nombres.map((_, i) => i % 2 === 0 ? "#534AB7" : "#1D9E75");
+    const colores = nombres.map((_, i) => i % 2 === 0 ? "#770A67" : "#A61791");
 
     // Comentario: Si no hay datos, muestra un mensaje.
     //  SI NO HAY DATOS AÚN
@@ -754,55 +755,145 @@ async function cargarTarjetasResumen() {
 // FUNCIÓN DE EXPORTAR EN EXCEL
 // Comentario: Define una función global para exportar datos a Excel.
 window.exportarExcel = function () {
-    // Comentario: Crea un nuevo libro de Excel.
-    const wb = XLSX.utils.book_new();
-    // Comentario: Obtiene la fecha actual formateada.
-    const fecha = new Date().toLocaleDateString("es-Mx");
+console.log(typeof window.exportarExcel);
+    const fecha = new Date().toLocaleDateString("es-MX");
 
-    // Comentario: Crea la hoja de fisioterapeutas.
-    // HOJA DE FISIOS
-    const fisiosData = (window._dataFisios ?? []).map(f => ({
-        Nombre: `${f.nombre} ${f.apellido_paterno}`,
-        Especialidad: f.especialidad ?? "-",
-        Cédula: f.cedula_profesional ?? "-",
-        Turno: f.turno ?? "-",
-        Experiencia: `${f.anios_experiencia ?? "-"} años`,
-        Estado: f.estado ?? "-",
-        Registrado: f.creado_en ? new Date(f.creado_en).toLocaleDateString("es-MX") : "-"
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fisiosData), "Fisioterapeutas");
+    // ── Paleta Motricare ──────────────────────────────────────────────────────
+    const S = {
+        fuenteHeader : { name: "Arial", bold: true, color: { rgb: "FFFFFF" }, sz: 10 },
+        fuenteDatos  : { name: "Arial", sz: 9, color: { rgb: "3D0030" } },
+        fuenteTitulo : { name: "Arial", bold: true, color: { rgb: "FFFFFF" }, sz: 14 },
+        fillFucsia   : { patternType: "solid", fgColor: { rgb: "9B1B6E" } },
+        fillFucsiaMed: { patternType: "solid", fgColor: { rgb: "7A1254" } },
+        fillRosa     : { patternType: "solid", fgColor: { rgb: "FCE4F3" } },
+        fillAlt      : { patternType: "solid", fgColor: { rgb: "F9F0F6" } },
+        fillBlanco   : { patternType: "solid", fgColor: { rgb: "FFFFFF" } },
+        alineaCentro : { horizontal: "center", vertical: "center" },
+        alineaIzq    : { horizontal: "left",   vertical: "center" },
+        bordeLinea   : { style: "thin", color: { rgb: "E8C8E0" } },
+    };
 
-    // Comentario: Crea la hoja de usuarios.
-    // HOJA USUARIOS
-    const usuariosData = (window._dataUsuarios ?? []).map(u => ({
-        Nombre: u.us_nom ?? "-",
-        Correo: u.us_correo ?? "-",
-        Teléfono: u.us_telefono ?? "-",
-        Rol: u.us_rol ?? "-",
-        Registrado: u.created_at ? new Date(u.created_at).toLocaleDateString("es-MX") : "-"
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(usuariosData), "Usuarios");
+    const borde = () => ({
+        top: S.bordeLinea, bottom: S.bordeLinea,
+        left: S.bordeLinea, right: S.bordeLinea,
+    });
 
-    // Comentario: Descarga el archivo Excel.
-    XLSX.writeFile(wb, `reporte-motricare-${fecha}.xlsx`);
-}
+    // ── Helper: construye una hoja con formato ────────────────────────────────
+    function crearHoja(titulo, subtitulo, columnas, filas) {
+        const aoa = [];
+        aoa.push([titulo,    ...Array(columnas.length - 1).fill(null)]);
+        aoa.push([subtitulo, ...Array(columnas.length - 1).fill(null)]);
+        aoa.push(Array(columnas.length).fill(null));
+        aoa.push(columnas);
+        filas.forEach(f => aoa.push(f));
+        aoa.push([...Array(columnas.length - 1).fill("TOTAL DE REGISTROS"), filas.length]);
+
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+        ws["!merges"] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: columnas.length - 1 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: columnas.length - 1 } },
+            { s: { r: 2, c: 0 }, e: { r: 2, c: columnas.length - 1 } },
+        ];
+
+        // Título y subtítulo
+        if (ws["A1"]) ws["A1"].s = { font: S.fuenteTitulo, fill: S.fillFucsia,    alignment: S.alineaIzq };
+        if (ws["A2"]) ws["A2"].s = { font: { ...S.fuenteDatos, italic: true, color: { rgb: "FFFFFF" } },
+                                      fill: S.fillFucsiaMed, alignment: S.alineaIzq };
+
+        // Headers (fila 4 → r=3)
+        columnas.forEach((_, ci) => {
+            const addr = XLSX.utils.encode_cell({ r: 3, c: ci });
+            if (ws[addr]) ws[addr].s = {
+                font: S.fuenteHeader, fill: S.fillFucsia,
+                alignment: S.alineaCentro, border: borde(),
+            };
+        });
+
+        // Datos (filas alternas)
+        filas.forEach((fila, ri) => {
+            const fill = ri % 2 === 1 ? S.fillAlt : S.fillBlanco;
+            fila.forEach((_, ci) => {
+                const addr = XLSX.utils.encode_cell({ r: 4 + ri, c: ci });
+                if (ws[addr]) ws[addr].s = {
+                    font: S.fuenteDatos, fill, alignment: S.alineaCentro, border: borde(),
+                };
+            });
+        });
+
+        // Fila resumen final
+        const rResumen = 4 + filas.length;
+        columnas.forEach((_, ci) => {
+            const addr = XLSX.utils.encode_cell({ r: rResumen, c: ci });
+            if (!ws[addr]) ws[addr] = { t: "z" };
+            ws[addr].s = ci < columnas.length - 1
+                ? { font: S.fuenteHeader, fill: S.fillFucsiaMed, alignment: { horizontal: "right" } }
+                : { font: { ...S.fuenteHeader, sz: 11 }, fill: S.fillFucsia, alignment: S.alineaCentro };
+        });
+
+        return ws;
+    }
+
+    // ── HOJA FISIOTERAPEUTAS ──────────────────────────────────────────────────
+    const fisiosCols = ["Nombre completo", "Especialidad", "Cédula", "Turno", "Experiencia", "Estado", "Registro"];
+    const fisiosFilas = (window._dataFisios ?? []).map(f => [
+        `${f.nombre} ${f.apellido_paterno}`,
+        f.especialidad          ?? "-",
+        f.cedula_profesional    ?? "-",
+        f.turno                 ?? "-",
+        `${f.anios_experiencia  ?? "-"} años`,
+        f.estado                ?? "-",
+        f.creado_en ? new Date(f.creado_en).toLocaleDateString("es-MX") : "-",
+    ]);
+    const wsFisios = crearHoja(
+        "REPORTE DE FISIOTERAPEUTAS — MOTRICARE",
+        `Generado el ${fecha}  |  Total: ${fisiosFilas.length} registros`,
+        fisiosCols, fisiosFilas
+    );
+    wsFisios["!cols"] = [28, 18, 20, 12, 14, 12, 16].map(w => ({ wch: w }));
+
+    // ── HOJA USUARIOS ─────────────────────────────────────────────────────────
+    const usuaCols = ["Nombre", "Correo electrónico", "Teléfono", "Rol", "Registro"];
+    const usuaFilas = (window._dataUsuarios ?? []).map(u => [
+        u.us_nom      ?? "-",
+        u.us_correo   ?? "-",
+        u.us_telefono ?? "-",
+        u.us_rol      ?? "-",
+        u.created_at ? new Date(u.created_at).toLocaleDateString("es-MX") : "-",
+    ]);
+    const wsUsuarios = crearHoja(
+        "REPORTE DE USUARIOS — MOTRICARE",
+        `Generado el ${fecha}  |  Total: ${usuaFilas.length} registros`,
+        usuaCols, usuaFilas
+    );
+    wsUsuarios["!cols"] = [24, 30, 16, 18, 16].map(w => ({ wch: w }));
+
+    // ── Ensamblar workbook y descargar ────────────────────────────────────────
+    const wb = { SheetNames: [], Sheets: {} };       //  workbook manual para xlsx-style
+    wb.SheetNames.push("Fisioterapeutas");
+    wb.Sheets["Fisioterapeutas"] = wsFisios;
+    wb.SheetNames.push("Usuarios");
+    wb.Sheets["Usuarios"] = wsUsuarios;
+
+    XLSX.writeFile(wb, `reporte-motricare-${fecha.replace(/\//g, "-")}.xlsx`);
+};
 // FUNCION PARA EXPORTAR EN PDF
 // Comentario: Define una función global asíncrona para exportar datos a PDF.
 window.exportarPDF = async function () {
     // Comentario: Importa jsPDF.
     const { jsPDF } = window.jspdf;
     // Comentario: Crea una nueva instancia de jsPDF.
-    const doc  = new jsPDF();
+    const doc = new jsPDF();
     // Comentario: Obtiene la fecha actual formateada.
     const fecha = new Date().toLocaleDateString("es-MX");
 
     // Comentario: Define colores para el PDF.
-    // COLORES MOTRICARE
-    const VERDE       = [13, 110, 86];
-    const VERDE_CLARO = [29, 158, 117];
-    const MORADO      = [83, 74, 183];
-    const GRIS        = [245, 245, 245];
-    const TEXTO       = [44, 44, 42];
+    // COLORES MOTRICARE — FUCSIA
+    const FUCSIA = [155, 27, 110];   // #9b1b6e  — 
+    const FUCSIA_MED = [122, 18, 84];   // #7a1254  — 
+    const ROSA = [252, 228, 243];  // #fce4f3  —
+    const MORADO = [122, 18, 84];   // reutiliza para secciones secundarias
+    const TEXTO = [61, 0, 48];   // #3d0030
 
     // Comentario: Función para obtener el total de páginas.
     // TOTAL DE PÁGINAS (para el pie)
@@ -814,12 +905,12 @@ window.exportarPDF = async function () {
         const total = totalPaginas();
         for (let i = 1; i <= total; i++) {
             doc.setPage(i);
-            const ancho  = doc.internal.pageSize.getWidth();
-            const alto   = doc.internal.pageSize.getHeight();
+            const ancho = doc.internal.pageSize.getWidth();
+            const alto = doc.internal.pageSize.getHeight();
 
             // Comentario: Dibuja la línea superior del pie.
             // LÍNEA SUPERIOR DEL PIE
-            doc.setDrawColor(...VERDE_CLARO);
+            doc.setDrawColor(...FUCSIA_MED);
             doc.setLineWidth(0.5);
             doc.line(14, alto - 15, ancho - 14, alto - 15);
 
@@ -839,7 +930,7 @@ window.exportarPDF = async function () {
     // ── FUNCIÓN ENCABEZADO DE SECCIÓN ────────────────
     const encabezadoSeccion = (titulo, y) => {
         const ancho = doc.internal.pageSize.getWidth();
-        doc.setFillColor(...VERDE);
+        doc.setFillColor(...FUCSIA_MED);
         doc.roundedRect(14, y, ancho - 28, 8, 2, 2, "F");
         doc.setFontSize(10);
         doc.setTextColor(255, 255, 255);
@@ -852,7 +943,7 @@ window.exportarPDF = async function () {
     // ── SEPARADOR ────────────────────────────────────
     const separador = (y) => {
         const ancho = doc.internal.pageSize.getWidth();
-        doc.setDrawColor(...VERDE_CLARO);
+        doc.setDrawColor(...FUCSIA_MED);
         doc.setLineWidth(0.3);
         doc.line(14, y, ancho - 14, y);
         return y + 6;
@@ -863,10 +954,10 @@ window.exportarPDF = async function () {
     const cargarLogo = () => new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = "/admin/icons/motricare.png";
+        img.src = "/admin/images/Logo-Reporte.png";
         img.onload = () => {
             const canvas = document.createElement("canvas");
-            canvas.width  = img.width;
+            canvas.width = img.width;
             canvas.height = img.height;
             canvas.getContext("2d").drawImage(img, 0, 0);
             resolve(canvas.toDataURL("image/png"));
@@ -883,7 +974,7 @@ window.exportarPDF = async function () {
 
     // Comentario: Dibuja el fondo verde del encabezado.
     // FONDO VERDE ENCABEZADO
-    doc.setFillColor(...VERDE);
+    doc.setFillColor(...FUCSIA);
     doc.rect(0, 0, ancho, 30, "F");
 
     // Comentario: Agrega el logo si está disponible.
@@ -920,15 +1011,15 @@ window.exportarPDF = async function () {
         head: [["Concepto", "Valor"]],
         body: [
             ["Ingreso total acumulado", document.getElementById("ingreso-total").textContent],
-            ["Total de citas",          document.getElementById("total-citas").textContent],
-            ["Pagos pendientes",        document.getElementById("pagos-pendientes").textContent],
-            ["Citas confirmadas",       document.getElementById("citas-confirmadas").textContent],
-            ["Citas pendientes",        document.getElementById("citas-pendientes").textContent],
-            ["Fisios activos",          document.getElementById("fisios-activos").textContent],
+            ["Total de citas", document.getElementById("total-citas").textContent],
+            ["Pagos pendientes", document.getElementById("pagos-pendientes").textContent],
+            ["Citas confirmadas", document.getElementById("citas-confirmadas").textContent],
+            ["Citas pendientes", document.getElementById("citas-pendientes").textContent],
+            ["Fisios activos", document.getElementById("fisios-activos").textContent],
         ],
-        styles:      { fontSize: 10, textColor: TEXTO },
-        headStyles:  { fillColor: VERDE_CLARO, textColor: [255,255,255], fontStyle: "bold" },
-        alternateRowStyles: { fillColor: GRIS },
+        styles: { fontSize: 10, textColor: TEXTO },
+        headStyles: { fillColor: FUCSIA_MED, textColor: [255, 255, 255], fontStyle: "bold" },
+        alternateRowStyles: { fillColor: ROSA },
         margin: { left: 14, right: 14 }
     });
 
@@ -957,9 +1048,9 @@ window.exportarPDF = async function () {
         startY: y,
         head: [["Mes", "Ingresos"]],
         body: filasIngresos.length > 0 ? filasIngresos : [["Sin datos", "-"]],
-        styles:      { fontSize: 10, textColor: TEXTO },
-        headStyles:  { fillColor: VERDE_CLARO, textColor: [255,255,255], fontStyle: "bold" },
-        alternateRowStyles: { fillColor: GRIS },
+        styles: { fontSize: 10, textColor: TEXTO },
+        headStyles: { fillColor: FUCSIA_MED, textColor: [255, 255, 255], fontStyle: "bold" },
+        alternateRowStyles: { fillColor: ROSA },
         margin: { left: 14, right: 14 }
     });
 
@@ -980,9 +1071,9 @@ window.exportarPDF = async function () {
             f.estado ?? "--",
             f.creado_en ? new Date(f.creado_en).toLocaleDateString("es-MX") : "--"
         ]),
-        styles:      { fontSize: 8, textColor: TEXTO },
-        headStyles:  { fillColor: MORADO, textColor: [255,255,255], fontStyle: "bold" },
-        alternateRowStyles: { fillColor: GRIS },
+        styles: { fontSize: 8, textColor: TEXTO },
+        headStyles: { fillColor: MORADO, textColor: [255, 255, 255], fontStyle: "bold" },
+        alternateRowStyles: { fillColor: ROSA },
         margin: { left: 14, right: 14 }
     });
 
@@ -1000,9 +1091,9 @@ window.exportarPDF = async function () {
             u.us_telefono ?? "-",
             u.created_at ? new Date(u.created_at).toLocaleDateString("es-MX") : "-"
         ]),
-        styles:      { fontSize: 9, textColor: TEXTO },
-        headStyles:  { fillColor: MORADO, textColor: [255,255,255], fontStyle: "bold" },
-        alternateRowStyles: { fillColor: GRIS },
+        styles: { fontSize: 9, textColor: TEXTO },
+        headStyles: { fillColor: MORADO, textColor: [255, 255, 255], fontStyle: "bold" },
+        alternateRowStyles: { fillColor: ROSA },
         margin: { left: 14, right: 14 }
     });
 

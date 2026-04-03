@@ -1,132 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="../../admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de fisioterapeutas</title>
+    <title>Registrar Fisioterapeuta</title>
 </head>
-
 <body>
+
     <div id="navbar"></div>
+
     <main class="container">
-        <!-- TEXTO -->
         <div class="page-header">
             <div class="text">
-                <p>Gestion de fisioterapeutas</p>
+                <p>Gestión de fisioterapeutas</p>
             </div>
             <div class="button">
-                <a href="./MostrarFisioterapeutas.html" class="btn-registrar">
-                    Ver fisioterapeutas
-                </a>
+                <a href="./MostrarFisioterapeutas.html" class="btn-registrar">Ver fisioterapeutas</a>
             </div>
         </div>
 
-        <!-- FORMULARIO DE REGISTRO -->
-        <form action="" class="form">
-            <p class="title">Registro</p>
-            <p class="message">Registrar fisioterapeutas</p>
-            <!-- ALERTA -->
+        <form class="form" id="form-registro">
+
+            <div class="form-header">
+                <div class="form-header-icon">＋</div>
+                <div>
+                    <p class="title">Nuevo fisioterapeuta</p>
+                    <p class="message">Completa los datos para registrar</p>
+                </div>
+            </div>
+
             <div id="alert-container"></div>
-            <div class="flex">
-                <label for="">
-                    <input id="email" type="email" placeholder=" " required class="input">
-                    <span>Correo: </span>
-                </label>
-                <label for="">
-                    <input id="nombre" type="text" placeholder=" " required class="input">
-                    <span>Nombre:</span>
-                </label>
-                <label for="">
-                    <input id="apellido_paterno" type="text" placeholder=" " required class="input">
-                    <span>Apellido Paterno</span>
-                </label>
 
-            </div>
-            <div class="flex">
-                <label for="">
-                    <input id="apellido_materno" type="text" placeholder=" " class="input">
-                    <span>Apellido Materno</span>
-                </label>
-                <label for="">
-                    <input id="telefono" type="text" placeholder=" " class="input">
-                    <span>Teléfono</span>
-                </label>
-            </div>
-            <label for="">
-                <input id="fecha_naci" type="date" placeholder=" " class="input">
-                <span>Fecha de nacimiento</span>
-            </label>
-            <label for="especialidad">
-                Datos profesionales:
-            </label>
-            <select name="" id="especialidad">
-                <option value="">Seleccionar especialidad</option>
-                <option value="ortopedico">Ortopédico</option>
-                <option value="neurologico">Neurológico</option>
-                <option value="musculoesqueletico">Musculoesquelético</option>
-                <option value="respiratorio">Respiratorio</option>
-                <option value="deportivo">Deportivo</option>
-            </select>
-            <div class="flex">
-                <label for="">
-                    <input id="anios_experiencia" type="number" min="0" placeholder=" " class="input">
-                    <span>Años de experiencia</span>
-                </label>
-                <label for="">
-                    <input id="institucion_egreso" type="text" placeholder=" " class="input">
-                    <SPan>Institución</SPan>
-                </label>
-                <label for="">
-                    <input id="cedula" type="text" placeholder=" " required class="input">
-                    <span>Cedula profesional</span>
-                </label>
+            <div class="form-section-title" style="grid-column: 1/-1">Información personal</div>
+
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="email">Correo electrónico</label>
+                    <input id="email" type="email" class="field-input" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="nombre">Nombre</label>
+                    <input id="nombre" type="text" class="field-input" placeholder="Nombre(s)" required>
+                </div>
             </div>
 
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="apellido_paterno">Apellido paterno</label>
+                    <input id="apellido_paterno" type="text" class="field-input" placeholder="Apellido paterno" required>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="apellido_materno">Apellido materno</label>
+                    <input id="apellido_materno" type="text" class="field-input" placeholder="Apellido materno">
+                </div>
+            </div>
 
-            <label for="turno">Turno (opcional):</label>
-            <select id="turno">
-                <option value="">Seleccionar turno</option>
-                <option value="mañana">Mañana</option>
-                <option value="tarde">Tarde</option>
-                <option value="noche">Noche</option>
-            </select>
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="telefono">Teléfono</label>
+                    <input id="telefono" type="text" class="field-input" placeholder="10 dígitos">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="fecha_naci">Fecha de nacimiento</label>
+                    <input id="fecha_naci" type="date" class="field-input">
+                </div>
+            </div>
 
-            <button onclick="registrarFisioterapeuta()" class="submit" type="button">Registrar</button>
+            <p class="form-section-title">Datos profesionales</p>
+
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="especialidad">Especialidad</label>
+                    <select id="especialidad" class="field-select">
+                        <option value="">Seleccionar especialidad</option>
+                        <option value="ortopedico">Ortopédico</option>
+                        <option value="neurologico">Neurológico</option>
+                        <option value="musculoesqueletico">Musculoesquelético</option>
+                        <option value="respiratorio">Respiratorio</option>
+                        <option value="deportivo">Deportivo</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="cedula">Cédula profesional</label>
+                    <input id="cedula" type="text" class="field-input" placeholder="Número de cédula" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="anios_experiencia">Años de experiencia</label>
+                    <input id="anios_experiencia" type="number" min="0" class="field-input" placeholder="0">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="institucion_egreso">Institución de egreso</label>
+                    <input id="institucion_egreso" type="text" class="field-input" placeholder="Universidad...">
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="turno">Turno (opcional)</label>
+                <select id="turno" class="field-select">
+                    <option value="">Seleccionar turno</option>
+                    <option value="mañana">Mañana</option>
+                    <option value="tarde">Tarde</option>
+                    <option value="noche">Noche</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <a href="./MostrarFisioterapeutas.html" class="btn-cancelar">Cancelar</a>
+                <button type="button" class="submit" onclick="registrarFisioterapeuta()">
+                    Registrar fisioterapeuta
+                </button>
+            </div>
+
         </form>
-
-        <hr>
     </main>
 
-    <script type="module" src="../../auth.js">
-        
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init("OO8krxAYwy7wFtUOX");</script>
     <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
-
-                <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
                 const script = document.createElement('script');
                 script.type = 'module';
                 script.src = '/admin/Navbar/Navbar.js';
-                script.defer = true;
                 document.body.appendChild(script);
-
-            })
+            });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../../auth.js"></script>
 
-    <!-- ENVIAR CORREO -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>
-        emailjs.init("OO8krxAYwy7wFtUOX"); 
-    </script>
 </body>
-
-
 </html>

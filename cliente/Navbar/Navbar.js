@@ -115,6 +115,31 @@ async function cerrarSesion() {
     await supabase.auth.signOut();
     window.location.href = "../Login.html";
 }
+// MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
+function marcarEnlaceActivo() {
+    const urlActual = window.location.pathname;
+
+    const enlaces = document.querySelectorAll(".sidebar nav ul li a");
+
+    enlaces.forEach(enlace => {
+        enlace.classList.remove("selected");
+
+        const href = enlace.getAttribute("href");
+
+        //  SI LA URL ACTUAL CONTIENE LA RUTA DEL ENLACE
+        if (href && urlActual.includes(href)) {
+            enlace.classList.add("selected");
+        }
+    });
+
+    // CASO ESPECIAL: DASHBOARD ES LA RAÍZ
+    if (urlActual === "/cliente/dashboard.html" || urlActual === "/cliente/") {
+        document.querySelector('a[href="/cliente/dashboard.html"]')
+            ?.classList.add("selected");
+    }
+}
+
+marcarEnlaceActivo();
 
 window.toggleDropdown = toggleDropdown;
 window.abrirSelectorFoto = abrirSelectorFoto;

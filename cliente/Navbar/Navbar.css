@@ -1,25 +1,20 @@
 /* LETRA NUNITO SANS */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
-/* NAVBAR */
-
-/*  COLORES*/
 
 :root {
-    --background-color: #5f796b;
-    --text-title-color: #275e42;
-    --text-color: #e5e9e4;
-    --icon-color: #275e42;
-    --icon-menu-color: #3f4144;
-    --menu-color: #275e42;
+    --background-color: #9b1b6e;        /* fucsia oscuro — navbar/sidebar */
+    --text-title-color: #6d0f4e;        /* fucsia muy oscuro — títulos */
+    --text-color: #ffffff;              /* blanco puro — texto sobre fucsia */
+    --icon-color: #6d0f4e;
+    --icon-menu-color: #3d0030;
+    --menu-color: #ffffff;              /* líneas del menú hamburguesa */
 
-    --text-select-color: #4f7f6a;
-    --background-selected: #d4e8e0;
-    --background-hover: #c2d9d0;
+    --text-select-color: #8b1560;       /* fucsia medio — texto seleccionado */
+    --background-selected: #fce4f3;    /* rosa muy pálido — fondo seleccionado */
+    --background-hover: #f7c9e8;       /* rosa suave — hover */
 
-    --border-color: #c5d9d2;
+    --border-color: #e8a0d0;           /* rosa claro — bordes */
 }
-
-/* ESTILOS GLOBALES */
 
 * {
     margin: 0;
@@ -28,13 +23,10 @@
     font-family: "Nunito Sans", sans-serif;
 }
 
-/* BODY */
 body {
     width: 100%;
     height: 100vh;
 }
-
-/* HEADER */
 
 header {
     width: 100%;
@@ -47,12 +39,16 @@ header {
     top: 0;
     left: 0;
     z-index: 200;
-    /* SE MUESTRE SOBRE TODOS LOS ELEMENTOS DE LA PÁGINA*/
 }
 
-/* SECTION RIGHT */
-.right {
+.sidebar ul,
+.sidebar ul li {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
 
+.right {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -60,7 +56,6 @@ header {
 }
 
 .right a {
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -80,13 +75,9 @@ header {
 .right .user {
     width: 2.1rem;
     border-radius: 50%;
-
 }
 
-/* MENU */
-
 .menu-container {
-
     height: 100%;
     display: flex;
     align-items: center;
@@ -94,31 +85,26 @@ header {
 }
 
 .menu {
-
     width: 1.5rem;
     height: 1.2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
 }
 
 .menu div {
     width: 100%;
     height: 0.15rem;
     background-color: var(--menu-color);
-    transition:all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-
-/* SE ACTIVAN CUANDO SE TIENE LA CLASE .MENU-TOGGLE */
-
-.menu.menu-toggle div:first-child{
+.menu.menu-toggle div:first-child {
     width: 40%;
     transform: rotate(-40deg) translate(-30%, 175%);
 }
 
-.menu.menu-toggle div:last-child{
+.menu.menu-toggle div:last-child {
     width: 40%;
     transform: rotate(40deg) translate(-30%, -150%);
 }
@@ -130,31 +116,18 @@ header {
     gap: 0.6rem;
 }
 
-/* .brand .name{
-    border: 2px solid orange;
-    font-size: 1.5 rem;
-    font-weight: 900;
-    color: var(--text-title-color);
-
-} */
-
-
-/* LEFT SECTION */
-
 .left {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1.4rem;
-
 }
 
 .brand .logo {
-    width: 1.7rem;
+    width: 2rem;
 }
-/*  */
+
 .sidebar {
-   
     margin-top: 3rem;
     width: 4rem;
     height: 100%;
@@ -165,16 +138,15 @@ header {
     padding: 1.1rem 0;
     border-right: 1px solid var(--border-color);
     overflow-y: auto;
-    background-color: #567665;
-    /* TRANSICION PARA EL ANCHO */
+    background-color: #85155d;          /* fucsia ligeramente más claro que el header */
     transition: width 0.3s ease;
 }
-/* DEBE IR PEGADO LA CLASE QUE SE VA A ASIGNAR */
-.sidebar.menu-toggle{
+
+.sidebar.menu-toggle {
     width: 18.75rem;
 }
+
 .sidebar a {
-   
     display: flex;
     align-items: center;
     gap: 1.3rem;
@@ -190,87 +162,86 @@ header {
 
 .sidebar a:hover {
     background-color: var(--background-hover);
-    color: #222223;
+    color: #3d0030;                     /* fucsia muy oscuro para legibilidad */
 }
 
 .sidebar img {
     width: 1.6rem;
 }
 
-/* selected */
-
 .sidebar a.selected {
-
     color: var(--text-select-color);
     background-color: var(--background-selected);
 }
-/* SIDEBAR LOGOO */
 
-.sidebar-logo{
+.sidebar-logo {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1rem 0;
-    border-bottom: 1px solid rgb(57, 74, 57);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     margin-bottom: 0.5rem;
     overflow: hidden;
 }
 
-.sidebar-logo img{
-    width: 2rem;
+.sidebar-logo img {
+    width: 3rem;
     transition: width 0.3s ease;
 }
-.sidebar.menu-toggle .sidebar-logo img{
-    width: 6rem;
+
+.sidebar.menu-toggle .sidebar-logo img {
+    width: 7rem;
 }
 
-/* MENU DROPDOWN */
-
-.user-menu{
+.user-menu {
     position: relative;
     cursor: pointer;
 }
-.user-avatar{
+
+.user-avatar {
     border-radius: 45%;
     display: flex;
-    border: 2px solid rgb(94, 95, 95);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     justify-content: center;
     align-items: center;
     width: 3rem;
     height: 3rem;
     overflow: hidden;
-    flex-shrink: 0; /*Evita que se deforme*/
+    flex-shrink: 0;
     color: black;
 }
 
-.user-avatar img{
-     width: 100%;
+.user-avatar img {
+    width: 100%;
     height: 100%;
     object-fit: cover;
 }
-.dropdown{
+
+.dropdown {
     display: none;
     position: absolute;
     right: 0;
     top: 2.8rem;
-    background: rgba(48, 117, 60, 0.697);
+    background: #7a1254;               /* fucsia oscuro semisólido */
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     width: 200px;
     z-index: 999;
-    color: #c5d9d2;
+    color: #ffffff;
 }
 
-.dropdown.active{
+.dropdown.active {
     display: block;
 }
-.dropdown ul{
+
+.dropdown ul {
     list-style: none;
     padding: 0.5rem 0;
     margin: 0;
 }
-.dropdown ul li{
+
+.dropdown ul li {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -280,35 +251,41 @@ header {
     transition: background 0.2s ease;
 }
 
-.dropdown ul li:hover{
-    background-color: #a4ee76de;
-    color: #000;
+.dropdown ul li:hover {
+    background-color: var(--background-hover);
+    color: #3d0030;
 }
 
-.dropdown ul li img{
+.dropdown ul li img {
     width: 1.2rem;
 }
-/* MEDIA QUERIES */
 
-@media (max-width:500px){
-    .right .icons-header{
+/* ICONOS */
+/* ICONOS */
+.fa-solid{
+    font-size: 20px;
+}
+
+@media (max-width: 500px) {
+    .right .icons-header {
         display: none;
     }
 
-    .sidebar{
+    .sidebar {
         width: 0;
     }
-  .menu.menu-toggle div:first-child {
-    width: 100%;
-    transform: rotate(-50deg) translate(-0.3rem, 0.4rem);
-  }
 
-  .menu.menu-toggle div:nth-child(2) {
-    opacity: 0;
-  }
+    .menu.menu-toggle div:first-child {
+        width: 100%;
+        transform: rotate(-50deg) translate(-0.3rem, 0.4rem);
+    }
 
-  .menu.menu-toggle div:last-child {
-    width: 100%;
-    transform: rotate(50deg) translate(-0.3rem, -0.4rem);
-  }
+    .menu.menu-toggle div:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu.menu-toggle div:last-child {
+        width: 100%;
+        transform: rotate(50deg) translate(-0.3rem, -0.4rem);
+    }
 }
