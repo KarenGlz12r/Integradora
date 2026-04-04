@@ -1,19 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear ejercicios</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./ejercicios.css">
 </head>
+
 <body>
     <div id="navbar"></div>
-      <script>
+    <main class="main-content">
+        <div class="page-header">
+            <div class="text">
+                <p><i class="bi bi-list-check"></i> Gestión ejercicios</p>
+            </div>
+            <div class="button">
+                <a href="./ejercicios.html" class="btn-registrar">
+                    <i class="bi bi-arrow-left"></i> Ver ejercicios
+                </a>
+            </div>
+        </div>
+        <form class="form" id="form-crear">
+
+            <!-- Encabezado -->
+            <div class="form-header">
+                <div class="form-header-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+                <div>
+                    <p class="title">Nuevo ejercicio</p>
+                    <p class="message">Completa los campos para registrar</p>
+                </div>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <!-- Fila 1: Nombre + Zona -->
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="eje_nom">Nombre del ejercicio</label>
+                    <input id="eje_nom" type="text" class="field-input" placeholder="Ej. Flexión de rodilla" required>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="rut_zona">Rutina a asignar</label>
+                    <select id="id_rut" class="field-select" required>
+                        <option value="">Seleccionar rutina</option>
+                    </select>
+                </div>
+                <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
+            </div>
+
+            <!-- Descripción -->
+            <div class="field-group">
+                <label class="field-label" for="rut_desc">Descripción</label>
+                <textarea id="eje_desc" class="field-input field-textarea"
+                    placeholder="Describe en qué consiste el ejercicio..." required></textarea>
+            </div>
+
+
+            <!-- URL imagen -->
+            <div class="field-group">
+                <label class="field-label" for="rut_img">URL del video</label>
+                <input id="eje_video" type="url" class="field-input" placeholder="https://...">
+            </div>
+
+            <div class="separador-img">— o sube un video —</div>
+
+            <!-- Upload -->
+            <label class="label-file">
+                <input id="rut_video_file" type="file" accept="video/*" class="input-file">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <span>Arrastra o haz clic para subir</span>
+            </label>
+<p id="video_file_feedback" style="display:none; color: green; font-size: 0.85rem;">
+    Archivo subido<span id="video_file_name"></span>
+</p>
+            <!-- Botones -->
+            <div class="form-actions">
+                <a href="./ejercicios.html" class="btn-cancelar">Cancelar</a>
+                <button type="button" class="submit" onclick="RegistrarVideo()">
+                    <i class="bi bi-check-lg"></i> Registrar ejercicio
+                </button>
+            </div>
+
+        </form>
+    </main>
+    <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
             .then(html => {
@@ -27,8 +105,10 @@
 
             })
     </script>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./crearEjercicios.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    
+
 </body>
+
 </html>

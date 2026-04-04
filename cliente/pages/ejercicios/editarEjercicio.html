@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar ejercicio</title> <!-- ← corregido, decía "Crear ejercicios" -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="./ejercicios.css">
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <main class="main-content">
+        <div class="page-header">
+            <div class="text">
+                <p><i class="bi bi-list-check"></i> Gestión ejercicios</p>
+            </div>
+            <div class="button">
+                <a href="./ejercicios.html" class="btn-registrar">
+                    <i class="bi bi-arrow-left"></i> Ver ejercicios
+                </a>
+            </div>
+        </div>
+
+        <form class="form" id="form-editar">
+
+            <!-- Encabezado -->
+            <div class="form-header">
+                <div class="form-header-icon">
+                    <i class="bi bi-pencil"></i> <!-- ← ícono de editar -->
+                </div>
+                <div>
+                    <p class="title">Editar ejercicio</p>
+                    <p class="message">Modifica los campos que desees actualizar</p>
+                </div>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <!-- Fila 1: Nombre + Rutina -->
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label" for="eje_nom">Nombre del ejercicio</label>
+                    <input id="eje_nom" type="text" class="field-input" placeholder="Ej. Flexión de rodilla" required>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="id_rut">Rutina a asignar</label>
+                    <select id="id_rut" class="field-select" required>
+                        <option value="">Seleccionar rutina</option>
+                    </select>
+                </div>
+                <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
+            </div>
+
+            <!-- Descripción -->
+            <div class="field-group">
+                <label class="field-label" for="eje_desc">Descripción</label>
+                <textarea id="eje_desc" class="field-input field-textarea"
+                    placeholder="Describe en qué consiste el ejercicio..." required></textarea>
+            </div>
+
+            <!-- URL video -->
+            <div class="field-group">
+                <label class="field-label" for="eje_video">URL del video</label>
+                <input id="eje_video" type="url" class="field-input" placeholder="https://...">
+            </div>
+
+            <div class="separador-img">— o sube un video —</div>
+
+            <!-- Upload -->
+            <label class="label-file">
+                <input id="rut_video_file" type="file" accept="video/*" class="input-file">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <span id="video_file_label">Arrastra o haz clic para subir</span> 
+            </label>
+            <p id="video_file_feedback" style="display:none; color: green; font-size: 0.85rem;">
+                ✅ <span id="video_file_name"></span> 
+            </p>
+
+            <!-- Botones -->
+            <div class="form-actions">
+                <a href="./ejercicios.html" class="btn-cancelar">Cancelar</a>
+                <button type="button" class="submit" onclick="GuardarCambios()">
+                    <i class="bi bi-check-lg"></i> Guardar Cambios
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+            })
+    </script>
+    <script type="module" src="./EditarEjercicio.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

@@ -25,8 +25,25 @@
                 </a>
             </div>
         </div>
+                <div class="content">
+            <div class="filtros">
+                <div class="barra">
+                    <input type="text" class="input" id="search" placeholder="Buscar ejercicio...">
+                    <i class="bi bi-search"></i>
+                </div>
+                <ul class="lista-filtros" id="filtrosList">
+                    <li class="filtro">Brazo</li>
+                    <li class="filtro">Pierna</li>
+                    <li class="filtro">Mano</li>
+                    <li class="filtro">Tobillo</li>
+                    <li class="filtro">Hombro</li>
+                    <li class="filtro">Cadera</li>
+                </ul>
+                <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
+            </div>
+        </div>
         <!-- SECCIÓN DONDE SE MUESTRAN LOS EJERCICIOS -->
-         <section id="videos-disponibles">
+         <section id="videos-disponibles" class="videos-disponibles ">
             <p id="noResult" style="display:none">No se encontraron ejercicios.</p>
 
          </section>

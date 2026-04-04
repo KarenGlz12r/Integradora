@@ -91,10 +91,14 @@ function renderVideos(ejercicios) {
                 <p class="card-text objetivo-text">Descripción</p>
                 <p class="card-text">${video.eje_desc}</p>
                 <div class="btn-accion">
-                    <button class="btn btn-warning" onclick="editarRutina('${video.id_eje}')">Editar</button>
-                    <button class="btn btn-danger" onclick="eliminarRutina('${video.id_eje}')">Eliminar</button>
+                    <button class="btn btn-warning" onclick="editarEjercicio('${video.id_eje}')">Editar</button>
+                    <button class="btn btn-danger" onclick="eliminarEjercicio('${video.id_eje}')">Eliminar</button>
                 </div>
             </div>
         </div>`).join('');
 }
+function editarEjercicio(id) {
+    window.location.href = `./editarEjercicio.html?id=${id}`;
+}
 cargarVideos();
+window.editarEjercicio = editarEjercicio;
