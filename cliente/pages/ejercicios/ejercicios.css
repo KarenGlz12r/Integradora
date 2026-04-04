@@ -64,6 +64,9 @@
 .bi {
     font-size: 30px;
 }
+.btn .bi {
+    font-size: 15px;
+}
 
 .card {
     width: 17.5rem !important;
@@ -275,7 +278,7 @@
     padding: 8px 12px;
     border-radius: 10px;
     cursor: pointer;
-    width: 100px;
+    width: fit-content;
     text-align: center;
     font-size: 13px;
     background-color: var(--color-primary-lt);

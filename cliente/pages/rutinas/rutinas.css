@@ -491,6 +491,9 @@
     font-size: 20px;
     font-weight: 600;
 }
+.btn .bi {
+    font-size: 13px;
+}
 
 /* ══════════════════════════════════════════
    FORM — EDITAR / CREAR

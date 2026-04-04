@@ -7,10 +7,9 @@ let todas = [];
 let filtroActivo = 'todos';
 
 // ══════════════════════════════════════════
-// CARGAR RUTINAS EN TIEMPO REAL
+// CARGAR EJERCICIOS
 // ══════════════════════════════════════════
 async function cargarVideos() {
-    // Carga inicial
     const { data, error } = await supabase
         .from("ejercicios")
         .select("id_eje, eje_nom, eje_desc, eje_video");
@@ -29,23 +28,21 @@ supabase
         { event: "*", schema: "public", table: "ejercicios" },
         async (payload) => {
             console.log("Cambio detectado:", payload.eventType);
-            // Recarga los datos cuando hay INSERT, UPDATE o DELETE
             await cargarVideos();
         }
     )
     .subscribe();
-// CARGAR LOS VIDEOS
 
-// CONVERTIR LOS VIDEOS
+// ══════════════════════════════════════════
+// CONVERTIR URL A EMBED
+// ══════════════════════════════════════════
 function getVideoEmbed(url) {
     if (!url) return '<div class="no-video">Sin video</div>';
 
     const esYoutube = url.includes('youtube.com') || url.includes('youtu.be');
 
     if (esYoutube) {
-        // Convertir cualquier formato de URL de YouTube a formato embed
         let videoId = '';
-
         if (url.includes('youtu.be/')) {
             videoId = url.split('youtu.be/')[1].split('?')[0];
         } else if (url.includes('watch?v=')) {
@@ -63,14 +60,51 @@ function getVideoEmbed(url) {
         </iframe>`;
     }
 
-    // Video local / subido desde la computadora
+    // Video subido a Supabase Storage
     return `<video class="card-img-top" controls muted>
         <source src="${url}" type="video/mp4">
         Tu navegador no soporta este video.
     </video>`;
 }
+
 // ══════════════════════════════════════════
-// RENDERIZAR VIDEOS
+// FILTROS
+// ══════════════════════════════════════════
+function aplicarFiltros() {
+    const busqueda = document.getElementById('search').value.toLowerCase().trim();
+
+    const filtradas = todas.filter(eje => {
+        // filtroActivo compara contra eje_nom ya que ejercicios no tienen rut_zona
+        const coincideFiltro = filtroActivo === 'todos' ||
+            eje.eje_nom?.toLowerCase().includes(filtroActivo.toLowerCase());
+        const coincideBus = eje.eje_nom?.toLowerCase().includes(busqueda);
+        return coincideFiltro && coincideBus;
+    });
+
+    renderVideos(filtradas);
+}
+
+// ── Chips de filtro — definido UNA sola vez ──
+document.querySelectorAll('.filtro').forEach(chip => {
+    chip.addEventListener('click', function () {
+        const estaActivo = this.classList.contains('active');
+        document.querySelectorAll('.filtro').forEach(f => f.classList.remove('active'));
+
+        if (estaActivo) {
+            filtroActivo = 'todos';
+        } else {
+            this.classList.add('active');
+            filtroActivo = this.textContent.trim();
+        }
+
+        aplicarFiltros();
+    });
+});
+
+document.getElementById('search').addEventListener('input', aplicarFiltros);
+
+// ══════════════════════════════════════════
+// RENDERIZAR EJERCICIOS
 // ══════════════════════════════════════════
 function renderVideos(ejercicios) {
     const section = document.getElementById('videos-disponibles');
@@ -78,27 +112,89 @@ function renderVideos(ejercicios) {
 
     if (ejercicios.length === 0) {
         section.innerHTML = '';
-        noResult.style.display = 'block';
+        if (noResult) noResult.style.display = 'block';
         return;
     }
 
-    noResult.style.display = 'none';
-    section.innerHTML = ejercicios.map(video => `   
+    if (noResult) noResult.style.display = 'none';
+
+    section.innerHTML = ejercicios.map(video => `
         <div class="card">
-             ${getVideoEmbed(video.eje_video)}
+            ${getVideoEmbed(video.eje_video)}
             <div class="card-body">
                 <h5 class="card-title">${video.eje_nom}</h5>
                 <p class="card-text objetivo-text">Descripción</p>
                 <p class="card-text">${video.eje_desc}</p>
                 <div class="btn-accion">
-                    <button class="btn btn-warning" onclick="editarEjercicio('${video.id_eje}')">Editar</button>
-                    <button class="btn btn-danger" onclick="eliminarEjercicio('${video.id_eje}')">Eliminar</button>
+                    <button class="btn btn-warning" onclick="editarEjercicio('${video.id_eje}')">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button class="btn btn-danger" onclick="eliminarEjercicio('${video.id_eje}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
                 </div>
             </div>
-        </div>`).join('');
+        </div>
+    `).join('');
 }
+
+// ══════════════════════════════════════════
+// EDITAR EJERCICIO
+// ══════════════════════════════════════════
 function editarEjercicio(id) {
     window.location.href = `./editarEjercicio.html?id=${id}`;
 }
+
+// ══════════════════════════════════════════
+// ELIMINAR EJERCICIO
+// ══════════════════════════════════════════
+let idEliminar = null;
+
+function eliminarEjercicio(id) {
+    idEliminar = id;
+    const modal = new bootstrap.Modal(document.getElementById("modalEliminar"));
+    modal.show();
+}
+
+document.getElementById("btnConfirmarEliminar").addEventListener("click", async () => {
+    if (!idEliminar) return;
+
+    // Primero eliminar de la tabla intermedia para no violar la FK
+    const { error: errorRutEje } = await supabase
+        .from("rutina_eje")
+        .delete()
+        .eq("id_eje", idEliminar);
+
+    if (errorRutEje) {
+        console.error("Error al eliminar de rutina_eje:", errorRutEje);
+        mostrarAlerta("Error al eliminar el ejercicio", "danger");
+        return;
+    }
+
+    // Luego eliminar el ejercicio
+    const { error } = await supabase
+        .from("ejercicios")
+        .delete()
+        .eq("id_eje", idEliminar);
+
+    if (error) {
+        console.error("Error al eliminar ejercicio:", error);
+        mostrarAlerta("Error al eliminar el ejercicio", "danger");
+        return;
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminar"));
+    modal.hide();
+
+    mostrarAlerta("Ejercicio eliminado exitosamente", "success");
+    idEliminar = null;
+    cargarVideos();
+});
+
+
+// ══════════════════════════════════════════
+// INICIALIZAR
+// ══════════════════════════════════════════
 cargarVideos();
 window.editarEjercicio = editarEjercicio;
+window.eliminarEjercicio = eliminarEjercicio;

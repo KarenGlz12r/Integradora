@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ejercicios</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+   
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./ejercicios.css">
 </head>
-<body>
 
+<body>
     <div id="navbar"></div>
-    <main class=" main-content">
-                <div class="page-header">
+    <main class="main-content">
+        <div class="page-header">
             <div class="text">
-                <p><i class="bi bi-list-check"></i> Gestion de ejercicios</p>
+                <p><i class="bi bi-list-check"></i> Gestión de ejercicios</p>
             </div>
             <div class="button">
                 <a href="./crearEjercicio.html" class="btn-registrar">
@@ -25,49 +25,63 @@
                 </a>
             </div>
         </div>
-                <div class="content">
+
+        <div class="content">
             <div class="filtros">
                 <div class="barra">
                     <input type="text" class="input" id="search" placeholder="Buscar ejercicio...">
                     <i class="bi bi-search"></i>
                 </div>
-                <ul class="lista-filtros" id="filtrosList">
-                    <li class="filtro">Brazo</li>
-                    <li class="filtro">Pierna</li>
-                    <li class="filtro">Mano</li>
-                    <li class="filtro">Tobillo</li>
-                    <li class="filtro">Hombro</li>
-                    <li class="filtro">Cadera</li>
-                </ul>
+                <!-- <ul class="lista-filtros" id="filtrosList">
+                    <li class="filtro">Rotación</li>
+                    <li class="filtro">Flexibilidad</li>
+                    <li class="filtro">Fortalecimiento</li>
+                    <li class="filtro">Resistencia</li>
+                    <li class="filtro">Coordinación</li>
+                    <li class="filtro">Estiramiento</li>
+                </ul> -->
+                <!-- ← solo UN noResult aquí -->
+
                 <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
             </div>
         </div>
-        <!-- SECCIÓN DONDE SE MUESTRAN LOS EJERCICIOS -->
-         <section id="videos-disponibles" class="videos-disponibles ">
-            <p id="noResult" style="display:none">No se encontraron ejercicios.</p>
 
-         </section>
+        <!-- SECCIÓN DONDE SE MUESTRAN LOS EJERCICIOS -->
+        <section id="videos-disponibles" class="videos-disponibles"></section>
+               <!-- Modal confirmar eliminar -->
+        <div class="modal fade" id="modalEliminar" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">¿Eliminar rutina?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar este video?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </main>
 
-        <script>
+    <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
-
-                //CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML
                 const script = document.createElement('script');
                 script.type = 'module';
                 script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
-
             })
     </script>
     <script type="module" src="./ejercicios.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    
 </body>
+
 </html>

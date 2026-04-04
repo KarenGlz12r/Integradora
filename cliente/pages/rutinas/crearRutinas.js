@@ -89,12 +89,12 @@ async function RegistrarRutinas() {
         .single();
 
     // Verificar nombre duplicado
- const { data: rutExistente } = await supabase
-    .from("rutina")
-    .select("id_rut")
-    .ilike("rut_nom", nombreRutina)
-    .eq("fisioterapeuta_id", fisio.id)
-    .maybeSingle();
+    const { data: rutExistente } = await supabase
+        .from("rutina")
+        .select("id_rut")
+        .ilike("rut_nom", nombreRutina)
+        .eq("fisioterapeuta_id", fisio.id)
+        .maybeSingle();
 
     if (rutExistente) {
         mostrarAlerta("Ya existe una rutina con ese nombre", "warning");

@@ -67,8 +67,10 @@ function renderRutinas(rutinas) {
                 <p class="card-text">${rut.rut_desc}</p>
                 <p class="card-text objetivo-text">${rut.rut_objetivo}</p>
                 <div class="btn-accion">
-                    <button class="btn btn-warning" onclick="editarRutina('${rut.id_rut}')">Editar</button>
-                    <button class="btn btn-danger" onclick="eliminarRutina('${rut.id_rut}')">Eliminar</button>
+                    <button class="btn btn-warning" onclick="editarRutina('${rut.id_rut}')">
+                     <i class="bi bi-pencil"></i> Editar</button>
+                    <button class="btn btn-danger" onclick="eliminarRutina('${rut.id_rut}')">
+                     <i class="bi bi-trash"></i> Eliminar</button>
                 </div>
             </div>
         </div>`).join('');
@@ -76,45 +78,51 @@ function renderRutinas(rutinas) {
 function editarRutina(id) {
     window.location.href = `./EditarRutina.html?id=${id}`;
 }
-
 // ══════════════════════════════════════════
 // ELIMINAR RUTINA
 // ══════════════════════════════════════════
-let idEliminar = null; // Guarda el id de la rutina a eliminar
+let idEliminar = null;
 
 function eliminarRutina(id) {
     idEliminar = id;
-    // Abre el modal de confirmación
     const modal = new bootstrap.Modal(document.getElementById("modalEliminar"));
     modal.show();
 }
 
-// Botón confirmar dentro del modal
 document.getElementById("btnConfirmarEliminar").addEventListener("click", async () => {
     if (!idEliminar) return;
 
+    // Primero eliminar de la tabla intermedia para no violar la FK
+    const { error: errorRutEje } = await supabase
+        .from("rutina_eje")
+        .delete()
+        .eq("id_rut", idEliminar);
+
+    if (errorRutEje) {
+        console.error("Error al eliminar de rutina_eje:", errorRutEje);
+        mostrarAlerta("Error al eliminar la rutina", "danger");
+        return;
+    }
+
+    // Luego eliminar la rutina
     const { error } = await supabase
         .from("rutina")
         .delete()
         .eq("id_rut", idEliminar);
 
     if (error) {
-        console.error(error);
+        console.error("Error al eliminar rutina:", error);
         mostrarAlerta("Error al eliminar la rutina", "danger");
         return;
     }
 
-    // Cerrar modal
     const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminar"));
     modal.hide();
 
     mostrarAlerta("Rutina eliminada exitosamente", "success");
     idEliminar = null;
-
-    // Recargar las rutinas
     cargarRutinas();
 });
-
 
 
 // ══════════════════════════════════════════
