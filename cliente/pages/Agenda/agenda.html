@@ -56,11 +56,24 @@
                         <i class="bi bi-circle-fill" id="det-estado-icon"></i>
                         <span id="det-estado"></span>
                     </div>
-                    <!-- <div class="detalle-fila" id="det-notas-fila">
-                        <i class="bi bi-journal-text"></i>
-                        <span id="det-notas"></span>
-                    </div> -->
+                 <!-- CAMBIAR FECHA Y HORA -->
+<div class="detalle-fila align-items-center mt-2">
+    <i class="bi bi-calendar3" style="color:#9b1b6e;"></i>
+    <div class="d-flex align-items-center gap-2 w-100">
+        <label class="fw-semibold mb-0" style="color:#6e1068; white-space:nowrap;">Fecha:</label>
+        <input type="date" id="input-fecha" class="form-control form-control-sm">
+    </div>
+</div>
 
+<div class="detalle-fila align-items-center mt-2">
+    <i class="bi bi-clock" style="color:#9b1b6e;"></i>
+    <div class="d-flex gap-2 w-100 align-items-center">
+        <label class="fw-semibold mb-0" style="color:#6e1068; white-space:nowrap;">Hora:</label>
+        <input type="time" id="input-hora-inicio" class="form-control form-control-sm">
+        <span style="color:#6e1068;">—</span>
+        <input type="time" id="input-hora-fin" class="form-control form-control-sm">
+    </div>
+</div>
                     <!-- SEPARADOR -->
                     <hr style="border-color: #e8a0d0; margin: 1rem 0;">
 

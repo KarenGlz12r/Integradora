@@ -41,12 +41,15 @@ async function cargarCitas(fisioId) {
             backgroundColor: color.bg,
             borderColor: color.border,
             extendedProps: {
-                paciente: cita.usuario?.us_nom ?? '—',
-                telefono: cita.usuario?.us_telefono ?? '—',
-                correo:   cita.usuario?.us_correo ?? '—',
-                motivo:   cita.motivo,
-                estado:   cita.estado,
-                notas:    cita.notas_fisio
+                paciente:   cita.usuario?.us_nom ?? '—',
+                telefono:   cita.usuario?.us_telefono ?? '—',
+                correo:     cita.usuario?.us_correo ?? '—',
+                motivo:     cita.motivo,
+                estado:     cita.estado,
+                notas:      cita.notas_fisio,
+                fecha:      cita.fecha,
+                horaInicio: cita.hora_inicio,
+                horaFin:    cita.hora_fin
             }
         };
     });
@@ -80,8 +83,8 @@ async function inicializar() {
             document.getElementById('det-horario').textContent  =
                 `${info.event.start.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })} — 
                  ${info.event.end?.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) ?? ''}`;
-            document.getElementById('det-motivo').textContent  = p.motivo;
-            document.getElementById('det-estado').textContent  = p.estado.replace('_', ' ');
+            document.getElementById('det-motivo').textContent = p.motivo;
+            document.getElementById('det-estado').textContent = p.estado.replace('_', ' ');
 
             // Color icono estado
             const colores = {
@@ -90,18 +93,12 @@ async function inicializar() {
             };
             document.getElementById('det-estado-icon').style.color = colores[p.estado] || '#1565c0';
 
-            // // Notas solo lectura
-            // const notasFila = document.getElementById('det-notas-fila');
-            // if (p.notas) {
-            //     document.getElementById('det-notas').textContent = p.notas;
-            //     notasFila.style.display = 'flex';
-            // } else {
-            //     notasFila.style.display = 'none';
-            // }
-
-            // Prellenar selector y textarea
-            document.getElementById('select-estado').value  = p.estado;
-            document.getElementById('input-notas').value    = p.notas ?? '';
+            // Prellenar selector, textarea, fecha y horas
+            document.getElementById('select-estado').value    = p.estado;
+            document.getElementById('input-notas').value      = p.notas ?? '';
+            document.getElementById('input-fecha').value      = p.fecha;
+            document.getElementById('input-hora-inicio').value = p.horaInicio?.slice(0, 5) ?? '';
+            document.getElementById('input-hora-fin').value   = p.horaFin?.slice(0, 5) ?? '';
 
             // Guardar citaId en el botón
             document.getElementById('btn-guardar-estado').dataset.citaId = citaId;
@@ -112,45 +109,60 @@ async function inicializar() {
 
     calendario.render();
 
-document.getElementById('btn-guardar-estado').addEventListener('click', async () => {
-    const btn         = document.getElementById('btn-guardar-estado');
-    const citaId      = btn.dataset.citaId;
-    const nuevoEstado = document.getElementById('select-estado').value;
-    const nuevasNotas = document.getElementById('input-notas').value.trim();
+    // ── Guardar cambios ──
+    document.getElementById('btn-guardar-estado').addEventListener('click', async () => {
+        const btn          = document.getElementById('btn-guardar-estado');
+        const citaId       = btn.dataset.citaId;
+        const nuevoEstado  = document.getElementById('select-estado').value;
+        const nuevasNotas  = document.getElementById('input-notas').value.trim();
+        const nuevaFecha   = document.getElementById('input-fecha').value;
+        const nuevaHoraIni = document.getElementById('input-hora-inicio').value;
+        const nuevaHoraFin = document.getElementById('input-hora-fin').value;
 
-    console.log('Intentando guardar:', { citaId, nuevoEstado, nuevasNotas }); // ← debug
+        if (!nuevaFecha || !nuevaHoraIni || !nuevaHoraFin) {
+            alert('La fecha y horas son obligatorias.');
+            return;
+        }
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+        if (nuevaHoraFin <= nuevaHoraIni) {
+            alert('La hora de fin debe ser mayor a la hora de inicio.');
+            return;
+        }
 
-    const { data, error } = await supabase
-        .from('citas')
-        .update({ 
-            estado: nuevoEstado, 
-            notas_fisio: nuevasNotas 
-        })
-        .eq('id', citaId)
-        .select();
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
 
-    console.log('Respuesta Supabase:', data, error); // ← debug
+        const { data, error } = await supabase
+            .from('citas')
+            .update({
+                estado:      nuevoEstado,
+                notas_fisio: nuevasNotas,
+                fecha:       nuevaFecha,
+                hora_inicio: nuevaHoraIni + ':00',
+                hora_fin:    nuevaHoraFin + ':00'
+            })
+            .eq('id', citaId)
+            .select();
 
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-floppy"></i> Guardar';
+        console.log('Respuesta Supabase:', data, error);
 
-    if (error) { 
-        console.error('Error al actualizar cita:', error); 
-        alert('Error al guardar, intenta de nuevo.');
-        return; 
-    }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-floppy"></i> Guardar';
 
-    const nuevosEventos = await cargarCitas(fisioId);
-    calendario.removeAllEvents();
-    calendario.addEventSource(nuevosEventos);
+        if (error) {
+            console.error('Error al actualizar cita:', error);
+            alert('Error al guardar, intenta de nuevo.');
+            return;
+        }
 
-    modal.hide();
-});
+        const nuevosEventos = await cargarCitas(fisioId);
+        calendario.removeAllEvents();
+        calendario.addEventSource(nuevosEventos);
 
-    // Tiempo real
+        modal.hide();
+    });
+
+    // ── Tiempo real ──
     supabase
         .channel('agenda-citas')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'citas' }, async () => {
@@ -161,4 +173,4 @@ document.getElementById('btn-guardar-estado').addEventListener('click', async ()
         .subscribe();
 }
 
-inicializar();3
+inicializar();
