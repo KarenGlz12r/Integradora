@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="./login.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <div class="login-header">
+                <i class="bi bi-heart-pulse-fill"></i>
+                <h1>Motricare</h1>
+                <p>Inicia sesión para ver tus mensajes</p>
+            </div>
+
+            <div class="login-body">
+                <div class="input-group-custom">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="correo" placeholder="Correo electrónico" />
+                </div>
+
+                <div class="input-group-custom">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" id="password" placeholder="Contraseña" />
+                    <i class="bi bi-eye toggle-pass" id="togglePass"></i>
+                </div>
+
+                <p class="error-msg" id="errorMsg"></p>
+
+                <button class="btn-login" id="btnLogin">
+                    <span id="btnTexto">Entrar</span>
+                    <div class="spinner-border spinner-border-sm d-none" id="spinner"></div>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="./login.js"></script>
+</body>
+</html>

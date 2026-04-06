@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis mensajes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="./chat.css">
+</head>
+<body>
+    <header class="chat-header">
+        <div class="chat-header-left">
+            <i class="bi bi-heart-pulse-fill"></i>
+            <span>Motricare</span>
+        </div>
+        <button class="btn-cerrar" id="btnCerrar">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+    </header>
+
+    <main class="chat-main">
+        <div id="talkjs-container" class="chat-container">
+            <div class="chat-loading">
+                <div class="spinner-border" role="status"></div>
+                <p>Cargando mensajes...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./chat.js"></script>
+</body>
+</html>

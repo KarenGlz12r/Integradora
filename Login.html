@@ -27,14 +27,37 @@
         </form>
 
     </div>
-    <script type="module">
-        import { login } from "./auth.js";
-        import { redirigirSesionActiva } from "./proteger.js";
+   <script type="module">
+    import { login } from "./auth.js";
+    import { redirigirSesionActiva } from "./proteger.js";
 
+    // Muestra loading mientras verifica sesión
+    const btn = document.getElementById("btnLogin");
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+
+    try {
         await redirigirSesionActiva();
+    } catch(e) {
+        console.error('Error verificando sesión:', e);
+    }
 
-        document.getElementById("btnLogin").addEventListener("click", login);  
-    </script>
+    // Reactiva el botón siempre
+    btn.disabled = false;
+    btn.textContent = "Iniciar sesión";
+
+    btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        btn.textContent = "Entrando...";
+        try {
+            await login();
+        } catch(e) {
+            console.error('Error en login:', e);
+        }
+        btn.disabled = false;
+        btn.textContent = "Iniciar sesión";
+    });
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

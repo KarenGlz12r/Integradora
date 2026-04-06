@@ -144,6 +144,7 @@ function renderVideos(ejercicios) {
         </div>
     `).join('');
 }
+
 // Listener: rellena el modal antes de mostrarlo
 document.getElementById('modalDescripcion')
     .addEventListener('show.bs.modal', function (e) {

@@ -116,6 +116,8 @@ async function cargarProximaCita(fisioId) {
 }
 
 // CARGAR LOS PACIENTES Y SU INFORMACIÓN DE CITA
+
+// CARGAR LOS PACIENTES Y SU INFORMACIÓN DE CITA
 async function cargarPacientes(fisioId) {
     const { data: citas, error } = await supabase
         .from('citas')
@@ -135,17 +137,12 @@ async function cargarPacientes(fisioId) {
         .eq('fisioterapeuta_id', fisioId)
         .order('fecha', { ascending: false });
 
-    if (error) {
-        console.error('Error cargando pacientes:', error);
-        return;
-    }
+    if (error) { console.error('Error cargando pacientes:', error); return; }
 
     const seccion = document.getElementById('lista-pacientes');
 
     if (!citas || citas.length === 0) {
-        seccion.innerHTML = `
-            <p class="sin-pacientes">No tienes pacientes registrados aún.</p>
-        `;
+        seccion.innerHTML = `<p class="sin-pacientes">No tienes pacientes registrados aún.</p>`;
         return;
     }
 
@@ -178,9 +175,24 @@ async function cargarPacientes(fisioId) {
                     ${cita.estado.replace('_', ' ')}
                 </span>
             </div>
+            <!-- ← BOTÓN NUEVO -->
+            <button 
+                class="btn-chat-paciente" 
+                onclick="abrirChat('${cita.usuario?.id_us}', '${cita.usuario?.us_nom}')">
+                <i class="bi bi-chat-dots-fill"></i> Mensaje
+            </button>
         </div>
     `).join('');
 }
+
+// ← FUNCIÓN NUEVA al final del archivo, antes de inicializar()
+window.abrirChat = function(pacienteId, pacienteNombre) {
+    if (!pacienteId) return;
+    sessionStorage.setItem('chatPacienteId', pacienteId);
+    sessionStorage.setItem('chatPacienteNombre', pacienteNombre);
+    window.location.href = '../Chat/chat.html';
+}
+
 // ── TIEMPO REAL ──────────────────────────────────────────────────
 function activarTiempoReal(fisioId) {
     // Escucha cambios en citas

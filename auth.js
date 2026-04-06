@@ -16,20 +16,22 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // LOGIN
 // ===============================
 export async function login() {
-  const email = document.getElementById("emailLogin").value.trim();
-  const password = document.getElementById("password").value;
+    const email    = document.getElementById("emailLogin").value.trim();
+    const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+    if (!email || !password) {
+        mostrarAlerta("Por favor llena todos los campos.", "warning");
+        return;
+    }
 
-  if (error) {
-    mostrarAlerta("Credenciales incorrectas", "danger");
-    return;
-  }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  await redirigirPorRol();
+    if (error) {
+        mostrarAlerta("Credenciales incorrectas.", "danger");
+        return;
+    }
+
+    await redirigirPorRol();
 }
 
 // ===============================

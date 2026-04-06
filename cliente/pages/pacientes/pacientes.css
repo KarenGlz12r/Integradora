@@ -308,6 +308,29 @@
 .estado-confirmada     { background: #e8f5e9; color: #2e7d32; }
 .estado-pendiente_pago { background: #fff3e0; color: #e65100; }
 .estado-cancelada      { background: #fce4ec; color: #c62828; }
+
+
+/* CHAT DESDE EL DE PACINTES */
+.btn-chat-paciente {
+    margin-top: 0.75rem;
+    width: 100%;
+    padding: 0.5rem;
+    background: #6e1068;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background 0.2s;
+}
+
+.btn-chat-paciente:hover {
+    background: #5f104a;
+}
 /* ── MEDIA QUERIES ─────────────────────────────────────────────── */
 
 /* Tablets grandes y laptops pequeñas (max 1200px) */

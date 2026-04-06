@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+/* ══════════════════════════════════════════
+   VARIABLES
+══════════════════════════════════════════ */
+:root {
+    --color-primary: #9b1b6e;
+    --color-primary-dk: #7a1254;
+    --color-primary-lt: #fce4f3;
+    --color-hover: #f7c9e8;
+    --color-text-dark: #3d0030;
+    --color-border: #e8a0d0;
+    --color-white: #ffffff;
+}
+
+/* ══════════════════════════════════════════
+   GLOBALES
+══════════════════════════════════════════ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.main-content {
+    margin-top: 3.5rem;
+    margin-left: 4rem;
+    padding: 1rem 1rem 0 1rem;
+    height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+    overflow: hidden;
+}
+
+.main-content.menu-toggle {
+    margin-left: 18.75rem;
+}
+
+/* ══════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════ */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    flex-shrink: 0; /* ← no se encoge */
+}
+
+.page-header .button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.text {
+    color: var(--color-primary);
+    font-size: 30px;
+    font-weight: 900;
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* ══════════════════════════════════════════
+   CHAT
+══════════════════════════════════════════ */
+.chat-container {
+    flex: 1;              /* ← ocupa todo el espacio restante */
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 1rem;
+}
+
+.chat-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+    color: #6e1068;
+}
+
+.text-purple {
+    color: #6e1068 !important;
+}
+
+/* ══════════════════════════════════════════
+   MEDIA QUERIES
+══════════════════════════════════════════ */
+
+/* Laptops pequeñas (max 1200px) */
+@media (max-width: 1200px) {
+    .text { font-size: 26px; }
+}
+
+/* Tablets (max 900px) */
+@media (max-width: 900px) {
+    .main-content {
+        margin-left: 0;
+        padding: 0.75rem 0.75rem 0;
+        height: calc(100vh - 3.5rem);
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 0;
+    }
+
+    .text { font-size: 22px; }
+
+    .chat-container {
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Móviles (max 600px) */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 0.5rem 0.5rem 0;
+        margin-top: 3rem;
+        height: calc(100vh - 3rem);
+    }
+
+    .text { font-size: 18px; }
+
+    .page-header { margin-bottom: 0.5rem; }
+
+    .chat-container {
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Móviles muy pequeños (max 380px) */
+@media (max-width: 380px) {
+    .text { font-size: 16px; }
+
+    .main-content {
+        padding: 0.4rem 0.4rem 0;
+    }
+}
