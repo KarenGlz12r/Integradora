@@ -10,9 +10,55 @@ let filtroActivo = 'todos';
 // CARGAR EJERCICIOS
 // ══════════════════════════════════════════
 async function cargarVideos() {
+    // 1. Obtener el usuario con sesión activa
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // 2. Obtener el fisioterapeuta que corresponde a ese usuario
+    const { data: fisio, error: errorFisio } = await supabase
+        .from("fisioterapeutas")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+    if (errorFisio) { console.error(errorFisio); return; }
+
+    // 3. Obtener las rutinas que pertenecen a ese fisioterapeuta
+    const { data: rutinas, error: errorRutinas } = await supabase
+        .from("rutina")
+        .select("id_rut")
+        .eq("fisioterapeuta_id", fisio.id);
+
+    if (errorRutinas) { console.error(errorRutinas); return; }
+
+    const idsRutinas = rutinas.map(r => r.id_rut);
+
+    if (idsRutinas.length === 0) {
+        todas = [];
+        renderVideos([]);
+        return;
+    }
+
+    // 4. Obtener los ids de ejercicios que pertenecen a esas rutinas
+    const { data: rutinaEjes, error: errorRE } = await supabase
+        .from("rutina_eje")
+        .select("id_eje")
+        .in("id_rut", idsRutinas);
+
+    if (errorRE) { console.error(errorRE); return; }
+
+    const idsEjercicios = [...new Set(rutinaEjes.map(re => re.id_eje))];
+
+    if (idsEjercicios.length === 0) {
+        todas = [];
+        renderVideos([]);
+        return;
+    }
+
+    // 5. Obtener solo los ejercicios de esas ids
     const { data, error } = await supabase
         .from("ejercicios")
-        .select("id_eje, eje_nom, eje_desc, eje_video");
+        .select("id_eje, eje_nom, eje_desc, eje_video")
+        .in("id_eje", idsEjercicios);
 
     if (error) { console.error(error); return; }
 

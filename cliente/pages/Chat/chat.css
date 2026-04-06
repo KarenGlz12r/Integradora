@@ -52,7 +52,7 @@ html, body {
     justify-content: space-between;
     width: 100%;
     margin-bottom: 0.75rem;
-    flex-shrink: 0; /* ← no se encoge */
+    flex-shrink: 0;
 }
 
 .page-header .button {
@@ -76,7 +76,7 @@ html, body {
    CHAT
 ══════════════════════════════════════════ */
 .chat-container {
-    flex: 1;              /* ← ocupa todo el espacio restante */
+    flex: 1;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -109,13 +109,13 @@ html, body {
 /* Tablets (max 900px) */
 @media (max-width: 900px) {
     .main-content {
-        margin-left: 0;
+        margin-left: 4rem; /* Mantiene sidebar colapsado */
         padding: 0.75rem 0.75rem 0;
         height: calc(100vh - 3.5rem);
     }
 
     .main-content.menu-toggle {
-        margin-left: 0;
+        margin-left: 18.75rem; /* Mantiene sidebar expandido */
     }
 
     .text { font-size: 22px; }
@@ -129,9 +129,14 @@ html, body {
 /* Móviles (max 600px) */
 @media (max-width: 600px) {
     .main-content {
+        margin-left: 4rem;
         padding: 0.5rem 0.5rem 0;
         margin-top: 3rem;
         height: calc(100vh - 3rem);
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 18.75rem;
     }
 
     .text { font-size: 18px; }
@@ -146,9 +151,14 @@ html, body {
 
 /* Móviles muy pequeños (max 380px) */
 @media (max-width: 380px) {
-    .text { font-size: 16px; }
-
     .main-content {
+        margin-left: 4rem;
         padding: 0.4rem 0.4rem 0;
     }
+
+    .main-content.menu-toggle {
+        margin-left: 18.75rem;
+    }
+
+    .text { font-size: 16px; }
 }

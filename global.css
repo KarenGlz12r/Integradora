@@ -1,319 +1,163 @@
 /* ====== BODY ====== */
-/* Sección: estilos globales del body */
 body {
-    /* Selector del elemento <body> */
     min-height: 100vh;
-    /* Altura mínima: ocupa al menos toda la altura de la ventana */
     margin: 0;
-    /* Elimina el margen por defecto del navegador */
     background: linear-gradient(180deg,
-            /* Fondo: degradado vertical */
-            #275e42 0%,
-            #6FAF98 60%,
-            #275e42 100%);
-    /* Color final en 100% */
+            #7a1254 0%,
+            #9b1b6e 60%,
+            #7a1254 100%);
     font-family: 'Segoe UI', sans-serif;
-    /* Tipografía principal y fallback */
     position: relative;
-    /* Posicionamiento relativo para contener pseudo-elementos */
     overflow: hidden;
-    /* Oculta contenido que sobresalga del body */
 }
-
-/* Cierre de body */
 
 body::before,
-/* Pseudo-elemento antes del body */
 body::after {
-    /* Pseudo-elemento después del body */
     content: "";
-    /* Contenido vacío necesario para mostrar el pseudo-elemento */
     position: absolute;
-    /* Posición absoluta respecto al body (relative) */
     width: 140%;
-    /* Ancho mayor al 100% para crear efectos de halo */
     height: 40%;
-    /* Alto del pseudo-elemento */
     left: -20%;
-    /* Desplazamiento horizontal para centrar el halo visual */
     border-radius: 50%;
-    /* Forma el pseudo-elemento como un óvalo */
     background: radial-gradient(ellipse at center,
-            /* Fondo radial para brillo */
             rgba(255, 255, 255, 0.25),
-            /* Centro más claro semitransparente */
             transparent 70%);
-    /* Se desvanece a transparente */
     z-index: 0;
-    /* Coloca detrás del contenido principal */
 }
-
-/* Cierre de body::before, body::after */
 
 body::before {
-    /* Estilos específicos para ::before */
     top: -10%;
-    /* Posición vertical: ligeramente fuera arriba */
 }
-
-/* Cierre de body::before */
 
 body::after {
-    /* Estilos específicos para ::after */
     bottom: -15%;
-    /* Posición vertical: ligeramente fuera abajo */
 }
-
-/* Cierre de body::after */
 
 .background-noise {
-    /* Capa fija para ruido/grano sobre el fondo */
     position: fixed;
-    /* Fija la capa en la ventana */
     inset: 0;
-    /* Equivalente a top:0; right:0; bottom:0; left:0; */
     background-image:
         radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-    /* Patrón de puntos pequeños */
     background-size: 3px 3px;
-    /* Tamaño del patrón para repetir */
     pointer-events: none;
-    /* No interfiere con clics/hover */
     opacity: 0.3;
-    /* Opacidad baja para efecto sutil */
     z-index: 1;
-    /* Por encima de pseudo-elementos de fondo, por debajo del contenido principal */
 }
-
-/* Cierre de .background-noise */
 
 /* ====== TÍTULO ====== */
-/* Sección: estilo del título principal */
 .titulo {
-    /* Clase para el título de la página */
     text-align: center;
-    /* Centra el texto horizontalmente */
     margin-top: 50px;
-    /* Separación superior */
     font-size: 38px;
-    /* Tamaño grande para destacar */
     font-weight: 700;
-    /* Negrita */
     color: #ffffff;
-    /* Texto en blanco */
     letter-spacing: 1px;
-    /* Espaciado entre letras */
 }
-
-/* Cierre de .titulo */
 
 /* ====== CONTENEDOR ====== */
-/* Sección: tarjeta contenedora del formulario */
 .container {
-    /* Clase para el contenedor principal */
     max-width: 460px;
-    /* Ancho máximo fijo para la tarjeta */
-    background: linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 100%);
-    /* Fondo degradado claro */
+    background: linear-gradient(180deg, #FFFFFF 0%, #fce4f3 100%);
     border-radius: 35px;
-    /* Bordes redondeados pronunciados */
     padding: 35px;
-    /* Espaciado interno */
     border: 1px solid rgba(255, 255, 255, 0.6);
-    /* Borde sutil semitransparente */
     box-shadow:
-        /* Sombras para profundidad */
         0px 25px 50px rgba(0, 0, 0, 0.15),
-        /* Sombra principal oscura y difusa */
-        0px 10px 25px rgba(111, 175, 152, 0.25);
-    /* Sombra secundaria con tono verde */
+        0px 10px 25px rgba(155, 27, 110, 0.25);
     margin: 80px auto;
-    /* Separación vertical y centrado horizontal (auto) */
 }
-
-/* Cierre de .container */
 
 /* ====== ENCABEZADO ====== */
-/* Sección: subtítulo/encabezado dentro de la tarjeta */
 .heading {
-    /* Clase para encabezados dentro del contenedor */
     text-align: center;
-    /* Centrado del texto */
     font-weight: 800;
-    /* Muy negrita */
     font-size: 28px;
-    /* Tamaño medio-grande */
-    color: #2E2E2E;
-    /* Color gris oscuro para el texto */
+    color: #3d0030;
     margin-bottom: 10px;
-    /* Separación inferior */
 }
-
-/* Cierre de .heading */
 
 /* ====== FORM ====== */
-/* Sección: formulario */
 .form {
-    /* Clase para el bloque del formulario */
     margin-top: 25px;
-    /* Separación superior respecto al encabezado */
 }
-
-/* Cierre de .form */
 
 /* ====== INPUTS ====== */
-/* Sección: campos de entrada */
 .form .input {
-    /* Selector: elemento con clase input dentro de .form */
     width: 90%;
-    /* Ancho relativo al contenedor del formulario */
     background: #FFFFFF;
-    /* Fondo blanco para el input */
-    border: 1px solid #E2E6EA;
-    /* Borde claro */
+    border: 1px solid #e8a0d0;
     padding: 16px 22px;
-    /* Espaciado interno vertical y horizontal */
     border-radius: 18px;
-    /* Bordes redondeados */
     margin-top: 18px;
-    /* Separación superior entre campos */
     font-size: 15px;
-    /* Tamaño de fuente para el texto dentro */
     transition: all 0.2s ease;
-    /* Transición suave para hover/focus */
 }
-
-/* Cierre de .form .input */
 
 .form .input::placeholder {
-    /* Estilo para el texto placeholder del input */
     color: #9A9A9A;
-    /* Color gris para placeholder */
 }
-
-/* Cierre de ::placeholder */
 
 .form .input:focus {
-    /* Estado cuando el input está enfocado */
     outline: none;
-    /* Elimina el outline por defecto */
-    border-color: #6FAF98;
-    /* Cambia el borde a verde suave */
-    box-shadow: 0px 0px 0px 4px rgba(111, 175, 152, 0.2);
-    /* Resplandor alrededor del input */
+    border-color: #9b1b6e;
+    box-shadow: 0px 0px 0px 4px rgba(155, 27, 110, 0.2);
 }
-
-/* Cierre de :focus */
 
 /* ====== OLVIDÓ CONTRASEÑA ====== */
-/* Sección: enlace de recuperar contraseña */
 .form .forgot-password {
-    /* Contenedor para el enlace de contraseña */
     margin-top: 12px;
-    /* Espacio superior */
     text-align: right;
-    /* Alinea el enlace a la derecha */
 }
-
-/* Cierre de .forgot-password */
 
 .form .forgot-password a {
-    /* Estilo para el enlace dentro de forgot-password */
     font-size: 12px;
-    /* Tamaño pequeño */
-    color: #4F7F6A;
-    /* Color verde grisáceo */
+    color: #9b1b6e;
     text-decoration: none;
-    /* Sin subrayado por defecto */
     transition: color 0.2s ease;
-    /* Transición suave al cambiar color */
 }
-
-/* Cierre de .forgot-password a */
 
 .form .forgot-password a:hover {
-    /* Estado hover del enlace */
-    color: #2F6B55;
-    /* Color más oscuro al pasar el cursor */
+    color: #7a1254;
 }
-
-/* Cierre de :hover */
 
 /* ====== BOTÓN ====== */
-/* Sección: botón de iniciar sesión */
 .form .login-button {
-    /* Estilos del botón dentro del formulario */
     width: 100%;
-    /* Ocupa todo el ancho disponible */
     font-weight: 600;
-    /* Semi-negrita */
     font-size: 16px;
-    /* Tamaño de texto legible */
-    background: linear-gradient(135deg, #4F7F6A 0%, #6FAF98 100%);
-    /* Degradado diagonal verde */
+    background: linear-gradient(135deg, #7a1254 0%, #9b1b6e 100%);
     color: white;
-    /* Texto en blanco */
     padding: 16px;
-    /* Espaciado interno */
     margin-top: 30px;
-    /* Separación superior */
     border-radius: 22px;
-    /* Bordes redondeados del botón */
     border: none;
-    /* Sin borde visible */
     cursor: pointer;
-    /* Cursor de mano al pasar por encima */
-    box-shadow: 0px 15px 30px rgba(79, 127, 106, 0.4);
-    /* Sombra para elevar el botón */
+    box-shadow: 0px 15px 30px rgba(155, 27, 110, 0.4);
     transition: all 0.25s ease;
-    /* Transición para transformaciones y sombras */
 }
-
-/* Cierre de .login-button */
 
 .form .login-button:hover {
-    /* Estado hover del botón */
     transform: translateY(-2px);
-    /* Leve elevación visual */
-    box-shadow: 0px 20px 35px rgba(79, 127, 106, 0.5);
-    /* Sombra más pronunciada */
+    box-shadow: 0px 20px 35px rgba(155, 27, 110, 0.5);
 }
-
-/* Cierre de :hover */
 
 .form .login-button:active {
-    /* Estado activo (al hacer clic) */
     transform: scale(0.97);
-    /* Ligera reducción para efecto de pulsación */
 }
 
-/* Cierre de :active */
-
-
 /* ====== LOGO ====== */
-/* Sección: logo de navegación o marca */
 .logo-nav {
-    /* Clase para la imagen del logo */
     height: 100px;
-    /* Altura fija */
     width: auto;
-    /* Ancho automático manteniendo proporción */
     object-fit: contain;
-    /* Escala la imagen sin recortar */
     display: block;
-    /* Evita comportamiento inline y permite margin auto */
     margin: 30px auto 0;
-    /* Centrado horizontal y margen superior */
     transition: transform 0.2s ease;
-    /* Transición para el efecto hover */
 }
 
 .logo-nav:hover {
-    /* Estado hover del logo */
     transform: scale(1.05);
-    /* Pequeño agrandamiento al pasar el cursor */
 }
-
 
 /* MEDIA QUERIES */
 

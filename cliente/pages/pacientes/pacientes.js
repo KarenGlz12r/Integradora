@@ -38,8 +38,9 @@ async function cargarTotalPacientesConfirmados(fisioId) {
 // 2. PACIENTES NUEVOS ESTE MES  ← nombre corregido
 async function cargarPacientesNuevosMes(fisioId) {
     const ahora = new Date();
-    const primerDia = new Date(ahora.getFullYear(), ahora.getMonth(), 1).toISOString();
-    const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0).toISOString(); // ← toISOString corregido
+    const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-01`;
+    const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
+        .toISOString().split('T')[0];
 
     const { data: citas } = await supabase
         .from('citas')
@@ -54,17 +55,35 @@ async function cargarPacientesNuevosMes(fisioId) {
 
 // 3. CITAS PENDIENTES DE PAGO
 async function cargarCitasPendientesPago(fisioId) {
-    const { data: pagos } = await supabase.from('pagos').select('cita_id');
-    const citasConPago = pagos?.map(p => p.cita_id) || [];
-
+    // Trae citas con estado pendiente_pago del fisio
     const { data: citas } = await supabase
         .from('citas')
         .select('id')
         .eq('fisioterapeuta_id', fisioId)
         .eq('estado', 'pendiente_pago');
 
-    const pendientes = citas?.filter(c => !citasConPago.includes(c.id)) || [];
-    document.getElementById('card-pendientes-pago').querySelector('.card-stat-numero').textContent = pendientes.length;
+    if (!citas || citas.length === 0) {
+        document.getElementById('card-pendientes-pago')
+            .querySelector('.card-stat-numero').textContent = 0;
+        return;
+    }
+
+    const idsCitas = citas.map(c => c.id);
+
+    // De esas citas, busca cuáles tienen pago con estado 'procesado'
+    const { data: pagosCompletados } = await supabase
+        .from('pagos')
+        .select('cita_id')
+        .in('cita_id', idsCitas)
+        .eq('estado_pago', 'procesado');
+
+    const citasPagadas = new Set(pagosCompletados?.map(p => p.cita_id) || []);
+
+    // Solo cuenta las que NO tienen pago procesado
+    const pendientes = idsCitas.filter(id => !citasPagadas.has(id));
+
+    document.getElementById('card-pendientes-pago')
+        .querySelector('.card-stat-numero').textContent = pendientes.length;
 }
 
 

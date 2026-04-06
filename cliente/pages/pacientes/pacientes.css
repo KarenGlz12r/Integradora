@@ -103,7 +103,7 @@
 
 }
 .bi-person-lines-fill{
-    color: #1e721e;
+    color: #721e71;
     font-size: 28px;
 
     
@@ -167,9 +167,9 @@
 
 .total-badge {
   font-size: 20px;
-  color: #273327;
-  border: 1px solid #C8E6C9;
- background-color: #E8F5E9;
+  color: #312733;
+  border: 1px solid #cfa4c4;
+ background-color: #f5e8f3;
   padding: 2px 10px;
   border-radius: 15px;
   font-weight: 700;
@@ -189,7 +189,7 @@
   border-radius: 50%;
   border: none;
   outline: none;
-  background-color: #139143;
+  background-color: #8d1391;
   color: white;
   padding: 10px 40px 10px 10px;
   box-shadow: 0px 0px 3px #f3f3f3;
@@ -221,7 +221,7 @@
   width: 250px;
   border-radius: 0;
   background: transparent;
-  border-bottom: 3px solid #177c48;
+  border-bottom: 3px solid #7c1768;
   padding-left: 15px;
   padding-right: 50px;
 }
@@ -230,7 +230,7 @@
 /* COLOR DEL ICONO */
 .input:focus ~ .icon i,
 .icon:focus i {
-  color: #22aa32;
+  color: #a322aa;
   padding-left: 400px;
 }
 
@@ -336,19 +336,19 @@
 /* Tablets grandes y laptops pequeñas (max 1200px) */
 @media (max-width: 1200px) {
     .paciente-card {
-        width: calc(33.33% - 1rem); /* 3 por fila */
+        width: calc(33.33% - 1rem);
     }
 }
 
 /* Tablets (max 900px) */
 @media (max-width: 900px) {
     .main-content {
-        margin-left: 0;
+        margin-left: 4rem; /* Mantiene el sidebar colapsado */
         padding: 1rem;
     }
 
     .main-content.menu-toggle {
-        margin-left: 0;
+        margin-left: 18.75rem; /* Mantiene el sidebar expandido */
     }
 
     .cards-info {
@@ -361,15 +361,20 @@
     }
 
     .paciente-card {
-        width: calc(50% - 1rem); /* 2 por fila */
+        width: calc(50% - 1rem);
     }
 }
 
 /* Móviles (max 600px) */
 @media (max-width: 600px) {
     .main-content {
+        margin-left: 4rem; /* Respeta el sidebar */
         padding: 0.75rem;
         margin-top: 3rem;
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 18.75rem;
     }
 
     .cards-info {
@@ -399,7 +404,7 @@
     }
 
     .paciente-card {
-        width: 100%; /* 1 por fila */
+        width: 100%;
         min-width: unset;
     }
 
@@ -422,6 +427,15 @@
 
 /* Móviles muy pequeños (max 380px) */
 @media (max-width: 380px) {
+    .main-content {
+        margin-left: 4rem;
+        padding: 0.5rem;
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 18.75rem;
+    }
+
     .card-stat-numero {
         font-size: 1.5rem;
     }
