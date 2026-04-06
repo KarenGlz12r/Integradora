@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ejercicios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-   
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./ejercicios.css">
 </head>
@@ -32,23 +32,13 @@
                     <input type="text" class="input" id="search" placeholder="Buscar ejercicio...">
                     <i class="bi bi-search"></i>
                 </div>
-                <!-- <ul class="lista-filtros" id="filtrosList">
-                    <li class="filtro">Rotación</li>
-                    <li class="filtro">Flexibilidad</li>
-                    <li class="filtro">Fortalecimiento</li>
-                    <li class="filtro">Resistencia</li>
-                    <li class="filtro">Coordinación</li>
-                    <li class="filtro">Estiramiento</li>
-                </ul> -->
-                <!-- ← solo UN noResult aquí -->
-
                 <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
             </div>
         </div>
 
         <!-- SECCIÓN DONDE SE MUESTRAN LOS EJERCICIOS -->
         <section id="videos-disponibles" class="videos-disponibles"></section>
-               <!-- Modal confirmar eliminar -->
+        <!-- Modal confirmar eliminar -->
         <div class="modal fade" id="modalEliminar" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -62,6 +52,23 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL DE DESCRIPCIÓN -->
+        <div class="modal fade" id="modalDescripcion" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDescTitulo"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modalDescBody"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>

@@ -21,6 +21,8 @@
     display: flex;
     gap: 1rem;
     margin: 1rem 0.5rem;
+    align-items: center;
+    justify-content: center;
 
 }
 .card-info{
@@ -30,7 +32,7 @@
     background-color: #fafffa;
     border-radius: 20px;
     z-index: 1;
-    border: 1px solid #C8E6C9;
+    border: 1px solid #5f104a;
     box-shadow: 3px 3px 9px 2px #2c2c2a;
 }
 
@@ -61,7 +63,6 @@
 
 /* PARA LA INFORMACION DE LOS PACIENTES */
 .cards-info-pac{
-   
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
@@ -73,12 +74,12 @@
     background-color: rgb(247, 255, 248);
     border-radius: 20px;
     z-index: 1;
-    border: 1px solid #C8E6C9;
+    border: 1px solid #e6c8df;
     box-shadow: 3px 3px 9px 2px #2c2c2a;
     
 }
 .text {
-    color: #106e49;
+    color: #6e1068;
     font-size: 25px;
     font-family: 'Segoe UI';
     font-weight: 900;
@@ -89,7 +90,7 @@
 /* ICONOS */
 .bi-people {
   font-size: 30px;
-  color: rgb(17, 173, 17);
+  color: rgb(173, 17, 168);
 }
 
 .bi-calendar2-check{
@@ -107,6 +108,42 @@
 
     
 }
+/* CARD DE PACIENTES CONFIRMADOS */
+.card-stat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #ffe9f6;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: fit-content;
+    min-width: 200px;
+    height: 180px;
+    min-height: auto;
+}
+
+.card-stat-icon {
+    font-size: 2rem;
+    color: #a00f5f;
+    background: #f7c4fa;
+    border-radius: 10px;
+    padding: 0.5rem 0.7rem;
+}
+
+.card-stat-numero {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    line-height: 1;
+}
+
+.card-stat-label {
+    font-size: 0.85rem;
+    color: #74146f;
+    display: block;
+    margin-top: 2px;
+}
 
 /* SEPARACION DE LAS SECCIONES */
 .seccion-header {
@@ -117,7 +154,7 @@
   margin: 2rem 0 1rem;
   justify-content: center;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #add6af;
+  border-bottom: 2px solid #773969;
 }
 
 .seccion-header h2 {
@@ -129,12 +166,12 @@
 }
 
 .total-badge {
-  font-size: 15px;
+  font-size: 20px;
   color: #273327;
   border: 1px solid #C8E6C9;
  background-color: #E8F5E9;
   padding: 2px 10px;
-  border-radius: 20px;
+  border-radius: 15px;
   font-weight: 700;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
@@ -195,4 +232,182 @@
 .icon:focus i {
   color: #22aa32;
   padding-left: 400px;
+}
+
+/* PARA LAS CARDS DE LOS PACIENTES */
+.lista-pacientes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.paciente-card {
+  flex-direction: column;
+    align-items: flex-start;
+    width: calc(25% - 1rem);
+    min-width: 220px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s;
+}
+
+.paciente-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.paciente-avatar {
+    font-size: 2.8rem;
+    color: #9c27b0;
+    flex-shrink: 0;
+}
+
+.paciente-info {
+    flex: 1;
+}
+
+.paciente-nombre {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #212529;
+}
+
+.paciente-correo,
+.paciente-telefono {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin: 2px 0;
+}
+
+.paciente-cita {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.cita-fecha { font-weight: 600; color: #2e7d32; }
+.cita-hora  { color: #1565c0; }
+.cita-motivo { color: #6c757d; font-style: italic; }
+
+.cita-estado {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.estado-confirmada     { background: #e8f5e9; color: #2e7d32; }
+.estado-pendiente_pago { background: #fff3e0; color: #e65100; }
+.estado-cancelada      { background: #fce4ec; color: #c62828; }
+/* ── MEDIA QUERIES ─────────────────────────────────────────────── */
+
+/* Tablets grandes y laptops pequeñas (max 1200px) */
+@media (max-width: 1200px) {
+    .paciente-card {
+        width: calc(33.33% - 1rem); /* 3 por fila */
+    }
+}
+
+/* Tablets (max 900px) */
+@media (max-width: 900px) {
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 0;
+    }
+
+    .cards-info {
+        flex-wrap: wrap;
+    }
+
+    .card-stat {
+        width: 100%;
+        height: auto;
+    }
+
+    .paciente-card {
+        width: calc(50% - 1rem); /* 2 por fila */
+    }
+}
+
+/* Móviles (max 600px) */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 0.75rem;
+        margin-top: 3rem;
+    }
+
+    .cards-info {
+        flex-direction: column;
+    }
+
+    .card-info {
+        height: auto;
+        padding-bottom: 1rem;
+    }
+
+    .card-stat {
+        width: 100%;
+        min-width: unset;
+        height: auto;
+        flex-direction: row;
+    }
+
+    .seccion-header {
+        flex-wrap: wrap;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .lista-pacientes {
+        flex-direction: column;
+    }
+
+    .paciente-card {
+        width: 100%; /* 1 por fila */
+        min-width: unset;
+    }
+
+    .paciente-cita {
+        align-items: flex-start;
+    }
+
+    .input-wrapper {
+        width: 100%;
+    }
+
+    .stat-valor {
+        font-size: 20px;
+    }
+
+    .text {
+        font-size: 20px;
+    }
+}
+
+/* Móviles muy pequeños (max 380px) */
+@media (max-width: 380px) {
+    .card-stat-numero {
+        font-size: 1.5rem;
+    }
+
+    .paciente-nombre {
+        font-size: 1rem;
+    }
+
+    .paciente-avatar {
+        font-size: 2rem;
+    }
 }

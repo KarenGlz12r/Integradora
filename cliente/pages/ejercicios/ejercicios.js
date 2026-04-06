@@ -123,8 +123,15 @@ function renderVideos(ejercicios) {
             ${getVideoEmbed(video.eje_video)}
             <div class="card-body">
                 <h5 class="card-title">${video.eje_nom}</h5>
-                <p class="card-text objetivo-text">Descripción</p>
-                <p class="card-text">${video.eje_desc}</p>
+                <button 
+                type="button" 
+                class="btn btn-primary"
+                data-bs-toggle="modal" 
+                data-bs-target="#modalDescripcion"
+                data-titulo="${video.eje_nom}"
+                data-descripcion="${video.eje_desc}">
+                Ver descripción
+            </button>
                 <div class="btn-accion">
                     <button class="btn btn-warning" onclick="editarEjercicio('${video.id_eje}')">
                         <i class="bi bi-pencil"></i> Editar
@@ -137,7 +144,13 @@ function renderVideos(ejercicios) {
         </div>
     `).join('');
 }
-
+// Listener: rellena el modal antes de mostrarlo
+document.getElementById('modalDescripcion')
+    .addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        this.querySelector('#modalDescTitulo').textContent = btn.dataset.titulo;
+        this.querySelector('#modalDescBody').textContent  = btn.dataset.descripcion;
+    });
 // ══════════════════════════════════════════
 // EDITAR EJERCICIO
 // ══════════════════════════════════════════

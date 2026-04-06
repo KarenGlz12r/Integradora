@@ -21,82 +21,53 @@
         </div>
 
         <section class="cards-info">
-            <div class="card-info">
-                <div class="card-content">
-                    <p class="stat-label">Total pacientes:</p>
-                    <h2 class="stat-valor" id="pacientes">
-                        <i class="bi bi-person-lines-fill"></i>
-                        3
-                    </h2>
+            <div class="card-stat" id="card-pacientes-confirmados">
+                <!-- Se rellena dinámicamente -->
+                <div class="card-stat-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="card-stat-info">
+                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-label">Cargando...</span>
                 </div>
             </div>
-            <div class="card-info">
-                <div class="card-content">
-                    <p class="stat-label">Citas este mes:</p>
-                    <h2 class="stat-valor" id="citas">
-                        <i class="bi bi-calendar2-week"></i>
-                        3
-                    </h2>
+            <!-- Pacientes nuevos este mes -->
+            <div class="card-stat" id="card-nuevos-mes">
+                <div class="card-stat-icon" style="background:#e8f5e9; color:#2e7d32;">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <div class="card-stat-info">
+                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-label">Pacientes nuevos este mes</span>
                 </div>
             </div>
-            <div class="card-info">
-                <div class="card-content">
-                    <p class="stat-label">Próxima cita:</p>
-                    <h2 class="stat-valor" id="fecha">
-                        <i class="bi bi-calendar2-check"></i>
-                        20 Mar
-                    </h2>
+
+            <!-- Citas pendientes de pago -->
+            <div class="card-stat" id="card-pendientes-pago">
+                <div class="card-stat-icon" style="background:#fff3e0; color:#e65100;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="card-stat-info">
+                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-label">Citas pendientes de pago</span>
+                </div>
+            </div>
+
+            <!-- Próxima cita -->
+            <div class="card-stat" id="card-proxima-cita">
+                <div class="card-stat-icon" style="background:#e3f2fd; color:#1565c0;">
+                    <i class="bi bi-calendar-event-fill"></i>
+                </div>
+                <div class="card-stat-info">
+                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-label">Próxima cita</span>
                 </div>
             </div>
         </section>
         <div class="seccion-header">
-            <h2>Pacientes registrados</h2>
-            <span class="total-badge" id="cantidad-pacientes">3 pacientes</span>
+            <h2 class="total-badge">Información de las citas</h2>
         </div>
-        <section class="pacientes-info">
-            <div class="input-wrapper">
-                <input id="search" placeholder="Buscar paciente..." class="input" type="text">
-
-                <label for="search" class="icon">
-                    <i class="bi bi-search" style="font-size: 18px;"></i>
-                </label>
-            </div>
-            <div class="cards-info-pac">
-                <div class="card-pac">
-                    <div class="card-content">
-                        Hola
-                        <div class="cita"></div>
-                        <div class="motivo">Dolor</div>
-                        <div class="estado"></div>
-
-                    </div>
-                </div>
-                <div class="card-pac">
-                    <div class="card-content">
-                        Hola
-                        <div class="cita"></div>
-                        <div class="motivo">Dolor</div>
-                        <div class="estado"></div>
-                    </div>
-                </div>
-                <div class="card-pac">
-                    <div class="card-content">
-                        Hola
-                        <div class="cita"></div>
-                        <div class="motivo">Dolor</div>
-                        <div class="estado"></div>
-                    </div>
-                </div>
-                <div class="card-pac">
-                    <div class="card-content">
-                        Hola
-                        <div class="cita"></div>
-                        <div class="motivo">Dolor</div>
-                        <div class="estado"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <section id="lista-pacientes" class="lista-pacientes"></section>
     </main>
 
     <script>
@@ -117,6 +88,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
         crossorigin="anonymous"></script>
+    <script src="./pacientes.js" type="module"></script>
 </body>
 
 </html>

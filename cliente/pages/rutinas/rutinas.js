@@ -64,8 +64,17 @@ function renderRutinas(rutinas) {
             <div class="card-body">
                 <h5 class="card-title">${rut.rut_nom}</h5>
                 <p class="info">${rut.rut_zona}</p>
-                <p class="card-text">${rut.rut_desc}</p>
-                <p class="card-text objetivo-text">${rut.rut_objetivo}</p>
+                    <p class="card-text">${rut.rut_desc}</p>
+                <button 
+                type="button" 
+                class="btn btn-primary"
+                data-bs-toggle="modal" 
+                data-bs-target="#modalDescripcion"
+                data-titulo="${rut.rut_nom}"
+                data-descripcion="${rut.rut_objetivo}">
+                Ver objetivo
+            </button>
+            
                 <div class="btn-accion">
                     <button class="btn btn-warning" onclick="editarRutina('${rut.id_rut}')">
                      <i class="bi bi-pencil"></i> Editar</button>
@@ -75,6 +84,14 @@ function renderRutinas(rutinas) {
             </div>
         </div>`).join('');
 }
+
+// Listener: rellena el modal antes de mostrarlo
+document.getElementById('modalDescripcion')
+    .addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        this.querySelector('#modalDescTitulo').textContent = btn.dataset.titulo;
+        this.querySelector('#modalDescBody').textContent  = btn.dataset.descripcion;
+    });
 function editarRutina(id) {
     window.location.href = `./EditarRutina.html?id=${id}`;
 }

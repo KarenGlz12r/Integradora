@@ -70,7 +70,7 @@
 
 .card {
     width: 17.5rem !important;
-    min-height: 480px !important;
+    min-height: 300px !important;
     transition: transform 0.3s ease;
 }
 
@@ -736,6 +736,15 @@
     padding: 10px 22px;
 }
 
+/* BTN DE VER DESCRIPCIÓN */
+.btn-primary{
+    margin-top: 1rem;
+    background-color: #9b1b6e !important;
+    border: 1px solid #3d0030 !important;
+}
+.btn-primary:hover{
+    background-color: #af0b8c !important;
+}
 /* ── Responsive form-row  DE RUTINAS── */
 @media (max-width: 600px) {
     .form-row {

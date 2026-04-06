@@ -664,6 +664,15 @@
     padding-top: 1rem;
     border-top: 1px solid var(--color-border);
 }
+/* BTN DE VER DESCRIPCIÓN */
+.btn-primary{
+    margin-top: 1rem;
+    background-color: #9b1b6e !important;
+    border: 1px solid #b3098e !important;
+}
+.btn-primary:hover{
+    background-color: #af0b8c !important;
+}
 
 .btn-cancelar {
     padding: 10px 20px;
