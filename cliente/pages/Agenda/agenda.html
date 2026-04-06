@@ -27,46 +27,87 @@
             <div id="calendario"></div>
         </div>
         <!-- MODAL DETALLE CITA -->
-        <div class="modal fade" id="modalCita" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bi bi-calendar-event"></i>
-                            Detalle de cita
-                        </h5>
-                        <button class="btn-close" type="button" data-bs-dismiss="modal"></button>
+        <!-- MODAL DETALLE CITA -->
+<div class="modal fade" id="modalCita" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-event"></i>
+                    Detalle de cita
+                </h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="detalle-cita">
+                    <div class="detalle-fila">
+                        <i class="bi bi-person-fill"></i>
+                        <span id="det-paciente"></span>
                     </div>
-                    <div class="modal-body">
-                        <div class="detalle-cita">
-                            <div class="detalle-fila">
-                                <i class="bi bi-person-fill"></i>
-                                <span id="det-paciente"></span>
-                            </div>
-                            <div class="detalle-fila">
-                                <i class="bi bi-clipboard2-pulse"></i>
-                                <span id="det-motivo"></span>
-                            </div>
-                            <div class="detalle-fila">
-                                <i class=" bi bi-clock"></i>
-                                <span id="det-horario"></span>
-                            </div>
-                            <div class="detalle-fila">
-                                <i class="bi bi-circle-fill" id="det-estado-icon"></i>
-                                <span id="det-estado"></span>
-                            </div>
-                            <div class="detalle-fila" id="det-notas-fila">
-                                <i class="bi bi-journal-text"></i>
-                                <span id="det-notas"></span>
-                            </div>
+                    <div class="detalle-fila">
+                        <i class="bi bi-clipboard2-pulse"></i>
+                        <span id="det-motivo"></span>
+                    </div>
+                    <div class="detalle-fila">
+                        <i class="bi bi-clock"></i>
+                        <span id="det-horario"></span>
+                    </div>
+                    <div class="detalle-fila">
+                        <i class="bi bi-circle-fill" id="det-estado-icon"></i>
+                        <span id="det-estado"></span>
+                    </div>
+                    <!-- <div class="detalle-fila" id="det-notas-fila">
+                        <i class="bi bi-journal-text"></i>
+                        <span id="det-notas"></span>
+                    </div> -->
+
+                    <!-- SEPARADOR -->
+                    <hr style="border-color: #e8a0d0; margin: 1rem 0;">
+
+                    <!-- CAMBIAR ESTADO -->
+                    <div class="detalle-fila align-items-center">
+                        <i class="bi bi-arrow-repeat" style="color:#9b1b6e;"></i>
+                        <div class="d-flex align-items-center gap-2 w-100">
+                            <label class="fw-semibold mb-0" style="color:#6e1068; white-space:nowrap;">
+                                Estado:
+                            </label>
+                            <select id="select-estado" class="form-select form-select-sm">
+                                <option value="pendiente_pago">Pendiente pago</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="completada">Completada</option>
+                                <option value="no_asistio">No asistió</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn-secondary btn" data-bs-dismiss="modal">Cerrar</button>
+
+                    <!-- NOTAS DEL FISIO -->
+                    <div class="detalle-fila align-items-start mt-2">
+                        <i class="bi bi-pencil-square" style="color:#9b1b6e; margin-top:6px;"></i>
+                        <div class="d-flex flex-column gap-1 w-100">
+                            <label class="fw-semibold mb-0" style="color:#6e1068;">
+                                Notas del fisio:
+                            </label>
+                            <textarea 
+                                id="input-notas" 
+                                class="form-control form-control-sm" 
+                                rows="3" 
+                                placeholder="Escribe tus notas aquí...">
+                            </textarea>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button id="btn-guardar-estado" class="btn" 
+                    style="background:#9b1b6e; color:white;">
+                    <i class="bi bi-floppy"></i> Guardar
+                </button>
+            </div>
         </div>
+    </div>
+</div>
     </main>
 
     <script>
