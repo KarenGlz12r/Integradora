@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+/* ══════════════════════════════════════════
+   VARIABLES
+══════════════════════════════════════════ */
+:root {
+    --color-primary: #9b1b6e;
+    --color-primary-dk: #7a1254;
+    --color-primary-lt: #fce4f3;
+    --color-hover: #f7c9e8;
+    --color-text-dark: #3d0030;
+    --color-border: #e8a0d0;
+    --color-white: #ffffff;
+}
+/* ══════════════════════════════════════════
+   GLOBALES
+══════════════════════════════════════════ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+.main-content{
+    margin-top: 3.5rem;
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+    margin-left: 4rem;
+}
+
+.main-content.menu-toggle{
+    margin-left: 18.75rem;
+}
+/* ══════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════ */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.page-header .button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.text {
+    color: var(--color-primary);
+    font-size: 25px;
+    font-weight: 900;
+}
+.agenda-wrapper {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-top: 1.5rem;
+}
+
+/* Botones del toolbar */
+.fc .fc-button-primary {
+    background-color: #6e1068 !important;
+    border-color: #6e1068 !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #5f104a !important;
+    border-color: #5f104a !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #5f104a !important;
+    border-color: #5f104a !important;
+}
+
+/* Título del mes */
+.fc .fc-toolbar-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+/* Eventos */
+.fc-event {
+    cursor: pointer;
+    border-radius: 6px !important;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+}
+
+/* MODAL detalle */
+.detalle-cita {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.detalle-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.detalle-fila i {
+    font-size: 1.1rem;
+    color: #6e1068;
+    flex-shrink: 0;
+}
+/* MODAL DETALLE */
+.detalle-cita {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+}
+
+.detalle-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #333;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detalle-fila:last-child {
+    border-bottom: none;
+}
+
+.detalle-fila i {
+    font-size: 1.2rem;
+    color: #6e1068;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.detalle-fila span {
+    font-size: 0.95rem;
+    color: #333;
+    text-transform: capitalize;
+}
+
+/* Etiqueta del estado */
+.badge-estado {
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.modal-header {
+    background: #f9f0f7;
+    border-bottom: 2px solid #e6c8df;
+}
+
+.modal-title {
+    color: #6e1068;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #f0f0f0;
+}
+/* Responsive */
+@media (max-width: 600px) {
+    .agenda-wrapper {
+        padding: 0.75rem;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1rem;
+    }
+}
