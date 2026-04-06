@@ -84,6 +84,19 @@
                 </div>
             </div>
 
+            <!-- Asignar a paciente -->
+            <div class="field-group">
+                <label class="field-label" for="usuario_id">
+                    Asignar a paciente <span style="font-weight:400; color:#888;">(opcional — solo pacientes con cita registrada)</span>
+                </label>
+                <select id="usuario_id" class="field-select">
+                    <option value="">Sin asignar (rutina general)</option>
+                </select>
+                <p id="no-pacientes" style="display:none; font-size:12px; color:#9b1b6e; margin-top:4px;">
+                    <i class="bi bi-info-circle"></i> Aún no tienes pacientes con citas registradas.
+                </p>
+            </div>
+
             <!-- URL imagen -->
             <div class="field-group">
                 <label class="field-label" for="rut_img">URL de imagen</label>

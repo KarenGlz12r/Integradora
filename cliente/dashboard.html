@@ -1,119 +1,159 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Motricare</title>
     <link rel="stylesheet" href="cliente.css">
     <link rel="stylesheet" href="./Navbar/Navbar.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
     <div id="navbar"></div>
+
     <main class="main-content">
+
         <!-- BIENVENIDA -->
-         <section class="welcome-section">
+        <section class="welcome-section">
             <div class="img-doctor">
-                <img src="./images/Dr.Luuk_Herssen.jpeg" alt="" id="foto-doctor">
+                <img src="./images/Dr.Luuk_Herssen.jpeg" alt="Foto de perfil" id="foto-doctor">
             </div>
             <div class="welcome-text">
-                 <h2 id="nombre-doctor">¡Bienvenido...</h2>
-            <span id="especialidad-doctor">Fisioterapeuta</span>
+                <h2 id="nombre-doctor">¡Bienvenido...</h2>
+                <span id="especialidad-doctor">Fisioterapeuta</span>
             </div>
-         </section>
-         <!-- TARJETAS DE ESTADISTICAS -->
-          <section class="stats-section">
-            <div class="stat-card">
-                <div class="bg">
-                    <div class="icon-text">
-                        <div class="icon">
-                            <img src="./images/group.png" alt="">
-                        </div>
-                        <div class="text">
-                           <p>Pacientes activos</p>
-                           <strong>30</strong>
-                        </div>
+        </section>
+
+        <!-- KPI CARDS -->
+        <section class="stats-section">
+            <div class="stat-card pink">
+                <div class="kpi-icon pink"><i class="fa-solid fa-users"></i></div>
+                <div class="kpi-info">
+                    <p>Pacientes confirmados</p>
+                    <strong id="kpi-pacientes"><span class="skeleton" style="width:28px;height:24px;"></span></strong>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="kpi-icon green"><i class="fa-solid fa-user-plus"></i></div>
+                <div class="kpi-info">
+                    <p>Nuevos este mes</p>
+                    <strong id="kpi-nuevos"><span class="skeleton" style="width:28px;height:24px;"></span></strong>
+                </div>
+            </div>
+            <div class="stat-card amber">
+                <div class="kpi-icon amber"><i class="fa-solid fa-clock"></i></div>
+                <div class="kpi-info">
+                    <p>Pendientes de pago</p>
+                    <strong id="kpi-pendientes"><span class="skeleton" style="width:28px;height:24px;"></span></strong>
+                </div>
+            </div>
+            <div class="stat-card blue">
+                <div class="kpi-icon blue"><i class="fa-solid fa-calendar-day"></i></div>
+                <div class="kpi-info">
+                    <p>Próxima cita</p>
+                    <strong id="kpi-proxima" class="kpi-hora"><span class="skeleton" style="width:60px;height:20px;"></span></strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- CITAS DEL DÍA + ALERTAS -->
+        <section class="middle-section">
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        Citas de hoy
+                    </div>
+                    <span class="dash-badge today" id="badge-fecha">—</span>
+                </div>
+                <div id="lista-citas-hoy">
+                    <p class="sin-datos">Cargando...</p>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Alertas
+                    </div>
+                    <span class="dash-badge alert" id="badge-alertas">0 activas</span>
+                </div>
+                <div id="lista-alertas">
+                    <p class="sin-datos">Cargando...</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PRÓXIMAS CITAS + ACCESOS RÁPIDOS -->
+        <section class="bottom-section">
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Próximas citas
+                    </div>
+                    <span class="dash-badge next">Esta semana</span>
+                </div>
+                <div id="lista-proximas">
+                    <p class="sin-datos">Cargando...</p>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="fa-solid fa-bolt"></i>
+                        Accesos rápidos
                     </div>
                 </div>
-                <div class="blob"></div>
-            </div>
-            <!-- <div class="stat-card">
-                <div class="bg">
-                    <div class="icon-text">
-                        <div class="icon">
-                            <img src="./images/file.png" alt="">
-                        </div>
-                        <div class="text">
-                           <p>Rutinas asignadas</p>
-                           <strong>30</strong>
-                        </div>
-                    </div>
-                    
+                <div class="accesos-grid">
+                    <a href="/cliente/pages/pacientes/pacientes.html" class="acceso-btn">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Pacientes</span>
+                    </a>
+                    <a href="/cliente/pages/Agenda/agenda.html" class="acceso-btn">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Agenda</span>
+                    </a>
+                    <a href="/cliente/pages/rutinas/rutinas.html" class="acceso-btn">
+                        <i class="fa-solid fa-folder"></i>
+                        <span>Rutinas</span>
+                    </a>
+                    <a href="/cliente/pages/Chat/chat.html" class="acceso-btn">
+                        <i class="fa-solid fa-message"></i>
+                        <span>Chat</span>
+                    </a>
+                    <a href="/cliente/pages/ejercicios/ejercicios.html" class="acceso-btn">
+                        <i class="fa-solid fa-video"></i>
+                        <span>Ejercicios</span>
+                    </a>
+                    <a href="#" class="acceso-btn">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento</span>
+                    </a>
                 </div>
-                <div class="blob"></div>
-               
-            </div> -->
-            <div class="stat-card">
-                <div class="bg">
-                    <div class="icon-text">
-                        <div class="icon">
-                            <img src="./images/graphic-progression.png" alt="">
-                        </div>
-                        <div class="text">
-                           <p>Pacientes con progreso</p>
-                           <strong>30</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="blob"></div>
             </div>
-            <div class="stat-card">
-                <div class="bg">
-                    <div class="icon-text">
-                        <div class="icon">
-                            <img src="./images/message.png" alt="">
-                        </div>
-                        <div class="text">
-                           <p>Mensajes</p>
-                           <strong>30</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="blob"></div>
-            </div>
-          </section>
-          <!-- GRÁFICAS + PACIENTES PRIORITARIOS -->
-           <section class="middle-section">
-            <div class="chart-card">
-                
-            </div>
-            <div class="priority-card"></div>
-           </section>
-           <!-- SESIONES DEL DÍA + ALERTAS CLINICAS -->
-            <section class="bottom-section">
-                <div class="sessions-card"></div>
-                <div class="alerts-card"></div>
-            </section>
+
+        </section>
+
     </main>
 
-    
+    <script>
+        fetch('./Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = './Navbar/Navbar.js';
+                document.body.appendChild(script);
+            });
+    </script>
+    <script type="module" src="./dashboard.js"></script>
 </body>
-
-<script >
-    fetch('./Navbar/Navbar.html')
-.then(res => res.text())
-.then(html =>{
-    document.getElementById('navbar').innerHTML = html;
-
-    <!-- CARGAMOS EL SCRIPT DESPUES DE QUE SE INYECTE EL HTML -->
-    const script = document.createElement('script');
-     script.type = 'module';
-    script.src='./Navbar/Navbar.js';
-    document.body.appendChild(script);
-
-})
-</script>
-<script type="module" src="./dashboard.js"></script>
-
 </html>

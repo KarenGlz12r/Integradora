@@ -26,149 +26,319 @@
 }
 
 
-.middle-section, .bottom-section{
-    display: grid;
-    grid-template-columns: 1.5fr,1fr;
-    gap: 1rem;
-    margin-top: 1rem;
-}
+ /* ── KPI CARDS ── */
+        .stats-section {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
 
-/* SECCION DE BIENVENIDA */
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 12px rgba(155, 27, 110, 0.08);
+            border: 1px solid #e8a0d0;
+            position: relative;
+            overflow: hidden;
+            width: auto;
+            height: auto;
+        }
 
-.welcome-section{
-   
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    
-}
-.welcome-text{
-    display: flex;
-    flex-direction: column;
- 
-}
-.welcome-text h2{
-    font-size: 1.2rem;
-    margin: 0;
-    color: rgb(31, 33, 32);
-    font-family: "Ubuntu", sans-serif;
-}
-.welcome-section .img-doctor{
-    border-radius: 45%;
-    width: 6rem;
-    height: 6rem;
-    overflow: hidden;
-    flex-shrink: 0; /*Evita que se deforme*/
-    color: black;
-}
-.img-doctor img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            opacity: 0.07;
+            background: var(--blob-color, #9b1b6e);
+        }
 
-/* SECCIO DE ESTADISTICAS */
-.stats-section{
-    margin-top: 1rem;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-/* CARDS DE ESTADISTICAS */
+        .stat-card .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.3rem;
+        }
 
-.stat-card{
-    position: relative;
-    width: 180px;
-    height: 140px;
-    border-radius: 14px;
-    z-index: 1111;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
-}
-.bg{
-    position: absolute;
-    top:5px;
-    left: 5px;
-    width: 170px;
-    height: 130px;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,.95);
-    backdrop-filter: blur(24px);
-    border-radius: 10px;
-    overflow: hidden;
-    outline: 2px solid white;
-}
-.blob{
-    position: absolute;
-    z-index: 1;
-    top:50%;
-    left: 50%;
-    width: 120px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #3b633d;
-    opacity: 1;
-    filter: blur(12px);
-     animation: blob-bounce 5s infinite ease;
+        .stat-card .kpi-icon.pink  { background: #fce4f3; color: #9b1b6e; }
+        .stat-card .kpi-icon.green { background: #e8f5e9; color: #3b633d; }
+        .stat-card .kpi-icon.amber { background: #fff3e0; color: #e65100; }
+        .stat-card .kpi-icon.blue  { background: #e3f2fd; color: #1565c0; }
 
-}
+        .stat-card.pink  { --blob-color: #9b1b6e; }
+        .stat-card.green { --blob-color: #3b633d; }
+        .stat-card.amber { --blob-color: #e65100; }
+        .stat-card.blue  { --blob-color: #1565c0; }
 
-/* ANIMACIONES DEL BLOB-BOUNCE */
-@keyframes blob-bounce{
-    0%{
-        transform: translate(-100%, -100%) translate3d(0,0,0);
-    }
-    25%{
-        transform: translate(-100%,-100%) translate3d(100%,0,0);
-    }
-    50%{
-        transform: translate(-100%,-100%) translate3d(100%,100%,0);
+        .kpi-info p {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 2px;
+        }
 
-    }
-    75%{
-        transform: translate(-100%,-100%) translate3d(0,100%,0);
-    }
-    100%{
-        transform: translate(-100%,-100%) translate3d(0,0,0);
-    }
-}
+        .kpi-info strong {
+            font-size: 1.5rem;
+            color: #3d0030;
+            font-weight: 800;
+            line-height: 1;
+        }
 
-/* ESTILOS DENTREO DEL ICON-TEXT */
+        .kpi-info strong.kpi-hora {
+            font-size: 1.1rem;
+        }
 
-.icon-text .icon{
-    text-align: center;
-}
+        /* ── SECCIÓN MEDIA (CITAS + ALERTAS) ── */
+        .middle-section {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
 
-.icon-text .text{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-}
-.icon-text p{
-    font-size: 16px;
-    font-family: Ubuntu, 'sans serif';
-}
-.icon-text strong{
-    font-size: 16px;
-    font-weight: 700;
-    color: #275e42;
-}
-/* ESTILOS DE LOS ICONOS */
+        /* ── SECCIÓN INFERIOR (PRÓXIMAS + ACCESOS) ── */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
 
-.bg .icon-text .icon img{
-    width: 2.4rem;
-    height: 2rem;
-}
+        /* ── CARD GENÉRICA ── */
+        .dash-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem;
+            box-shadow: 0 2px 12px rgba(155, 27, 110, 0.07);
+            border: 1px solid #e8a0d0;
+        }
 
-/* SECCION DE LAS GRÁFICAS Y PACIENTES */
-.chart-card{
-    border: 2px solid red
-}
+        .dash-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.9rem;
+        }
+
+        .dash-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #3d0030;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-card-title i {
+            color: #9b1b6e;
+            font-size: 15px;
+        }
+
+        .dash-badge {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .dash-badge.today  { background: #fce4f3; color: #7a1254; }
+        .dash-badge.alert  { background: #fff3e0; color: #e65100; }
+        .dash-badge.next   { background: #e3f2fd; color: #1565c0; }
+
+        /* ── CITAS DEL DÍA ── */
+        .cita-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #f5e8f0;
+        }
+
+        .cita-item:last-child { border-bottom: none; }
+
+        .cita-hora {
+            font-size: 12px;
+            color: #9b1b6e;
+            font-weight: 700;
+            min-width: 46px;
+        }
+
+        .cita-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 45%;
+            background: #fce4f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #9b1b6e;
+            font-size: 16px;
+        }
+
+        .cita-info { flex: 1; min-width: 0; }
+        .cita-info p  { font-size: 13px; font-weight: 700; color: #3d0030; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cita-info span { font-size: 11px; color: #888; }
+
+        .cita-estado {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .cita-estado.confirmada   { background: #e8f5e9; color: #2e7d32; }
+        .cita-estado.completada   { background: #e3f2fd; color: #1565c0; }
+        .cita-estado.pendiente_pago { background: #fff3e0; color: #e65100; }
+        .cita-estado.cancelada    { background: #fce4f3; color: #7a1254; }
+        .cita-estado.no_asistio   { background: #fdecea; color: #b71c1c; }
+
+        .sin-datos {
+            font-size: 13px;
+            color: #aaa;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        /* ── ALERTAS ── */
+        .alerta-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #f5e8f0;
+        }
+
+        .alerta-item:last-child { border-bottom: none; }
+
+        .alerta-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .alerta-dot.warn { background: #e65100; }
+        .alerta-dot.info { background: #1565c0; }
+        .alerta-dot.danger { background: #b71c1c; }
+
+        .alerta-info p    { font-size: 12px; font-weight: 700; color: #3d0030; margin: 0; }
+        .alerta-info span { font-size: 11px; color: #888; }
+
+        /* ── PRÓXIMAS CITAS ── */
+        .proxima-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid #f5e8f0;
+        }
+
+        .proxima-item:last-child { border-bottom: none; }
+
+        .px-fecha {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #fce4f3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .px-fecha span:first-child { font-size: 15px; font-weight: 900; color: #9b1b6e; line-height: 1; }
+        .px-fecha span:last-child  { font-size: 10px; color: #7a1254; text-transform: uppercase; font-weight: 700; }
+
+        .px-info p    { font-size: 13px; font-weight: 700; color: #3d0030; margin: 0; }
+        .px-info span { font-size: 11px; color: #888; }
+
+        /* ── ACCESOS RÁPIDOS ── */
+        .accesos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .acceso-btn {
+            background: #fce4f3;
+            border: 1px solid #e8a0d0;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .acceso-btn:hover { background: #f7c9e8; }
+
+        .acceso-btn i   { font-size: 18px; color: #9b1b6e; flex-shrink: 0; }
+        .acceso-btn span { font-size: 12px; font-weight: 700; color: #7a1254; }
+
+        /* ── WELCOME ── */
+        .welcome-section {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .img-doctor {
+            border-radius: 45%;
+            width: 64px;
+            height: 64px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 3px solid #e8a0d0;
+        }
+
+        .img-doctor img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .welcome-text h2   { font-size: 1.2rem; color: #3d0030; font-family: "Ubuntu", sans-serif; margin: 0; }
+        .welcome-text span { font-size: 13px; color: #9b1b6e; font-weight: 600; }
+
+        /* ── LOADING SKELETON ── */
+        .skeleton {
+            background: linear-gradient(90deg, #f5e8f0 25%, #fce4f3 50%, #f5e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .stats-section     { grid-template-columns: repeat(2, 1fr); }
+            .middle-section    { grid-template-columns: 1fr; }
+            .bottom-section    { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .stats-section { grid-template-columns: 1fr 1fr; }
+        }

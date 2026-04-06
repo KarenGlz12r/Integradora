@@ -301,6 +301,44 @@ header {
     flex-shrink: 0 !important;
     gap: 1rem !important;
 }
+.bell-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            color: #fce4f3;
+            text-decoration: none;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .bell-btn:hover {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+        }
+        .bell-btn i { font-size: 16px; }
+        .bell-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e65100;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #9b1b6e;
+            line-height: 1;
+            pointer-events: none;
+        }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 500px) {

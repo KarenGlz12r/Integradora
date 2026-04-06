@@ -1,49 +1,351 @@
-// DASHBOARD.JS DEL CLIENTE
+// DASHBOARD.JS — FISIOTERAPEUTA
 import { protegerRuta } from "../proteger.js";
-
-// PERMITE JALAR LA INFORMACION
-
 import { supabase } from "../auth.js";
+
 await protegerRuta("fisioterapeuta");
 
-export async function cargarDatosDashboard() {
+// ── HELPERS ─────────────────────────────────────────────────────
 
+const HOY = new Date().toISOString().split("T")[0];
+
+// Devuelve el id del fisioterapeuta logueado
+async function getFisioId() {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // OBTENER LOS DATOS DEL FISIOTERAPEUTA
+    if (!user) return null;
 
     const { data: fisio } = await supabase
         .from("fisioterapeutas")
-        .select("nombre, apellido_paterno, especialidad")
+        .select("id, nombre, apellido_paterno, especialidad")
         .eq("user_id", user.id)
         .single();
 
-    // TRAER FOTO DEL FISIOTERAPEUTA
+    return fisio || null;
+}
 
-    const { data: perfil } = await supabase
-        .from("perfiles")
-        .select("foto_url")
-        .eq("id", user.id)
-        .single();
+// Formatea "2026-04-06" → "Lunes 6 Abr"
+function formatearFechaBadge(isoDate) {
+    const d = new Date(isoDate + "T00:00:00");
+    return d.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "short" });
+}
 
-    if (!fisio) return;
+// Formatea "2026-04-07" → { dia: "7", mes: "Abr" }
+function formatearFechaBloque(isoDate) {
+    const d = new Date(isoDate + "T00:00:00");
+    return {
+        dia: d.getDate(),
+        mes: d.toLocaleDateString("es-MX", { month: "short" })
+    };
+}
 
-    // ACTUALIZAR NOMBRE
+// Etiqueta legible para estados de cita
+function etiquetaEstado(estado) {
+    const mapa = {
+        confirmada:     "confirmada",
+        completada:     "completada",
+        pendiente_pago: "pendiente pago",
+        cancelada:      "cancelada",
+        no_asistio:     "no asistió"
+    };
+    return mapa[estado] ?? estado;
+}
+
+// ── PERFIL DEL FISIO ─────────────────────────────────────────────
+
+async function cargarPerfil(fisio) {
     document.getElementById("nombre-doctor").textContent =
-        `¡Bienvenido ${fisio.nombre} ${fisio.apellido_paterno}!`;
+        `¡Bienvenido, ${fisio.nombre} ${fisio.apellido_paterno}!`;
+    document.getElementById("especialidad-doctor").textContent = fisio.especialidad ?? "Fisioterapeuta";
 
-    // ACTUALIZAR ESPECIALIDAD
-    document.getElementById("especialidad-doctor").textContent = fisio.especialidad;
+    // Badge de fecha de hoy
+    document.getElementById("badge-fecha").textContent = formatearFechaBadge(HOY);
+}
 
-    // ACTUALIZAR FOTO
-    if (perfil?.foto_url) {
-        const url = perfil.foto_url.includes("?t=")
-            ? perfil.foto_url
-            : `${perfil.foto_url}?t=${Date.now()}`;
+// ── KPI: PACIENTES CONFIRMADOS ───────────────────────────────────
 
-        document.getElementById("foto-doctor").src = url;
+async function cargarKpiPacientes(fisioId) {
+    const { data } = await supabase
+        .from("citas")
+        .select("usuario_id")
+        .eq("fisioterapeuta_id", fisioId)
+        .eq("estado", "confirmada");
+
+    const unicos = new Set(data?.map(c => c.usuario_id) ?? []);
+    document.getElementById("kpi-pacientes").textContent = unicos.size;
+}
+
+// ── KPI: NUEVOS ESTE MES ─────────────────────────────────────────
+
+async function cargarKpiNuevos(fisioId) {
+    const ahora     = new Date();
+    const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-01`;
+    const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
+        .toISOString().split("T")[0];
+
+    const { data } = await supabase
+        .from("citas")
+        .select("usuario_id")
+        .eq("fisioterapeuta_id", fisioId)
+        .gte("fecha", primerDia)
+        .lte("fecha", ultimoDia);
+
+    const unicos = new Set(data?.map(c => c.usuario_id) ?? []);
+    document.getElementById("kpi-nuevos").textContent = unicos.size;
+}
+
+// ── KPI: PENDIENTES DE PAGO ──────────────────────────────────────
+
+async function cargarKpiPendientes(fisioId) {
+    const { data: citas } = await supabase
+        .from("citas")
+        .select("id")
+        .eq("fisioterapeuta_id", fisioId)
+        .eq("estado", "pendiente_pago");
+
+    if (!citas || citas.length === 0) {
+        document.getElementById("kpi-pendientes").textContent = 0;
+        return;
+    }
+
+    const ids = citas.map(c => c.id);
+
+    const { data: pagados } = await supabase
+        .from("pagos")
+        .select("cita_id")
+        .in("cita_id", ids)
+        .eq("estado_pago", "procesado");
+
+    const pagadasSet = new Set(pagados?.map(p => p.cita_id) ?? []);
+    const sinPagar   = ids.filter(id => !pagadasSet.has(id));
+
+    document.getElementById("kpi-pendientes").textContent = sinPagar.length;
+}
+
+// ── KPI: PRÓXIMA CITA ────────────────────────────────────────────
+
+async function cargarKpiProxima(fisioId) {
+    const { data } = await supabase
+        .from("citas")
+        .select("fecha, hora_inicio, motivo")
+        .eq("fisioterapeuta_id", fisioId)
+        .gte("fecha", HOY)
+        .in("estado", ["confirmada", "pendiente_pago"])
+        .order("fecha", { ascending: true })
+        .order("hora_inicio", { ascending: true })
+        .limit(1);
+
+    const el = document.getElementById("kpi-proxima");
+
+    if (!data || data.length === 0) {
+        el.textContent = "—";
+        return;
+    }
+
+    const c = data[0];
+    // Si es hoy mostrar solo la hora, si es otro día mostrar fecha corta
+    if (c.fecha === HOY) {
+        el.textContent = c.hora_inicio.slice(0, 5);
+    } else {
+        const { dia, mes } = formatearFechaBloque(c.fecha);
+        el.textContent = `${dia} ${mes}`;
     }
 }
 
-cargarDatosDashboard();
+// ── CITAS DEL DÍA ────────────────────────────────────────────────
+
+async function cargarCitasHoy(fisioId) {
+    const { data: citas, error } = await supabase
+        .from("citas")
+        .select(`
+            id,
+            hora_inicio,
+            hora_fin,
+            motivo,
+            estado,
+            usuario:usuario_id (
+                us_nom
+            )
+        `)
+        .eq("fisioterapeuta_id", fisioId)
+        .eq("fecha", HOY)
+        .order("hora_inicio", { ascending: true });
+
+    const contenedor = document.getElementById("lista-citas-hoy");
+
+    if (error || !citas || citas.length === 0) {
+        contenedor.innerHTML = `<p class="sin-datos">Sin citas para hoy </p>`;
+        return;
+    }
+
+    contenedor.innerHTML = citas.map(c => `
+        <div class="cita-item">
+            <span class="cita-hora">${c.hora_inicio.slice(0, 5)}</span>
+            <div class="cita-avatar"><i class="fa-solid fa-user-nurse"></i></div>
+            <div class="cita-info">
+                <p>${c.usuario?.us_nom ?? "Paciente"}</p>
+                <span>${c.motivo ?? "Sin motivo registrado"}</span>
+            </div>
+            <span class="cita-estado ${c.estado}">${etiquetaEstado(c.estado)}</span>
+        </div>
+    `).join("");
+}
+
+// ── ALERTAS ──────────────────────────────────────────────────────
+
+async function cargarAlertas(fisioId) {
+    const hace7Dias = new Date();
+    hace7Dias.setDate(hace7Dias.getDate() - 7);
+    const fechaLimite = hace7Dias.toISOString().split("T")[0];
+
+    // 1. Pendientes de pago (citas de hoy o futuras)
+    const { data: pendientes } = await supabase
+        .from("citas")
+        .select("id, fecha, hora_inicio, usuario:usuario_id(us_nom)")
+        .eq("fisioterapeuta_id", fisioId)
+        .eq("estado", "pendiente_pago")
+        .gte("fecha", HOY)
+        .order("fecha", { ascending: true })
+        .limit(5);
+
+    // 2. No asistieron (últimos 7 días)
+    const { data: noAsistieron } = await supabase
+        .from("citas")
+        .select("id, fecha, usuario:usuario_id(us_nom)")
+        .eq("fisioterapeuta_id", fisioId)
+        .eq("estado", "no_asistio")
+        .gte("fecha", fechaLimite)
+        .lte("fecha", HOY)
+        .order("fecha", { ascending: false })
+        .limit(3);
+
+    const alertas = [];
+
+    (pendientes ?? []).forEach(c => {
+        alertas.push({
+            tipo: "warn",
+            titulo: `${c.usuario?.us_nom ?? "Paciente"} — pago pendiente`,
+            subtitulo: `Cita el ${formatearFechaBadge(c.fecha)} · ${c.hora_inicio.slice(0, 5)}`
+        });
+    });
+
+    (noAsistieron ?? []).forEach(c => {
+        alertas.push({
+            tipo: "danger",
+            titulo: `${c.usuario?.us_nom ?? "Paciente"} — no asistió`,
+            subtitulo: `El ${formatearFechaBadge(c.fecha)}`
+        });
+    });
+
+    const contenedor = document.getElementById("lista-alertas");
+    const badge      = document.getElementById("badge-alertas");
+
+    badge.textContent = `${alertas.length} activa${alertas.length !== 1 ? "s" : ""}`;
+
+    if (alertas.length === 0) {
+        contenedor.innerHTML = `<p class="sin-datos">Sin alertas </p>`;
+        return;
+    }
+
+    contenedor.innerHTML = alertas.map(a => `
+        <div class="alerta-item">
+            <div class="alerta-dot ${a.tipo}"></div>
+            <div class="alerta-info">
+                <p>${a.titulo}</p>
+                <span>${a.subtitulo}</span>
+            </div>
+        </div>
+    `).join("");
+}
+
+// ── PRÓXIMAS CITAS (excluyendo hoy) ──────────────────────────────
+
+async function cargarProximas(fisioId) {
+    const manana = new Date();
+    manana.setDate(manana.getDate() + 1);
+    const fechaManana = manana.toISOString().split("T")[0];
+
+    const { data: citas } = await supabase
+        .from("citas")
+        .select(`
+            fecha,
+            hora_inicio,
+            motivo,
+            usuario:usuario_id (us_nom)
+        `)
+        .eq("fisioterapeuta_id", fisioId)
+        .in("estado", ["confirmada", "pendiente_pago"])
+        .gte("fecha", fechaManana)
+        .order("fecha", { ascending: true })
+        .order("hora_inicio", { ascending: true })
+        .limit(5);
+
+    const contenedor = document.getElementById("lista-proximas");
+
+    if (!citas || citas.length === 0) {
+        contenedor.innerHTML = `<p class="sin-datos">No hay citas próximas</p>`;
+        return;
+    }
+
+    contenedor.innerHTML = citas.map(c => {
+        const { dia, mes } = formatearFechaBloque(c.fecha);
+        return `
+            <div class="proxima-item">
+                <div class="px-fecha">
+                    <span>${dia}</span>
+                    <span>${mes}</span>
+                </div>
+                <div class="px-info">
+                    <p>${c.usuario?.us_nom ?? "Paciente"}</p>
+                    <span>${c.hora_inicio.slice(0, 5)} · ${c.motivo ?? "Sin motivo"}</span>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+// ── TIEMPO REAL ──────────────────────────────────────────────────
+
+function activarTiempoReal(fisioId) {
+    supabase
+        .channel("dashboard-citas")
+        .on("postgres_changes", { event: "*", schema: "public", table: "citas" }, () => {
+            cargarKpiPacientes(fisioId);
+            cargarKpiNuevos(fisioId);
+            cargarKpiPendientes(fisioId);
+            cargarKpiProxima(fisioId);
+            cargarCitasHoy(fisioId);
+            cargarAlertas(fisioId);
+            cargarProximas(fisioId);
+        })
+        .subscribe();
+
+    supabase
+        .channel("dashboard-pagos")
+        .on("postgres_changes", { event: "*", schema: "public", table: "pagos" }, () => {
+            cargarKpiPendientes(fisioId);
+            cargarAlertas(fisioId);
+        })
+        .subscribe();
+}
+
+// ── INICIALIZAR ──────────────────────────────────────────────────
+
+async function inicializar() {
+    const fisio = await getFisioId();
+    if (!fisio) return;
+
+    await cargarPerfil(fisio);
+
+    await Promise.all([
+        cargarKpiPacientes(fisio.id),
+        cargarKpiNuevos(fisio.id),
+        cargarKpiPendientes(fisio.id),
+        cargarKpiProxima(fisio.id),
+        cargarCitasHoy(fisio.id),
+        cargarAlertas(fisio.id),
+        cargarProximas(fisio.id)
+    ]);
+
+    activarTiempoReal(fisio.id);
+}
+
+inicializar();

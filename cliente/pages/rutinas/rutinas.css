@@ -408,6 +408,7 @@
     cursor: text;
     transition: 0.3s ease;
     pointer-events: none;
+    margin-left: 7.5rem;
 }
 
 .form label .input:focus+span,

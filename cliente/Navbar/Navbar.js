@@ -113,7 +113,7 @@ cargarFotoPerfil();
 
 async function cerrarSesion() {
     await supabase.auth.signOut();
-    window.location.href = "../../Login.html";
+    window.location.href = "../../../Login.html";
 }
 // MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
 function marcarEnlaceActivo() {
@@ -145,4 +145,69 @@ window.toggleDropdown = toggleDropdown;
 window.abrirSelectorFoto = abrirSelectorFoto;
 window.subirFoto = subirFoto;
 window.cerrarSesion = cerrarSesion;
+
+// ── CAMPANA DE MENSAJES NO LEÍDOS (TalkJS) ──────────────────────
+
+const APP_ID_NAVBAR = "twddIXRo"; // mismo App ID que chat.js
+
+function loadTalkJSNavbar() {
+    return new Promise(resolve => {
+        if (window.Talk) { resolve(); return; }
+        const s = document.createElement("script");
+        s.src = "https://cdn.talkjs.com/talk.js";
+        s.async = true;
+        s.defer = true;
+        s.onload = resolve;
+        document.head.appendChild(s);
+    });
+}
+
+function actualizarBadge(count) {
+    const badge = document.getElementById("bell-badge");
+    if (!badge) return;
+
+    if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : count;
+        badge.style.display = "flex";
+    } else {
+        badge.style.display = "none";
+    }
+}
+
+async function iniciarCampana() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: fisio } = await supabase
+        .from("fisioterapeutas")
+        .select("nombre, apellido_paterno")
+        .eq("user_id", user.id)
+        .single();
+
+    if (!fisio) return;
+
+    await loadTalkJSNavbar();
+
+    await Talk.ready;
+
+    const me = new Talk.User({
+        id:    user.id,
+        name:  `${fisio.nombre} ${fisio.apellido_paterno}`,
+        email: user.email,
+        role:  "fisioterapeuta"
+    });
+
+    const session = new Talk.Session({
+        appId: APP_ID_NAVBAR,
+        me
+    });
+
+    // Escucha cambios en no-leídos en tiempo real
+    session.unreads.onChange(conversaciones => {
+        const total = conversaciones.reduce((acc, c) => acc + c.unreadMessageCount, 0);
+        actualizarBadge(total);
+    });
+}
+
+iniciarCampana();
 

@@ -85,6 +85,8 @@ async function RegistrarVideo() {
     const urlVideo = document.getElementById("eje_video").value.trim();
     const videoInput = document.getElementById("rut_video_file");
     const video = videoInput ? videoInput.files[0] : null;
+    const repeticiones = parseInt(document.getElementById("eje_repeticiones").value) || null;
+    const duracion = parseInt(document.getElementById("eje_duracion").value) || null;
 
     // ── Validar campos obligatorios ────────
     if (!nombreEje || !descEje || !rutAsignar) {
@@ -210,9 +212,11 @@ async function RegistrarVideo() {
         .insert({
             eje_nom: nombreEje,
             eje_desc: descEje,
-            eje_video: videoFinal
+            eje_video: videoFinal,
+            repeticiones: repeticiones,
+            duracion: duracion
         })
-        .select("id_eje") // Retornar el id recién generado
+        .select("id_eje")
         .single();
 
     if (ejercicioError) {
@@ -246,6 +250,8 @@ async function RegistrarVideo() {
     document.getElementById("id_rut").value = "";
     document.getElementById("eje_video").value = "";
     document.getElementById("rut_video_file").value = "";
+    document.getElementById("eje_repeticiones").value = "";
+    document.getElementById("eje_duracion").value = "";
 
     // Resetear feedback del archivo de video
     const feedback = document.getElementById("video_file_feedback");
