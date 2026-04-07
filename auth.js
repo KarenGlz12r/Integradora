@@ -13,7 +13,7 @@ export default supabase;
 // ── URL base del backend ─────────────────────────────────────────
 // En desarrollo: http://localhost:4000
 // En producción: pon aquí tu URL de Railway, ej: https://motricare-backend.up.railway.app
-const API_BASE = "http://localhost:4000";
+const API_BASE = "integradora-production-f593.up.railway.app";
 
 // ── Helpers de sesión ────────────────────────────────────────────
 
