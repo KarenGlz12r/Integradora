@@ -192,7 +192,7 @@
         .cita-info span { font-size: 11px; color: #888; }
 
         .cita-estado {
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 700;
             padding: 3px 9px;
             border-radius: 20px;
@@ -265,7 +265,7 @@
         .px-fecha span:first-child { font-size: 15px; font-weight: 900; color: #9b1b6e; line-height: 1; }
         .px-fecha span:last-child  { font-size: 10px; color: #7a1254; text-transform: uppercase; font-weight: 700; }
 
-        .px-info p    { font-size: 13px; font-weight: 700; color: #3d0030; margin: 0; }
+        .px-info p    { font-size: 15px; font-weight: 700; color: #3d0030; margin: 0; }
         .px-info span { font-size: 11px; color: #888; }
 
         /* ── ACCESOS RÁPIDOS ── */
@@ -290,8 +290,8 @@
 
         .acceso-btn:hover { background: #f7c9e8; }
 
-        .acceso-btn i   { font-size: 18px; color: #9b1b6e; flex-shrink: 0; }
-        .acceso-btn span { font-size: 12px; font-weight: 700; color: #7a1254; }
+        .acceso-btn i   { font-size: 20px; color: #9b1b6e; flex-shrink: 0; }
+        .acceso-btn span { font-size: 15px; font-weight: 700; color: #7a1254; }
 
         /* ── WELCOME ── */
         .welcome-section {
@@ -302,8 +302,8 @@
 
         .img-doctor {
             border-radius: 45%;
-            width: 64px;
-            height: 64px;
+            width: 100px;
+            height: 100px;
             overflow: hidden;
             flex-shrink: 0;
             border: 3px solid #e8a0d0;
@@ -315,8 +315,8 @@
             object-fit: cover;
         }
 
-        .welcome-text h2   { font-size: 1.2rem; color: #3d0030; font-family: "Ubuntu", sans-serif; margin: 0; }
-        .welcome-text span { font-size: 13px; color: #9b1b6e; font-weight: 600; }
+        .welcome-text h2   { font-size: 1.5rem; color: #3d0030; font-family: "Ubuntu", sans-serif; margin: 0; }
+        .welcome-text span { font-size: 16px; color: #9b1b6e; font-weight: 600; }
 
         /* ── LOADING SKELETON ── */
         .skeleton {
