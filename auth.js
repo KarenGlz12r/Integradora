@@ -8,6 +8,7 @@ const supabase = createClient(
   "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq"
 );
 
+export { supabase };
 export default supabase;
 
 // ── URL base del backend ─────────────────────────────────────────

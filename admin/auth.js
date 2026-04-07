@@ -10,6 +10,7 @@ const supabase = createClient(
   "https://qhrennyqjhngysortocu.supabase.co",
   "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq"
 );
+export { supabase };
 export default supabase;
 
 // ── REGISTRO FISIOTERAPEUTA ──────────────────────────────────────

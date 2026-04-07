@@ -4,7 +4,7 @@
 import { protegerRuta } from "../../proteger.js";
 await protegerRuta("fisioterapeuta");
 
-import { supabase } from "../../auth.js";
+import supabase  from "../../auth.js";
 
 const menu = document.getElementById('menu');
 const sidebar = document.getElementById('sidebar');

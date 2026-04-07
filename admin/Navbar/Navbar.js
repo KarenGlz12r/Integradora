@@ -1,6 +1,6 @@
 
-import { supabase } from "../auth.js";
-
+import supabase, { apiFetch, limpiarSesion } from "../auth.js";
+// ADMIN/NAVBAR
 
 
 const menu = document.getElementById('menu');
