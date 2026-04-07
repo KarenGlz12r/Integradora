@@ -1,8 +1,9 @@
 // admin/auth.js
-import { apiFetch, supabase } from "../auth.js";
+import { apiFetch, supabase, limpiarSesion } from "../auth.js";
 
-export { supabase };
+export { supabase, apiFetch, limpiarSesion };  // ← agrega los dos
 export default supabase;
+
 
 // ── REGISTRO FISIOTERAPEUTA ──────────────────────────────────────
 export async function registrarFisioterapeuta() {
