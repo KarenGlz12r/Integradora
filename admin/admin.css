@@ -682,3 +682,88 @@
     padding: 2rem;
     box-shadow: 0 4px 20px rgba(155, 27, 110, 0.08);
 }
+/* ══════════════════════════════════════════
+   MEDIA QUERIES — MOBILE
+══════════════════════════════════════════ */
+
+/* Tablet y abajo */
+@media (max-width: 768px) {
+
+    /* Layout principal */
+    .main-content,
+    .containerm,
+    .container {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .main-content.menu-toggle,
+    .containerm.menu-toggle,
+    .container.menu-toggle {
+        margin-left: 0;
+    }
+
+    /* Tarjetas estadísticas: de 3 columnas a 1 */
+    .stats-section {
+        grid-template-columns: 1fr;
+    }
+
+    /* Gráficas: de 2 columnas a 1 */
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+
+    .pie-chart-card,
+    .bar-chart-card {
+        width: 100%;
+    }
+
+    .bar-chart-card canvas {
+        max-height: 200px;
+    }
+
+    /* Tabla + panel detalle: de 2 columnas a 1 */
+    .fisio-content {
+        grid-template-columns: 1fr;
+    }
+
+    /* Bienvenida */
+    .welcome-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    /* Formularios */
+    .form-row,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row.full,
+    .form-grid .full {
+        grid-column: 1;
+    }
+}
+
+/* Móvil chico */
+@media (max-width: 480px) {
+
+    .stats-section {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .stat-valor {
+        font-size: 28px;
+    }
+
+    .text {
+        font-size: 18px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
