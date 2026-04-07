@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota de Evolución</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="./NotaEvolucion.css">
+</head>
+<body>
+
+    <div id="navbar"></div>
+
+    <main class="main-content">
+
+        <!-- Encabezado de página -->
+        <div class="page-header">
+            <div class="text">
+                <p><i class="bi bi-clipboard2-pulse"></i> Nueva nota de evolución</p>
+            </div>
+            <div class="button">
+                <a href="./pacientes.html" class="btn-registrar">
+                    <i class="bi bi-arrow-left"></i> Volver a pacientes
+                </a>
+            </div>
+        </div>
+
+        <form class="form-nota" id="form-nota">
+
+            <!-- ── SECCIÓN 1: Datos generales ── -->
+            <div class="seccion">
+                <div class="seccion-titulo">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Datos generales</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="paciente_id">Paciente <span class="req">*</span></label>
+                        <select id="paciente_id" class="field-select" required>
+                            <option value="">Seleccionar paciente...</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="cita_id">Cita relacionada <span class="opcional">(opcional)</span></label>
+                        <select id="cita_id" class="field-select">
+                            <option value="">Seleccionar cita...</option>
+                        </select>
+                        <p id="no-citas" style="display:none; font-size:12px; color:#9b1b6e; margin-top:4px;">
+                            <i class="bi bi-info-circle"></i> Primero selecciona un paciente.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="motivo_sesion">Motivo de la sesión <span class="req">*</span></label>
+                        <input id="motivo_sesion" type="text" class="field-input"
+                               placeholder="¿Por qué acudió hoy el paciente?" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="duracion_minutos">Duración (minutos)</label>
+                        <input id="duracion_minutos" type="number" class="field-input"
+                               placeholder="Ej. 45" min="1" max="300">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 2: Evaluación subjetiva ── -->
+            <div class="seccion">
+                <div class="seccion-titulo">
+                    <i class="bi bi-chat-square-text"></i>
+                    <span>Evaluación subjetiva</span>
+                    <span class="seccion-subtitulo">Lo que refiere el paciente</span>
+                </div>
+
+                <!-- Escala de dolor -->
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Nivel de dolor al inicio <span class="req">*</span></label>
+                        <div class="dolor-scale" id="scale-inicio">
+                            <span class="dolor-label">Sin dolor</span>
+                            <div class="dolor-btns">
+                                <!-- generados por JS -->
+                            </div>
+                            <span class="dolor-label">Insoportable</span>
+                        </div>
+                        <input type="hidden" id="dolor_inicio" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Nivel de dolor al final <span class="req">*</span></label>
+                        <div class="dolor-scale" id="scale-fin">
+                            <span class="dolor-label">Sin dolor</span>
+                            <div class="dolor-btns">
+                                <!-- generados por JS -->
+                            </div>
+                            <span class="dolor-label">Insoportable</span>
+                        </div>
+                        <input type="hidden" id="dolor_fin" required>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="reporte_paciente">Reporte del paciente</label>
+                    <textarea id="reporte_paciente" class="field-input field-textarea"
+                              placeholder="¿Cómo se sintió desde la última sesión? ¿Hizo los ejercicios en casa?..."></textarea>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 3: Evaluación objetiva ── -->
+            <div class="seccion">
+                <div class="seccion-titulo">
+                    <i class="bi bi-search"></i>
+                    <span>Evaluación objetiva</span>
+                    <span class="seccion-subtitulo">Hallazgos clínicos del fisioterapeuta</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="postura">Postura</label>
+                        <input id="postura" type="text" class="field-input"
+                               placeholder="Ej. Escoliosis leve, hombro izquierdo elevado">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="rango_movimiento">Rango de movimiento</label>
+                        <input id="rango_movimiento" type="text" class="field-input"
+                               placeholder="Ej. Flexión 80°, extensión 20°">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="fuerza_muscular">Fuerza muscular</label>
+                        <input id="fuerza_muscular" type="text" class="field-input"
+                               placeholder="Ej. 3/5 escala Daniels en cuádriceps">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="pruebas_especiales">Pruebas especiales</label>
+                        <input id="pruebas_especiales" type="text" class="field-input"
+                               placeholder="Ej. Prueba de Lachman positiva">
+                    </div>
+                </div>
+
+                <!-- Signos vitales -->
+                <div class="seccion-subtitulo-bloque">Signos vitales <span class="opcional">(opcional)</span></div>
+                <div class="form-row tres-col">
+                    <div class="field-group">
+                        <label class="field-label" for="sv_ta">T/A</label>
+                        <input id="sv_ta" type="text" class="field-input" placeholder="120/80 mmHg">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="sv_fc">Frec. cardíaca</label>
+                        <input id="sv_fc" type="number" class="field-input" placeholder="72 lpm" min="0" max="300">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="sv_fr">Frec. respiratoria</label>
+                        <input id="sv_fr" type="number" class="field-input" placeholder="16 rpm" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="diagnostico_fisio">Diagnóstico fisioterapéutico</label>
+                    <input id="diagnostico_fisio" type="text" class="field-input"
+                           placeholder="Ej. Síndrome de dolor patelofemoral derecho">
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 4: Plan de tratamiento ── -->
+            <div class="seccion">
+                <div class="seccion-titulo">
+                    <i class="bi bi-journal-medical"></i>
+                    <span>Plan de tratamiento</span>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="objetivos_sesion">Objetivos de la sesión <span class="req">*</span></label>
+                    <textarea id="objetivos_sesion" class="field-input field-textarea"
+                              placeholder="¿Qué se buscaba lograr en esta sesión?" required></textarea>
+                </div>
+
+                <!-- Técnicas utilizadas (checkboxes) -->
+                <div class="field-group">
+                    <label class="field-label">Técnicas utilizadas</label>
+                    <div class="tecnicas-grid">
+                        <label class="tecnica-chip"><input type="checkbox" value="masaje_terapeutico"> Masaje terapéutico</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="electroterapia"> Electroterapia</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="ultrasonido"> Ultrasonido</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="termoterapia"> Termoterapia</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="crioterapia"> Crioterapia</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="movilizacion_articular"> Movilización articular</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="estiramientos"> Estiramientos</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="ejercicio_terapeutico"> Ejercicio terapéutico</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="puncion_seca"> Punción seca</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="vendaje_neuromuscular"> Vendaje neuromuscular</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="laser"> Láser</label>
+                        <label class="tecnica-chip"><input type="checkbox" value="magnetoterapia"> Magnetoterapia</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="ejercicios_realizados">Ejercicios realizados</label>
+                        <textarea id="ejercicios_realizados" class="field-input field-textarea field-textarea-sm"
+                                  placeholder="Describe los ejercicios realizados en la sesión..."></textarea>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="equipo_utilizado">Equipo utilizado</label>
+                        <textarea id="equipo_utilizado" class="field-input field-textarea field-textarea-sm"
+                                  placeholder="Ej. Banda elástica roja, pelota de rehabilitación..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECCIÓN 5: Respuesta y seguimiento ── -->
+            <div class="seccion">
+                <div class="seccion-titulo">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Respuesta y seguimiento</span>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="respuesta_tratamiento">Respuesta al tratamiento <span class="req">*</span></label>
+                    <textarea id="respuesta_tratamiento" class="field-input field-textarea"
+                              placeholder="¿Cómo respondió el paciente durante y después de la sesión?" required></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="observaciones">Observaciones adicionales</label>
+                    <textarea id="observaciones" class="field-input field-textarea field-textarea-sm"
+                              placeholder="Cualquier detalle relevante no cubierto arriba..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="plan_siguiente_sesion">Plan para la siguiente sesión</label>
+                        <textarea id="plan_siguiente_sesion" class="field-input field-textarea field-textarea-sm"
+                                  placeholder="¿Qué se planea hacer en la próxima cita?"></textarea>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="ejercicios_en_casa">Ejercicios en casa</label>
+                        <textarea id="ejercicios_en_casa" class="field-input field-textarea field-textarea-sm"
+                                  placeholder="Indica al paciente qué debe practicar en casa..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" for="frecuencia_recomendada">Frecuencia recomendada</label>
+                        <input id="frecuencia_recomendada" type="text" class="field-input"
+                               placeholder="Ej. 2 veces por semana">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="estado_paciente">Estado del paciente</label>
+                        <select id="estado_paciente" class="field-select">
+                            <option value="en_tratamiento">🔄 En tratamiento</option>
+                            <option value="alta_temporal">⏸️ Alta temporal</option>
+                            <option value="alta_definitiva">✅ Alta definitiva</option>
+                            <option value="referido">↗️ Referido a otro especialista</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas y botones -->
+            <div id="alert-container"></div>
+
+            <div class="form-actions">
+                <a href="./pacientes.html" class="btn-cancelar">Cancelar</a>
+                <button type="button" class="btn-guardar" id="btnGuardar" onclick="guardarNota()">
+                    <i class="bi bi-floppy"></i> Guardar nota
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+            });
+    </script>
+    <script type="module" src="./NotaEvolucion.js"></script>
+
+</body>
+</html>

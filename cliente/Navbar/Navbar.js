@@ -109,12 +109,6 @@ async function cargarFotoPerfil() {
 
 cargarFotoPerfil();
 
-// CERRAR SESION
-
-async function cerrarSesion() {
-    await supabase.auth.signOut();
-    window.location.href = "../../../Login.html";
-}
 // MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
 function marcarEnlaceActivo() {
     const urlActual = window.location.pathname;
