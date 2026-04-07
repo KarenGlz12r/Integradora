@@ -10,6 +10,7 @@ import { rateLimit } from "express-rate-limit";
 import authRoutes            from "./routes/auth.js";
 import fisioterapeutasRoutes from "./routes/fisioterapeutas.js";
 import pacientesRoutes       from "./routes/pacientes.js";
+import clinicoRoutes from "./routes/clinico.js";
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -58,6 +59,8 @@ app.get("/health", (req, res) => {
 app.use("/api/auth",              authRoutes);
 app.use("/api/fisioterapeutas",   fisioterapeutasRoutes);
 app.use("/api/pacientes",         pacientesRoutes);
+// HISTORIAL CLINICO
+app.use("/api/clinico", clinicoRoutes);
 
 // ── 404 ──────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -75,6 +78,7 @@ app.use((err, req, res, next) => {
 
     return res.status(500).json({ ok: false, error: "Error interno del servidor" });
 });
+
 
 // ── Arrancar servidor ────────────────────────────────────────────
 app.listen(PORT, () => {

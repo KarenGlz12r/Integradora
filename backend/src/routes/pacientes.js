@@ -7,33 +7,6 @@ import { verificarJWT, soloAdmin, adminOFisio } from "../middleware/authMiddlewa
 
 const router = Router();
 
-// ── GET /api/pacientes ───────────────────────────────────────────
-// Admin: devuelve todos los pacientes
-router.get("/", verificarJWT, soloAdmin, async (req, res) => {
-    const { data, error } = await supabaseAdmin
-        .from("usuario")
-        .select("id_us, us_nom, us_correo, us_telefono, us_fecha, created_at")
-        .order("created_at", { ascending: false });
-
-    if (error) return res.status(500).json({ ok: false, error: error.message });
-
-    return res.json({ ok: true, data });
-});
-
-// ── GET /api/pacientes/:id ───────────────────────────────────────
-// Admin o fisio pueden ver detalle de un paciente
-router.get("/:id", verificarJWT, adminOFisio, async (req, res) => {
-    const { data, error } = await supabaseAdmin
-        .from("usuario")
-        .select("id_us, us_nom, us_correo, us_telefono, us_fecha, created_at")
-        .eq("id_us", req.params.id)
-        .single();
-
-    if (error) return res.status(404).json({ ok: false, error: "Paciente no encontrado" });
-
-    return res.json({ ok: true, data });
-});
-
 // ── GET /api/pacientes/del-fisio/citas ───────────────────────────
 // Fisio: devuelve sus pacientes únicos (con al menos una cita confirmada o completada)
 router.get("/del-fisio/citas", verificarJWT, adminOFisio, async (req, res) => {
@@ -68,5 +41,36 @@ router.get("/del-fisio/citas", verificarJWT, adminOFisio, async (req, res) => {
 
     return res.json({ ok: true, data: pacientes });
 });
+
+// ── GET /api/pacientes/:id ───────────────────────────────────────
+// Admin o fisio pueden ver detalle de un paciente
+router.get("/:id", verificarJWT, adminOFisio, async (req, res) => {
+    const { data, error } = await supabaseAdmin
+        .from("usuario")
+        .select("id_us, us_nom, us_correo, us_telefono, us_fecha, created_at")
+        .eq("id_us", req.params.id)
+        .single();
+
+    if (error) return res.status(404).json({ ok: false, error: "Paciente no encontrado" });
+
+    return res.json({ ok: true, data });
+});
+
+// ── GET /api/pacientes ───────────────────────────────────────────
+// Admin: devuelve todos los pacientes
+router.get("/", verificarJWT, soloAdmin, async (req, res) => {
+    const { data, error } = await supabaseAdmin
+        .from("usuario")
+        .select("id_us, us_nom, us_correo, us_telefono, us_fecha, created_at")
+        .order("created_at", { ascending: false });
+
+    if (error) return res.status(500).json({ ok: false, error: error.message });
+
+    return res.json({ ok: true, data });
+});
+
+
+
+
 
 export default router;

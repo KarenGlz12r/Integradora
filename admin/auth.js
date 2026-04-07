@@ -5,19 +5,13 @@
 // import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { apiFetch } from "../auth.js";
 
-// const SUPABASE_URL  = "https://qhrennyqjhngysortocu.supabase.co";
-// const SUPABASE_ANON = "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq";
-
-// export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-import { createClient } from "@supabase/supabase-js";
-
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  "https://qhrennyqjhngysortocu.supabase.co",
+  "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq"
 );
-
 export default supabase;
+
 // ── REGISTRO FISIOTERAPEUTA ──────────────────────────────────────
 export async function registrarFisioterapeuta() {
     const emailContacto    = document.getElementById("email").value.trim();

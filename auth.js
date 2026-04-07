@@ -1,11 +1,11 @@
 // auth.js — RAÍZ del proyecto
 // Centraliza la comunicación con el backend y la sesión del usuario.
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  "https://qhrennyqjhngysortocu.supabase.co",
+  "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq"
 );
 
 export default supabase;
@@ -13,7 +13,7 @@ export default supabase;
 // ── URL base del backend ─────────────────────────────────────────
 // En desarrollo: http://localhost:4000
 // En producción: pon aquí tu URL de Railway, ej: https://motricare-backend.up.railway.app
-const API_BASE = "integradora-production-f593.up.railway.app";
+const API_BASE = "https://integradora-production-f593.up.railway.app";
 
 // ── Helpers de sesión ────────────────────────────────────────────
 
