@@ -13,7 +13,7 @@ export async function protegerRuta(rolRequerido = null) {
 
     // Sin token → login
     if (!token) {
-        window.location.href = "/Login.html";
+        window.location.href = "/index.html";
         return;
     }
 
@@ -22,13 +22,13 @@ export async function protegerRuta(rolRequerido = null) {
 
     if (!data || !data.ok) {
         limpiarSesion();
-        window.location.href = "/Login.html";
+        window.location.href = "/index.html";
         return;
     }
 
     // Verificar rol específico
     if (rolRequerido && data.rol !== rolRequerido) {
-        window.location.href = "/Login.html";
+        window.location.href = "/index.html";
         return;
     }
 

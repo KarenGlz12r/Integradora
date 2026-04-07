@@ -183,7 +183,7 @@ async function cerrarSesion() {
     // Limpiar localStorage y sesión de Supabase local
     limpiarSesion();
     await supabase.auth.signOut();
-    window.location.href = "/Login.html";
+    window.location.href = "/index.html";
 }
 
 window.toggleDropdown          = toggleDropdown;
