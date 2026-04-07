@@ -219,17 +219,17 @@
     align-items: flex-start;
     justify-content: flex-start;
 }
-
 #rutinas-dis {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    justify-items: center;
 }
 
 #rutinas-dis .card {
-    width: 16rem !important;
-    min-height: 480px !important;
+    width: 100% !important;
+    min-height: unset !important;
     border: 1px solid var(--color-border) !important;
     transition: transform 0.3s ease;
 }
@@ -240,21 +240,22 @@
 
 #rutinas-dis .card-img-top {
     width: 100% !important;
-    height: 180px !important;
+    height: 140px !important;      /* más compacta en mobile */
     object-fit: cover !important;
 }
 
 #rutinas-dis .card-body {
     width: 100%;
-    padding: 1rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
 }
 
 #rutinas-dis .card h5 {
     color: var(--color-primary-dk);
-    font-size: 14px;
-    letter-spacing: 2px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 0.4rem;
 }
 
 #rutinas-dis .card-text {
@@ -699,7 +700,7 @@
     padding: 10px 22px;
 }
 
-/* ── Responsive form-row  DE RUTINAS── */
+/* ── Responsive form-row DE RUTINAS── */
 @media (max-width: 600px) {
     .form-row {
         grid-template-columns: 1fr;
@@ -725,8 +726,17 @@
         padding: 1rem;
     }
 
+    #rutinas-dis {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
     #rutinas-dis .card {
-        width: 12rem !important;
+        width: 100% !important;
+        min-height: unset !important;
+    }
+
+    #rutinas-dis .card-img-top {
+        height: 160px !important;
     }
 
     .content,
@@ -760,14 +770,38 @@
         justify-content: flex-start;
     }
 
+    #rutinas-dis {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
     #rutinas-dis .card {
         width: 100% !important;
-        max-width: 320px;
+        max-width: unset !important;  /* quitamos el max-width fijo */
+        min-height: unset !important;
+    }
+
+    #rutinas-dis .card-img-top {
+        height: 130px !important;
+    }
+
+    #rutinas-dis .card h5 {
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Limitar descripción a 3 líneas */
+    #rutinas-dis .card-text {
+        font-size: 0.8rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .rutinas-disponibles {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: unset;
+        align-items: unset;
     }
 
     .filtro {
@@ -814,9 +848,45 @@
         font-size: 11px;
     }
 
+    #rutinas-dis {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
+    }
+
     #rutinas-dis .card {
         width: 100% !important;
-        max-width: 280px;
+        max-width: unset !important;
+    }
+
+    #rutinas-dis .card-img-top {
+        height: 110px !important;
+    }
+
+    #rutinas-dis .card h5 {
+        font-size: 12px;
+        letter-spacing: 0.3px;
+    }
+
+    #rutinas-dis .card-text {
+        font-size: 0.75rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Botones apilados en cards pequeñas */
+    .btn-accion {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .btn-accion .btn {
+        width: 100%;
+        font-size: 12px;
+        padding: 5px 8px;
+        text-align: center;
+        justify-content: center;
     }
 
     .titulo {
