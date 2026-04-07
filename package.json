@@ -1,0 +1,21 @@
+{
+  "name": "integradora",
+  "version": "1.0.0",
+  "description": "",
+  "main": "auth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KarenGlz12r/Integradora.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/KarenGlz12r/Integradora/issues"
+  },
+  "homepage": "https://github.com/KarenGlz12r/Integradora#readme"
+}
