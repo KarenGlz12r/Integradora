@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/KarenGlz12r/Integradora/issues"
   },
-  "homepage": "https://github.com/KarenGlz12r/Integradora#readme"
+  "homepage": "https://github.com/KarenGlz12r/Integradora#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1"
+  },
+  "devDependencies": {}
 }

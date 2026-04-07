@@ -1,12 +1,14 @@
 // auth.js — RAÍZ del proyecto
 // Centraliza la comunicación con el backend y la sesión del usuario.
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL  = "https://qhrennyqjhngysortocu.supabase.co";
-const SUPABASE_ANON = "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq";
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+export default supabase;
 
 // ── URL base del backend ─────────────────────────────────────────
 // En desarrollo: http://localhost:4000
