@@ -882,6 +882,12 @@
         flex-direction: column;
         gap: 0.35rem;
     }
+    .btn-primary{
+        font-size: 10px;
+    }
+    .btn-warning, .bi{
+        font-size: 10px;
+    }
 }
 
 /* ══════════════════════════════════════════
