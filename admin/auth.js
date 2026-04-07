@@ -1,15 +1,6 @@
 // admin/auth.js
-// El registro de fisioterapeutas ahora va al backend de Railway.
-// La SERVICE_ROLE_KEY ya NO está aquí.
+import { apiFetch, supabase } from "../auth.js";
 
-// import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { apiFetch } from "../auth.js";
-
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient(
-  "https://qhrennyqjhngysortocu.supabase.co",
-  "sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq"
-);
 export { supabase };
 export default supabase;
 
@@ -30,13 +21,11 @@ export async function registrarFisioterapeuta() {
     const institucionEgreso= document.getElementById("institucion_egreso").value || null;
     const turno            = document.getElementById("turno").value || null;
 
-    // Validaciones en el frontend (el backend también las hace)
     if (!emailContacto || !nombre || !apellidoPaterno || !cedula || !especialidad) {
         mostrarAlerta("Completa todos los campos obligatorios.", "danger");
         return;
     }
 
-    // Llamar al backend — el backend maneja la SERVICE_ROLE_KEY
     const data = await apiFetch("/api/fisioterapeutas", {
         method: "POST",
         body: JSON.stringify({
@@ -53,7 +42,6 @@ export async function registrarFisioterapeuta() {
         return;
     }
 
-    // Enviar correo con credenciales usando EmailJS (sigue en el frontend — no es sensible)
     await emailjs.send("service_0qv66qh", "template_ngc3ezn", {
         to_email:    emailContacto,
         to_name:     nombre,
@@ -61,12 +49,8 @@ export async function registrarFisioterapeuta() {
         password:    data.password
     });
 
-    mostrarAlerta(
-        `Fisioterapeuta registrado correctamente.`,
-        "success"
-    );
+    mostrarAlerta("Fisioterapeuta registrado correctamente.", "success");
 
-    // Limpiar formulario
     ["email","nombre","apellido_paterno","apellido_materno","cedula",
      "especialidad","telefono","anios_experiencia","institucion_egreso",
      "turno","fecha_naci"].forEach(id => {
