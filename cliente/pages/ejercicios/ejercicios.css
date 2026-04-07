@@ -746,18 +746,187 @@
     background-color: #af0b8c !important;
 }
 /* ── Responsive form-row  DE RUTINAS── */
-@media (max-width: 600px) {
-    .form-row {
-        grid-template-columns: 1fr;
+/* ══════════════════════════════════════════
+   RESPONSIVE — TABLET
+══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 4rem;
+        padding: 1rem;
     }
 
-    .form-actions {
-        flex-direction: column-reverse;
+    #videos-disponibles {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
 
-    .btn-cancelar,
-    .submit {
+    #videos-disponibles .card {
+        width: 100% !important;
+        min-height: unset !important;
+    }
+
+    .content, .barra {
         width: 100%;
+    }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MÓVIL GRANDE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 3.5rem;
+        margin-top: 4rem;
+        padding: 0.8rem;
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 1rem;
+    }
+
+    /* FIX: título en una sola línea */
+    .page-header {
+        flex-direction: row;          /* mantener en fila */
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+    }
+
+    .text {
+        font-size: 18px;              /* reduce para que quepa */
+        white-space: nowrap;          /* evita el salto de línea */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .page-header .button {
+        flex-shrink: 0;               /* el botón no se encoge */
+    }
+
+    /* Cards: 2 columnas */
+    #videos-disponibles {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    #videos-disponibles .card {
+        width: 100% !important;
+        min-height: unset !important;
+    }
+
+    #videos-disponibles .card-img-top {
+        height: 130px !important;
+    }
+
+    #videos-disponibles .card h5 {
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    #videos-disponibles .card-text {
+        font-size: 0.78rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .videos-disponibles {
+        flex-direction: unset;
+        align-items: unset;
+    }
+
+    .filtro {
+        width: 85px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .titulo { font-size: 20px; }
+    .titulo::after { width: 220px; }
+
+    .form {
+        max-width: 100%;
+        padding: 12px;
+    }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MÓVIL PEQUEÑO
+══════════════════════════════════════════ */
+@media (max-width: 576px) {
+    .main-content {
+        margin-left: 3.5rem;  /* deja espacio al sidebar */
+        margin-top: 4.5rem;
+        padding: 0.5rem;
+    }
+
+    .text {
+        font-size: 16px;
+    }
+
+    .input {
+        font-size: 14px;
+        height: 42px;
+    }
+
+    .filtro {
+        width: 70px;
+        font-size: 11px;
+    }
+
+    #videos-disponibles {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+
+    #videos-disponibles .card {
+        width: 100% !important;
+        min-height: unset !important;
+    }
+
+    #videos-disponibles .card-img-top {
+        height: 110px !important;
+    }
+
+    #videos-disponibles .card h5 {
+        font-size: 11px;
+        letter-spacing: 0.3px;
+    }
+
+    #videos-disponibles .card-text {
+        font-size: 0.72rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Botones apilados dentro de la card */
+    .btn-accion {
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .btn-accion .btn {
+        width: 100%;
+        font-size: 11px;
+        padding: 5px 6px;
+        text-align: center;
         justify-content: center;
+    }
+
+    .titulo { font-size: 18px; letter-spacing: 1px; }
+    .titulo::after { width: 160px; }
+
+    .form {
+        padding: 10px;
+        box-shadow: 2px 3px 8px rgba(155, 27, 110, 0.15);
+    }
+
+    .submit {
+        font-size: 14px;
+        padding: 8px;
     }
 }
