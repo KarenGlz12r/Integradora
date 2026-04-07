@@ -184,18 +184,170 @@
 .modal-footer {
     border-top: 1px solid #f0f0f0;
 }
-/* Responsive */
-@media (max-width: 600px) {
+/* ===============================
+   TABLETS GRANDES (≤ 1024px)
+================================ */
+@media (max-width: 1024px) {
+
+    .main-content {
+        margin-left: 4rem;
+        padding: 1.5rem;
+    }
+
     .agenda-wrapper {
-        padding: 0.75rem;
+        max-width: 100%;
+        padding: 1.25rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.1rem;
+    }
+}
+
+
+/* ===============================
+   TABLETS (≤ 768px)
+================================ */
+@media (max-width: 768px) {
+
+    .main-content {
+        margin-left: 0;
+        padding: 1.25rem;
+    }
+
+    .main-content.menu-toggle {
+        margin-left: 0;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .text {
+        font-size: 24px;
+    }
+
+    .agenda-wrapper {
+        padding: 1rem;
+        border-radius: 12px;
     }
 
     .fc .fc-toolbar {
-        flex-direction: column;
+        flex-wrap: wrap;
         gap: 0.5rem;
     }
 
     .fc .fc-toolbar-title {
         font-size: 1rem;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+
+/* ===============================
+   MÓVILES GRANDES (≤ 600px)
+================================ */
+@media (max-width: 600px) {
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 1rem;
+    }
+
+    .agenda-wrapper {
+        width: 100%;
+        padding: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .fc {
+        width: 100% !important;
+    }
+
+    .fc-view-harness {
+        width: 100% !important;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 0.95rem;
+    }
+
+    .fc .fc-button {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+
+/* ===============================
+   MÓVILES PEQUEÑOS (≤ 480px)
+================================ */
+@media (max-width: 480px) {
+
+    .main-content {
+        padding: 0.75rem;
+    }
+
+    .agenda-wrapper {
+        padding: 0.5rem;
+        border-radius: 10px;
+    }
+
+    .text {
+        font-size: 20px;
+    }
+
+    .bi-calendar3 {
+        font-size: 24px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 0.85rem;
+    }
+
+    .fc .fc-button {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+    }
+
+    .fc-event {
+        font-size: 0.7rem;
+    }
+}
+
+
+/* ===============================
+   MÓVILES MUY PEQUEÑOS (≤ 360px)
+================================ */
+@media (max-width: 360px) {
+
+    .main-content {
+        padding: 0.5rem;
+    }
+
+    .agenda-wrapper {
+        padding: 0.4rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 0.8rem;
+    }
+
+    .fc .fc-button {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    .fc-event {
+        font-size: 0.65rem;
     }
 }
