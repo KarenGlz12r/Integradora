@@ -5,6 +5,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 /* ══════════════════════════════════════════
    VARIABLES
 ══════════════════════════════════════════ */
@@ -17,6 +18,7 @@
     --color-border: #e8a0d0;
     --color-white: #ffffff;
 }
+
 /* REGISTRAR */
 .btn-registrar {
     background-color: #275e42;
@@ -25,7 +27,8 @@
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.9rem;
-    white-space: nowrap; /*  evita que el texto se rompa */
+    white-space: nowrap;
+    /*  evita que el texto se rompa */
 }
 
 .btn-registrar:hover {
@@ -41,8 +44,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 0; /*  permite que el contenido se encoja */
-    overflow: hidden; /*  evita desbordamiento */
+    min-width: 0;
+    /*  permite que el contenido se encoja */
+    overflow: hidden;
+    /*  evita desbordamiento */
 }
 
 .main-content.menu-toggle {
@@ -64,6 +69,7 @@
 .bi {
     font-size: 30px;
 }
+
 .btn .bi {
     font-size: 15px;
 }
@@ -78,6 +84,7 @@
     transform: scale(1.03);
     box-shadow: 5px 9px 10px 8px rgb(120, 119, 120);
 }
+
 #videos-disponibles {
     display: flex;
     flex-wrap: wrap;
@@ -95,7 +102,7 @@
 
 .card-body {
     width: 100%;
-    padding: 1rem;  
+    padding: 1rem;
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -113,6 +120,7 @@
     gap: 0.5rem;
     padding-top: 0.75rem;
 }
+
 .objetivo-text {
     background-color: #9f367e;
     color: rgb(255, 255, 255);
@@ -136,6 +144,7 @@
     color: #f5f0f0 !important;
     border-color: #9b1b6e !important;
 }
+
 .videos-disponibles {
     margin-top: 10px;
     display: flex;
@@ -198,6 +207,7 @@
     margin: 0;
     width: fit-content;
 }
+
 /* ══════════════════════════════════════════
    BARRA DE BÚSQUEDA Y FILTROS
 ══════════════════════════════════════════ */
@@ -324,6 +334,7 @@
     background-color: var(--color-primary);
     margin: 6px auto 0;
 }
+
 /* ══════════════════════════════════════════
    PAGE HEADER
 ══════════════════════════════════════════ */
@@ -340,6 +351,7 @@
     align-items: center;
     justify-content: flex-end;
 }
+
 /* ══════════════════════════════════════════
    BOTÓN REGISTRAR
 ══════════════════════════════════════════ */
@@ -357,11 +369,13 @@
     background-color: var(--color-primary-dk);
     color: var(--color-white);
 }
+
 .text {
     color: var(--color-primary);
     font-size: 25px;
     font-weight: 900;
 }
+
 /* ══════════════════════════════════════════
    FORMULARIO (CREAR / EDITAR)
 ══════════════════════════════════════════ */
@@ -737,14 +751,16 @@
 }
 
 /* BTN DE VER DESCRIPCIÓN */
-.btn-primary{
+.btn-primary {
     margin-top: 1rem;
     background-color: #9b1b6e !important;
     border: 1px solid #3d0030 !important;
 }
-.btn-primary:hover{
+
+.btn-primary:hover {
     background-color: #af0b8c !important;
 }
+
 /* ── Responsive form-row  DE RUTINAS── */
 /* ══════════════════════════════════════════
    RESPONSIVE — TABLET
@@ -764,7 +780,8 @@
         min-height: unset !important;
     }
 
-    .content, .barra {
+    .content,
+    .barra {
         width: 100%;
     }
 }
@@ -783,23 +800,22 @@
         margin-left: 1rem;
     }
 
-    /* FIX: título en una sola línea */
+    /* DESPUÉS */
     .page-header {
-        flex-direction: row;          /* mantener en fila */
-        align-items: center;
-        flex-wrap: nowrap;
+        flex-direction: column;
+        align-items: flex-start;
         gap: 0.5rem;
     }
 
     .text {
-        font-size: 18px;              /* reduce para que quepa */
-        white-space: nowrap;          /* evita el salto de línea */
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 18px;
+        white-space: normal;
+        /* permite que fluya normal */
     }
 
     .page-header .button {
-        flex-shrink: 0;               /* el botón no se encoge */
+        width: 100%;
+        justify-content: flex-start;
     }
 
     /* Cards: 2 columnas */
@@ -842,8 +858,13 @@
         padding: 6px 8px;
     }
 
-    .titulo { font-size: 20px; }
-    .titulo::after { width: 220px; }
+    .titulo {
+        font-size: 20px;
+    }
+
+    .titulo::after {
+        width: 220px;
+    }
 
     .form {
         max-width: 100%;
@@ -856,14 +877,16 @@
 ══════════════════════════════════════════ */
 @media (max-width: 576px) {
     .main-content {
-        margin-left: 3.5rem;  /* deja espacio al sidebar */
+        margin-left: 3.5rem;
+        /* deja espacio al sidebar */
         margin-top: 4.5rem;
         padding: 0.5rem;
     }
 
-    .text {
-        font-size: 16px;
-    }
+  .text {
+    font-size: 18px;
+    white-space: normal;
+}
 
     .input {
         font-size: 14px;
@@ -917,8 +940,14 @@
         justify-content: center;
     }
 
-    .titulo { font-size: 18px; letter-spacing: 1px; }
-    .titulo::after { width: 160px; }
+    .titulo {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .titulo::after {
+        width: 160px;
+    }
 
     .form {
         padding: 10px;
