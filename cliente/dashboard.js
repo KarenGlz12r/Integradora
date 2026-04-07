@@ -6,7 +6,12 @@ await protegerRuta("fisioterapeuta");
 
 // ── HELPERS ─────────────────────────────────────────────────────
 
-const HOY = new Date().toISOString().split("T")[0];
+// Fecha local en formato ISO "YYYY-MM-DD" (sin conversión UTC)
+function fechaLocalISO(date = new Date()) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+const HOY = fechaLocalISO();
 
 // Devuelve el id del fisioterapeuta logueado
 async function getFisioId() {
@@ -24,13 +29,15 @@ async function getFisioId() {
 
 // Formatea "2026-04-06" → "Lunes 6 Abr"
 function formatearFechaBadge(isoDate) {
-    const d = new Date(isoDate + "T00:00:00");
+    const [year, month, day] = isoDate.split("-").map(Number);
+    const d = new Date(year, month - 1, day);
     return d.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "short" });
 }
 
 // Formatea "2026-04-07" → { dia: "7", mes: "Abr" }
 function formatearFechaBloque(isoDate) {
-    const d = new Date(isoDate + "T00:00:00");
+    const [year, month, day] = isoDate.split("-").map(Number);
+    const d = new Date(year, month - 1, day);
     return {
         dia: d.getDate(),
         mes: d.toLocaleDateString("es-MX", { month: "short" })
@@ -56,7 +63,6 @@ async function cargarPerfil(fisio) {
         `¡Bienvenido, ${fisio.nombre} ${fisio.apellido_paterno}!`;
     document.getElementById("especialidad-doctor").textContent = fisio.especialidad ?? "Fisioterapeuta";
 
-    // Badge de fecha de hoy
     document.getElementById("badge-fecha").textContent = formatearFechaBadge(HOY);
 }
 
@@ -78,15 +84,15 @@ async function cargarKpiPacientes(fisioId) {
 async function cargarKpiNuevos(fisioId) {
     const ahora     = new Date();
     const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-01`;
-    const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
-        .toISOString().split("T")[0];
+    const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
+    const ultimoDiaISO = fechaLocalISO(ultimoDia);
 
     const { data } = await supabase
         .from("citas")
         .select("usuario_id")
         .eq("fisioterapeuta_id", fisioId)
         .gte("fecha", primerDia)
-        .lte("fecha", ultimoDia);
+        .lte("fecha", ultimoDiaISO);
 
     const unicos = new Set(data?.map(c => c.usuario_id) ?? []);
     document.getElementById("kpi-nuevos").textContent = unicos.size;
@@ -141,7 +147,6 @@ async function cargarKpiProxima(fisioId) {
     }
 
     const c = data[0];
-    // Si es hoy mostrar solo la hora, si es otro día mostrar fecha corta
     if (c.fecha === HOY) {
         el.textContent = c.hora_inicio.slice(0, 5);
     } else {
@@ -194,9 +199,8 @@ async function cargarCitasHoy(fisioId) {
 async function cargarAlertas(fisioId) {
     const hace7Dias = new Date();
     hace7Dias.setDate(hace7Dias.getDate() - 7);
-    const fechaLimite = hace7Dias.toISOString().split("T")[0];
+    const fechaLimite = fechaLocalISO(hace7Dias); // ← corregido
 
-    // 1. Pendientes de pago (citas de hoy o futuras)
     const { data: pendientes } = await supabase
         .from("citas")
         .select("id, fecha, hora_inicio, usuario:usuario_id(us_nom)")
@@ -206,7 +210,6 @@ async function cargarAlertas(fisioId) {
         .order("fecha", { ascending: true })
         .limit(5);
 
-    // 2. No asistieron (últimos 7 días)
     const { data: noAsistieron } = await supabase
         .from("citas")
         .select("id, fecha, usuario:usuario_id(us_nom)")
@@ -261,7 +264,7 @@ async function cargarAlertas(fisioId) {
 async function cargarProximas(fisioId) {
     const manana = new Date();
     manana.setDate(manana.getDate() + 1);
-    const fechaManana = manana.toISOString().split("T")[0];
+    const fechaManana = fechaLocalISO(manana); // ← corregido
 
     const { data: citas } = await supabase
         .from("citas")

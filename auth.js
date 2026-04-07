@@ -31,6 +31,22 @@ export async function login() {
         return;
     }
 
+    // Verificar si el fisioterapeuta está activo antes de permitir acceso
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        const { data: fisio } = await supabase
+            .from("fisioterapeutas")
+            .select("activo")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+        if (fisio && fisio.activo === false) {
+            await supabase.auth.signOut();
+            mostrarAlerta("Tu cuenta está inactiva. Contacta al administrador.", "danger");
+            return;
+        }
+    }
+
     await redirigirPorRol();
 }
 
@@ -74,3 +90,16 @@ function mostrarAlerta(mensaje, tipo = "warning") {
     // CERRAR AUTMATICAMENTE LUEGO DE 10 SEGUNDOS
     setTimeout(() =>container.innerHTML ="", 4000);
 }
+// Mostrar alerta si fue redirigido por cuenta inactiva
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("inactivo") === "1") {
+        const container = document.getElementById("alert-container");
+        if (container) {
+            container.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                Tu cuenta está inactiva. Contacta al administrador para más información.
+            </div>`;
+        }
+    }
+})();

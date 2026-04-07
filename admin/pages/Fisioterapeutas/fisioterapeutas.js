@@ -74,9 +74,14 @@ async function verDetalle(id) {
 
 async function cambiarEstado(id, estadoActual) {
     const nuevoEstado = estadoActual === "Activo" ? "Inactivo" : "Activo";
+    const activoBool  = nuevoEstado === "Activo"; // ← agregar esto
+
     const { error } = await supabase
         .from("fisioterapeutas")
-        .update({ estado: nuevoEstado })
+        .update({ 
+            estado: nuevoEstado,
+            activo: activoBool,  // ← y esto
+        })
         .eq("id", id);
 
     if (error) { console.error(error); return; }

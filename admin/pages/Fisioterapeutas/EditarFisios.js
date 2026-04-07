@@ -19,7 +19,12 @@ async function cargarDatos() {
 
     document.getElementById("nombre").value            = fisio.nombre ?? "";
     document.getElementById("apellido_paterno").value  = fisio.apellido_paterno ?? "";
-    document.getElementById("especialidad").value      = fisio.especialidad ?? "";
+    // Precargar especialidad con soporte para valor personalizado
+    if (typeof precargarEspecialidad === "function") {
+        precargarEspecialidad(fisio.especialidad ?? "");
+    } else {
+        document.getElementById("especialidad").value = fisio.especialidad ?? "";
+    }
     document.getElementById("cedula_profesional").value = fisio.cedula_profesional ?? "";
     document.getElementById("email_contacto").value    = fisio.email_contacto ?? "";  
     document.getElementById("telefono").value          = fisio.telefono ?? "";
@@ -31,18 +36,27 @@ async function cargarDatos() {
 document.getElementById("form-editar").addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const especialidadSel = document.getElementById("especialidad").value;
+    const especialidadFinal = especialidadSel === "__otra__"
+        ? document.getElementById("especialidad_custom").value.trim()
+        : especialidadSel;
+
+    const estadoValor = document.getElementById("estado").value;
+    const activoBool  = estadoValor === "Activo";
+
     const { error } = await supabase
-        .from("fisioterapeutas")  
+        .from("fisioterapeutas")
         .update({
             nombre:             document.getElementById("nombre").value,
             apellido_paterno:   document.getElementById("apellido_paterno").value,
-            especialidad:       document.getElementById("especialidad").value,
+            especialidad:       especialidadFinal,
             cedula_profesional: document.getElementById("cedula_profesional").value,
             email_contacto:     document.getElementById("email_contacto").value,
             telefono:           document.getElementById("telefono").value,
             anios_experiencia:  document.getElementById("anios_experiencia").value,
             turno:              document.getElementById("turno").value,
-            estado:             document.getElementById("estado").value,
+            estado:             estadoValor,
+            activo:             activoBool,
         })
         .eq("id", id);
 

@@ -74,14 +74,17 @@
             <div class="form-row">
                 <div class="field-group">
                     <label class="field-label" for="especialidad">Especialidad</label>
-                    <select id="especialidad" class="field-select">
+                    <select id="especialidad" class="field-select" onchange="toggleEspecialidadCustom(this)">
                         <option value="">Seleccionar especialidad</option>
                         <option value="ortopedico">Ortopédico</option>
                         <option value="neurologico">Neurológico</option>
                         <option value="musculoesqueletico">Musculoesquelético</option>
                         <option value="respiratorio">Respiratorio</option>
                         <option value="deportivo">Deportivo</option>
+                        <option value="__otra__">Otra especialidad...</option>
                     </select>
+                    <input id="especialidad_custom" type="text" class="field-input" placeholder="Escribe la especialidad"
+                        style="display:none; margin-top:8px;">
                 </div>
                 <div class="field-group">
                     <label class="field-label" for="cedula">Cédula profesional</label>
@@ -135,6 +138,28 @@
             });
     </script>
     <script type="module" src="../../auth.js"></script>
+    <script>
+        function toggleEspecialidadCustom(sel) {
+            const custom = document.getElementById('especialidad_custom');
+            if (sel.value === '__otra__') {
+                custom.style.display = 'block';
+                custom.required = true;
+                custom.focus();
+            } else {
+                custom.style.display = 'none';
+                custom.required = false;
+                custom.value = '';
+            }
+        }
+        // Helper para obtener el valor final de especialidad
+        function getEspecialidad() {
+            const sel = document.getElementById('especialidad');
+            if (sel.value === '__otra__') {
+                return document.getElementById('especialidad_custom').value.trim();
+            }
+            return sel.value;
+        }
+    </script>
 
 </body>
 </html>

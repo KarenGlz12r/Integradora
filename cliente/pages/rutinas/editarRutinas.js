@@ -27,7 +27,12 @@ async function cargarRutina() {
     }
 
     document.getElementById("rut_nom").value = rutina.rut_nom ?? "";
-    document.getElementById("rut_zona").value = rutina.rut_zona ?? "";
+    // Precargar zona: si el valor no está en el select, activar campo custom
+    if (typeof precargarZona === "function") {
+        precargarZona(rutina.rut_zona ?? "");
+    } else {
+        document.getElementById("rut_zona").value = rutina.rut_zona ?? "";
+    }
     document.getElementById("rut_desc").value = rutina.rut_desc ?? "";
     document.getElementById("rut_img").value = rutina.rut_img ?? "";
     document.getElementById("rut_img").dataset.original = rutina.rut_img ?? ""; 
@@ -40,7 +45,10 @@ async function cargarRutina() {
 // ══════════════════════════════════════════
 async function guardarCambios() {
     const nombreRutina = document.getElementById("rut_nom").value.trim();
-    const zonaCuerpo = document.getElementById("rut_zona").value;
+    const zonaSelect = document.getElementById("rut_zona").value;
+    const zonaCuerpo = zonaSelect === "__otra__"
+        ? document.getElementById("rut_zona_custom").value.trim()
+        : zonaSelect;
     const desc = document.getElementById("rut_desc").value.trim();
     const urlImagen = document.getElementById("rut_img").value.trim();
     const imagenCargada = document.getElementById("rut_img_file").files[0];

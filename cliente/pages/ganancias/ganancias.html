@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ganancias</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="./ganancias.css">
+</head>
+<body>
+
+    <div id="navbar"></div>
+
+    <main class="main-content">
+
+        <!-- ENCABEZADO -->
+        <div class="page-header">
+            <div class="header-left">
+                <i class="bi bi-graph-up-arrow header-icon"></i>
+                <div>
+                    <h1 class="page-title">Mis ganancias</h1>
+                    <p class="page-subtitle" id="subtitulo-periodo">Cargando...</p>
+                </div>
+            </div>
+            <div class="header-filtros">
+                <button class="btn-filtro active" data-periodo="mes" onclick="cambiarPeriodo('mes', this)">Este mes</button>
+                <button class="btn-filtro" data-periodo="trimestre" onclick="cambiarPeriodo('trimestre', this)">3 meses</button>
+                <button class="btn-filtro" data-periodo="anio" onclick="cambiarPeriodo('anio', this)">Este año</button>
+                <button class="btn-filtro" data-periodo="todo" onclick="cambiarPeriodo('todo', this)">Todo</button>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <section class="kpis-grid">
+
+            <div class="kpi-card kpi-principal">
+                <div class="kpi-icon" style="background:#f3e8fd; color:#7c1fa8;">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-total">$—</span>
+                    <span class="kpi-label">Total cobrado</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#e8f5e9; color:#2e7d32;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-citas-pagadas">—</span>
+                    <span class="kpi-label">Citas pagadas</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#fff3e0; color:#e65100;">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-pendiente">$—</span>
+                    <span class="kpi-label">Por cobrar</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#e3f2fd; color:#1565c0;">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-promedio">$—</span>
+                    <span class="kpi-label">Promedio por cita</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- GRÁFICA + MÉTODOS -->
+        <section class="seccion-media">
+
+            <!-- Gráfica de barras por mes -->
+            <div class="panel panel-grafica">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-bar-chart-fill"></i> Ingresos por mes</span>
+                </div>
+                <div class="grafica-wrap" id="grafica-barras">
+                    <p class="sin-datos">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Métodos de pago -->
+            <div class="panel panel-metodos">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-credit-card-fill"></i> Métodos de pago</span>
+                </div>
+                <div id="lista-metodos">
+                    <p class="sin-datos">Cargando...</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TABLA DETALLE -->
+        <section class="panel panel-tabla">
+            <div class="panel-header">
+                <span class="panel-titulo"><i class="bi bi-list-ul"></i> Detalle de cobros</span>
+                <span class="badge-count" id="badge-total-filas">0 registros</span>
+            </div>
+            <div class="tabla-wrap">
+                <table class="tabla-cobros">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Fecha cita</th>
+                            <th>Motivo</th>
+                            <th>Método</th>
+                            <th>Fecha pago</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-cobros">
+                        <tr><td colspan="7" class="sin-datos">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+            });
+    </script>
+    <script type="module" src="./ganancias.js"></script>
+
+</body>
+</html>

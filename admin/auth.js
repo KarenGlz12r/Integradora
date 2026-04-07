@@ -50,7 +50,10 @@ export async function registrarFisioterapeuta() {
     const nombre           = document.getElementById("nombre").value.trim();
     const apellidoPaterno  = document.getElementById("apellido_paterno").value.trim();
     const cedula           = document.getElementById("cedula").value.trim();
-    const especialidad     = document.getElementById("especialidad").value.trim();
+    const especialidadSel  = document.getElementById("especialidad").value;
+    const especialidad     = especialidadSel === "__otra__"
+        ? (document.getElementById("especialidad_custom")?.value.trim() ?? "")
+        : especialidadSel.trim();
     const fechaNacimiento  = document.getElementById("fecha_naci").value || null;
     const apellidoMaterno  = document.getElementById("apellido_materno").value || null;
     const telefono         = document.getElementById("telefono").value || null;
@@ -193,8 +196,11 @@ export async function registrarFisioterapeuta() {
     ["email","nombre","apellido_paterno","apellido_materno","cedula",
      "especialidad","telefono","anios_experiencia","institucion_egreso",
      "turno","fecha_naci"].forEach(id => {
-        document.getElementById(id).value = "";
+        const el = document.getElementById(id);
+        if (el) el.value = "";
     });
+    const custom = document.getElementById("especialidad_custom");
+    if (custom) { custom.value = ""; custom.style.display = "none"; }
 }
 
 function mostrarAlerta(mensaje, tipo = "warning") {

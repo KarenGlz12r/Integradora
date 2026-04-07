@@ -50,7 +50,7 @@
                 </div>
                 <div class="field-group">
                     <label class="field-label" for="rut_zona">Zona del cuerpo</label>
-                    <select id="rut_zona" class="field-select" required>
+                    <select id="rut_zona" class="field-select" required onchange="toggleZonaPersonalizada(this)">
                         <option value="">Seleccionar zona</option>
                         <option value="Brazo">Brazo</option>
                         <option value="Pierna">Pierna</option>
@@ -58,7 +58,10 @@
                         <option value="Tobillo">Tobillo</option>
                         <option value="Hombro">Hombro</option>
                         <option value="Cadera">Cadera</option>
+                        <option value="__otra__">Otra zona...</option>
                     </select>
+                    <input id="rut_zona_custom" type="text" class="field-input" placeholder="Escribe la zona del cuerpo"
+                        style="display:none; margin-top:8px;" oninput="sincronizarZonaCustom(this)">
                 </div>
             </div>
 
@@ -136,6 +139,23 @@
             });
     </script>
     <script type="module" src="./crearRutinas.js"></script>
+    <script>
+        function toggleZonaPersonalizada(sel) {
+            const custom = document.getElementById('rut_zona_custom');
+            if (sel.value === '__otra__') {
+                custom.style.display = 'block';
+                custom.required = true;
+                custom.focus();
+            } else {
+                custom.style.display = 'none';
+                custom.required = false;
+                custom.value = '';
+            }
+        }
+        function sincronizarZonaCustom(input) {
+            // el JS de guardar leerá rut_zona; si es __otra__ usará el custom
+        }
+    </script>
 
 </body>
 </html>

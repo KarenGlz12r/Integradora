@@ -48,7 +48,7 @@
                 </div>
                 <div class="field-group">
                     <label class="field-label" for="rut_zona">Zona del cuerpo</label>
-                    <select id="rut_zona" class="field-select" required>
+                    <select id="rut_zona" class="field-select" required onchange="toggleZonaPersonalizada(this)">
                         <option value="">Seleccionar zona</option>
                         <option value="Brazo">Brazo</option>
                         <option value="Pierna">Pierna</option>
@@ -56,7 +56,10 @@
                         <option value="Tobillo">Tobillo</option>
                         <option value="Hombro">Hombro</option>
                         <option value="Cadera">Cadera</option>
+                        <option value="__otra__">Otra zona...</option>
                     </select>
+                    <input id="rut_zona_custom" type="text" class="field-input" placeholder="Escribe la zona del cuerpo"
+                        style="display:none; margin-top:8px;">
                 </div>
             </div>
 
@@ -120,6 +123,34 @@
             });
     </script>
     <script type="module" src="./editarRutinas.js"></script>
+    <script>
+        function toggleZonaPersonalizada(sel) {
+            const custom = document.getElementById('rut_zona_custom');
+            if (sel.value === '__otra__') {
+                custom.style.display = 'block';
+                custom.required = true;
+                custom.focus();
+            } else {
+                custom.style.display = 'none';
+                custom.required = false;
+                custom.value = '';
+            }
+        }
+        // Llamada desde editarRutinas.js al cargar la rutina
+        function precargarZona(valor) {
+            const sel = document.getElementById('rut_zona');
+            const custom = document.getElementById('rut_zona_custom');
+            const opciones = [...sel.options].map(o => o.value);
+            if (opciones.includes(valor)) {
+                sel.value = valor;
+            } else if (valor) {
+                sel.value = '__otra__';
+                custom.style.display = 'block';
+                custom.required = true;
+                custom.value = valor;
+            }
+        }
+    </script>
 
 </body>
 </html>

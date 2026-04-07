@@ -60,7 +60,10 @@ async function cargarPacientesConCita() {
 // ══════════════════════════════════════════
 async function RegistrarRutinas() {
     const nombreRutina = document.getElementById("rut_nom").value.trim();
-    const zonaCuerpo = document.getElementById("rut_zona").value || 'No se obtuvo la zona';
+    const zonaSelect = document.getElementById("rut_zona").value;
+    const zonaCuerpo = zonaSelect === "__otra__"
+        ? (document.getElementById("rut_zona_custom").value.trim() || "No se obtuvo la zona")
+        : (zonaSelect || "No se obtuvo la zona");
     const desc = document.getElementById("rut_desc").value.trim();
     const urlImagen = document.getElementById("rut_img").value.trim();
     const imagenCargada = document.getElementById("rut_img_file").files[0];
@@ -174,6 +177,8 @@ async function RegistrarRutinas() {
     document.getElementById("rut_nom").value = "";
     document.getElementById("rut_desc").value = "";
     document.getElementById("rut_zona").value = "";
+    document.getElementById("rut_zona_custom").value = "";
+    document.getElementById("rut_zona_custom").style.display = "none";
     document.getElementById("rut_objetivo").value = "";
     document.getElementById("es_publica").value = "";
     document.getElementById("rut_img").value = "";
