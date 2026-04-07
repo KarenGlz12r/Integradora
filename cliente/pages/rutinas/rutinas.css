@@ -907,4 +907,10 @@
         font-size: 14px;
         padding: 8px;
     }
+        .btn-primary{
+        font-size: 10px;
+    }
+    .btn-warning, .bi{
+        font-size: 10px;
+    }
 }
