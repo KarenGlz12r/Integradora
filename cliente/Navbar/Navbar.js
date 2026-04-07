@@ -141,10 +141,43 @@ function marcarEnlaceActivo() {
 
 marcarEnlaceActivo();
 
-window.toggleDropdown = toggleDropdown;
-window.abrirSelectorFoto = abrirSelectorFoto;
-window.subirFoto = subirFoto;
-window.cerrarSesion = cerrarSesion;
+// / ── MODAL CERRAR SESIÓN ──────────────────────────────────────────
+ 
+function abrirModalCerrarSesion() {
+    document.getElementById("dropdown")?.classList.remove("active");
+    document.getElementById("modal-logout").classList.add("active");
+}
+ 
+function cerrarModal() {
+    document.getElementById("modal-logout").classList.remove("active");
+}
+ 
+// Cerrar modal al hacer clic en el overlay (fuera de la card)
+document.getElementById("modal-logout").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("modal-logout")) cerrarModal();
+});
+ 
+// Cerrar modal con Escape
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
+});
+ 
+async function cerrarSesion() {
+    // Llamar al backend para invalidar el token
+    await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    // Limpiar localStorage y sesión de Supabase local
+    limpiarSesion();
+    await supabase.auth.signOut();
+    window.location.href = "/Login.html";
+}
+ 
+window.toggleDropdown         = toggleDropdown;
+window.abrirSelectorFoto      = abrirSelectorFoto;
+window.subirFoto              = subirFoto;
+window.abrirModalCerrarSesion = abrirModalCerrarSesion;
+window.cerrarModal            = cerrarModal;
+window.cerrarSesion           = cerrarSesion;
+
 
 // ── CAMPANA DE MENSAJES NO LEÍDOS (TalkJS) ──────────────────────
 

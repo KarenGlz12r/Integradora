@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="Navbar.css">
+    <link rel="stylesheet" href="./Navbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Navbar</title>
 </head>
@@ -36,7 +36,7 @@
                             <img src="/cliente/icons/user-svgrepo-com.svg" alt="">
                             <span>Editar foto de perfil</span>
                         </li>
-                        <li onclick="cerrarSesion()">
+                        <li onclick="abrirModalCerrarSesion()">
                             <img src="/cliente/icons/logout-svgrepo-com.svg" alt="">
                             <span>Cerrar sesión</span>
                         </li>
@@ -79,6 +79,19 @@
                 </li>
             </ul>
         </nav>
+    </div>
+
+    <!-- Modal confirmación cerrar sesión -->
+    <div class="modal-overlay" id="modal-logout">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+            <h3>¿Cerrar sesión?</h3>
+            <p>¿Estás seguro de que deseas cerrar tu sesión?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-confirmar" onclick="cerrarSesion()">Sí, salir</button>
+            </div>
+        </div>
     </div>
 
 </body>

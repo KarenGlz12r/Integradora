@@ -1,28 +1,32 @@
-import { supabase } from "../../auth.js";
+// admin/pages/Fisioterapeutas/fisioterapeutas.js
+// Migrado: ya no llama a Supabase directamente — usa el backend via apiFetch.
+
+import { apiFetch } from "../../../auth.js";
 
 async function cargarFisios() {
-    const { data, error } = await supabase
-        .from("fisioterapeutas")
-        .select("id, nombre, apellido_paterno, especialidad, estado");
+    const data = await apiFetch("/api/fisioterapeutas");
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al cargar fisioterapeutas:", data?.error);
+        return;
+    }
 
-    const tbody = document.getElementById('tabla-fisioterapeutas');
+    const tbody = document.getElementById("tabla-fisioterapeutas");
     tbody.innerHTML = "";
 
-    data.forEach(fisio => {
+    data.data.forEach(fisio => {
         tbody.innerHTML += `
             <tr>
                 <td>${fisio.nombre} ${fisio.apellido_paterno}</td>
                 <td>${fisio.especialidad}</td>
                 <td>-</td>
                 <td>
-                    <span class="${fisio.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'}">
-                        ${fisio.estado === 'Activo' ? 'Activo' : 'Inactivo'}
+                    <span class="${fisio.estado === "Activo" ? "badge-activo" : "badge-inactivo"}">
+                        ${fisio.estado === "Activo" ? "Activo" : "Inactivo"}
                     </span>
                 </td>
                 <td>
-                    <button class="btn-ver" onclick="verDetalle('${fisio.id}')">Ver</button>
+                    <button class="btn-ver"    onclick="verDetalle('${fisio.id}')">Ver</button>
                     <button class="btn-editar" onclick="editarFisio('${fisio.id}')">Editar</button>
                 </td>
             </tr>`;
@@ -30,15 +34,16 @@ async function cargarFisios() {
 }
 
 async function verDetalle(id) {
-    const { data: fisio, error } = await supabase
-        .from("fisioterapeutas")
-        .select("id, nombre, apellido_paterno, telefono, cedula_profesional, especialidad, email_contacto, estado, turno, anios_experiencia")
-        .eq("id", id)
-        .single();
+    const data = await apiFetch("/api/fisioterapeutas/" + id);
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al obtener detalle:", data?.error);
+        return;
+    }
 
+    const fisio   = data.data;
     const detalle = document.getElementById("fisio-detail");
+
     detalle.innerHTML = `
         <div class="detail-header">
             <div class="detail-avatar">
@@ -59,32 +64,31 @@ async function verDetalle(id) {
             <p><strong>Turno:</strong> ${fisio.turno ?? "-"}</p>
             <p>
                 <strong>Estado:</strong>
-                <span class="${fisio.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'}">
-                    ${fisio.estado === 'Activo' ? 'Activo' : 'Inactivo'}
+                <span class="${fisio.estado === "Activo" ? "badge-activo" : "badge-inactivo"}">
+                    ${fisio.estado === "Activo" ? "Activo" : "Inactivo"}
                 </span>
             </p>
-        </div> 
+        </div>
         <div class="detail-actions">
             <button class="btn-editar" onclick="editarFisio('${fisio.id}')">Editar perfil</button>
             <button class="btn-estado" onclick="cambiarEstado('${fisio.id}', '${fisio.estado}')">
-                ${fisio.estado === 'Activo' ? 'Desactivar' : 'Activar'}
+                ${fisio.estado === "Activo" ? "Desactivar" : "Activar"}
             </button>
         </div>`;
 }
 
 async function cambiarEstado(id, estadoActual) {
     const nuevoEstado = estadoActual === "Activo" ? "Inactivo" : "Activo";
-    const activoBool  = nuevoEstado === "Activo"; // ← agregar esto
 
-    const { error } = await supabase
-        .from("fisioterapeutas")
-        .update({ 
-            estado: nuevoEstado,
-            activo: activoBool,  // ← y esto
-        })
-        .eq("id", id);
+    const data = await apiFetch(`/api/fisioterapeutas/${id}/estado`, {
+        method: "PATCH",
+        body: JSON.stringify({ estado: nuevoEstado })
+    });
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al cambiar estado:", data?.error);
+        return;
+    }
 
     cargarFisios();
     verDetalle(id);
@@ -94,8 +98,8 @@ function editarFisio(id) {
     window.location.href = `./EditarFisios.html?id=${id}`;
 }
 
-window.verDetalle = verDetalle;
+window.verDetalle    = verDetalle;
 window.cambiarEstado = cambiarEstado;
-window.editarFisio = editarFisio;
+window.editarFisio   = editarFisio;
 
 cargarFisios();

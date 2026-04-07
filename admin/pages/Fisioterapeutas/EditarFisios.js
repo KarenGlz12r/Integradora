@@ -1,75 +1,78 @@
-import { supabase } from "../../auth.js";
+// admin/pages/Fisioterapeutas/EditarFisios.js
+// Migrado: ya no llama a Supabase directamente — usa el backend via apiFetch.
+
+import { apiFetch } from "../../../auth.js";
 
 const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+const id     = params.get("id");
 
 async function cargarDatos() {
     if (!id) {
-        alert('No se proporcionó un fisioterapeuta válido');
+        alert("No se proporcionó un fisioterapeuta válido");
         return;
     }
 
-    const { data: fisio, error } = await supabase
-        .from("fisioterapeutas")  
-        .select("*")            
-        .eq("id", id)
-        .single();
+    const data = await apiFetch("/api/fisioterapeutas/" + id);
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al cargar datos:", data?.error);
+        mostrarAlerta("No se pudo cargar el fisioterapeuta.", "danger");
+        return;
+    }
+
+    const fisio = data.data;
 
     document.getElementById("nombre").value            = fisio.nombre ?? "";
     document.getElementById("apellido_paterno").value  = fisio.apellido_paterno ?? "";
+
     // Precargar especialidad con soporte para valor personalizado
     if (typeof precargarEspecialidad === "function") {
         precargarEspecialidad(fisio.especialidad ?? "");
     } else {
         document.getElementById("especialidad").value = fisio.especialidad ?? "";
     }
+
     document.getElementById("cedula_profesional").value = fisio.cedula_profesional ?? "";
-    document.getElementById("email_contacto").value    = fisio.email_contacto ?? "";  
-    document.getElementById("telefono").value          = fisio.telefono ?? "";
-    document.getElementById("anios_experiencia").value = fisio.anios_experiencia ?? "";
-    document.getElementById("turno").value             = fisio.turno ?? "Matutino";
-    document.getElementById("estado").value            = fisio.estado ?? "Activo";
+    document.getElementById("email_contacto").value     = fisio.email_contacto ?? "";
+    document.getElementById("telefono").value           = fisio.telefono ?? "";
+    document.getElementById("anios_experiencia").value  = fisio.anios_experiencia ?? "";
+    document.getElementById("turno").value              = fisio.turno ?? "Matutino";
+    document.getElementById("estado").value             = fisio.estado ?? "Activo";
 }
 
 document.getElementById("form-editar").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const especialidadSel = document.getElementById("especialidad").value;
+    const especialidadSel   = document.getElementById("especialidad").value;
     const especialidadFinal = especialidadSel === "__otra__"
         ? document.getElementById("especialidad_custom").value.trim()
         : especialidadSel;
 
     const estadoValor = document.getElementById("estado").value;
-    const activoBool  = estadoValor === "Activo";
 
-    const { error } = await supabase
-        .from("fisioterapeutas")
-        .update({
-            nombre:             document.getElementById("nombre").value,
-            apellido_paterno:   document.getElementById("apellido_paterno").value,
-            especialidad:       especialidadFinal,
-            cedula_profesional: document.getElementById("cedula_profesional").value,
-            email_contacto:     document.getElementById("email_contacto").value,
-            telefono:           document.getElementById("telefono").value,
-            anios_experiencia:  document.getElementById("anios_experiencia").value,
-            turno:              document.getElementById("turno").value,
-            estado:             estadoValor,
-            activo:             activoBool,
+    const data = await apiFetch(`/api/fisioterapeutas/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+            nombre:            document.getElementById("nombre").value,
+            apellidoPaterno:   document.getElementById("apellido_paterno").value,
+            especialidad:      especialidadFinal,
+            cedula:            document.getElementById("cedula_profesional").value,
+            emailContacto:     document.getElementById("email_contacto").value,
+            telefono:          document.getElementById("telefono").value,
+            aniosExperiencia:  document.getElementById("anios_experiencia").value,
+            turno:             document.getElementById("turno").value,
+            estado:            estadoValor
         })
-        .eq("id", id);
+    });
 
-    if (error) {
-        console.error(error);
-        mostrarAlerta("Error al guardar los cambios");
+    if (!data?.ok) {
+        console.error("Error al guardar:", data?.error);
+        mostrarAlerta(data?.error ?? "Error al guardar los cambios", "danger");
         return;
     }
 
     mostrarAlerta("Fisioterapeuta actualizado correctamente", "success");
-    // window.location.href = "./MostrarFisioterapeutas.html";
 });
-// FUNCIÓN DE ALERTA DE BOOTSTRAP
 
 function mostrarAlerta(mensaje, tipo = "warning") {
     const container = document.getElementById("alert-container");
@@ -79,8 +82,11 @@ function mostrarAlerta(mensaje, tipo = "warning") {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>`;
 
-    setTimeout(() => {
-        window.location.href = "./MostrarFisioterapeutas.html";
-    }, 2500);
+    if (tipo === "success") {
+        setTimeout(() => {
+            window.location.href = "./MostrarFisioterapeutas.html";
+        }, 2500);
+    }
 }
+
 cargarDatos();

@@ -1,45 +1,51 @@
-import { supabase } from "../../auth.js";
+// admin/pages/Pacientes/pacientes.js
+// Migrado: ya no llama a Supabase directamente — usa el backend via apiFetch.
+
+import { apiFetch } from "../../../auth.js";
 
 async function cargarPacientes() {
-    const { data, error } = await supabase
-        .from("usuario")
-        .select("id_us, us_nom, us_correo, us_telefono,us_fecha");
+    const data = await apiFetch("/api/pacientes");
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al cargar pacientes:", data?.error);
+        return;
+    }
 
-    const tbody = document.getElementById('tabla-fisioterapeutas');
+    const tbody = document.getElementById("tabla-fisioterapeutas");
     tbody.innerHTML = "";
 
-    data.forEach(paci => {
+    data.data.forEach(paci => {
         tbody.innerHTML += `
             <tr>
-                <td>${paci.us_nom} </td>
+                <td>${paci.us_nom}</td>
                 <td>${paci.us_correo}</td>
-                <td>${paci.us_telefono}</td>
-                <td>${paci.us_fecha}</td>
+                <td>${paci.us_telefono ?? "-"}</td>
+                <td>${paci.us_fecha ?? "-"}</td>
                 <td>
                     <button class="btn-ver" onclick="verDetalle('${paci.id_us}')">Ver</button>
                 </td>
             </tr>`;
     });
 }
+
 async function verDetalle(id) {
-    const { data: user, error } = await supabase
-        .from("usuario")
-        .select("id_us,us_nom, us_correo, us_telefono,us_fecha, created_at")
-        .eq("id_us", id)
-        .single();
+    const data = await apiFetch("/api/pacientes/" + id);
 
-    if (error) { console.error(error); return; }
+    if (!data?.ok) {
+        console.error("Error al obtener paciente:", data?.error);
+        return;
+    }
 
+    const user    = data.data;
     const detalle = document.getElementById("fisio-detail");
+
     detalle.innerHTML = `
         <div class="detail-header">
             <div class="detail-avatar">
                 ${user.us_nom.charAt(0)}
             </div>
             <div>
-                <h3>${user.us_nom} </h3>
+                <h3>${user.us_nom}</h3>
             </div>
         </div>
         <hr>
@@ -47,13 +53,11 @@ async function verDetalle(id) {
             <h4>Información personal</h4>
             <p><strong>Correo:</strong> ${user.us_correo ?? "--"}</p>
             <p><strong>Teléfono:</strong> ${user.us_telefono ?? "-"}</p>
-            <p><strong>Se unió: :</strong> ${user.created_at ?? "-"} </p>
+           <p><strong>Se unió:</strong> ${user.created_at ? new Date(user.created_at).toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" }) : "-"}</p>
+           
         </div>`;
 }
 
-
-
 window.verDetalle = verDetalle;
-
 
 cargarPacientes();

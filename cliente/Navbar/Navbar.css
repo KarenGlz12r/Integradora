@@ -339,7 +339,72 @@ header {
             line-height: 1;
             pointer-events: none;
         }
-
+        /* ── Modal de confirmación de cierre de sesión ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .modal-card .modal-icon {
+            font-size: 2.5rem;
+            color: #9b1b6e;
+            margin-bottom: 0.75rem;
+        }
+        .modal-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3d0030;
+            margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        .modal-buttons button {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+        .modal-buttons button:hover { opacity: 0.85; }
+        .btn-cancelar {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-confirmar {
+            background: #9b1b6e;
+            color: #fff;
+        }
 /* ── RESPONSIVE ── */
 @media (max-width: 500px) {
     .sidebar {

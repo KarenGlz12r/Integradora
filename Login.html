@@ -1,65 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de sesión — Motricare</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="global.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de sesión</title>
 </head>
 
 <body>
     <div class="background-noise"></div>
-    <div>
-        <img src="./assets/Logo2-Motricare.jpeg" alt="Logo de Motricare, clínica de fisioterapia" class="logo-nav">
+
+    <div style="text-align:center; padding-top: 32px; position: relative; z-index: 2;">
+        <img src="./assets/Logo2-Motricare.jpeg"
+             alt="Logo Motricare"
+             class="logo-nav"
+             style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
     </div>
-    <h1 class="titulo">Motricare</h1>
-    <div class="container">
+
+    <h1 class="titulo" style="position:relative; z-index:2;">Motricare</h1>
+
+    <div class="container" style="position:relative; z-index:2;">
         <div class="heading">Inicio de sesión</div>
+
+        <!-- Mensajes de error -->
         <div id="alert-container"></div>
-        <form action="" class="form">
-            <input required="" class="input" type="email" name="email" id="emailLogin" placeholder="Correo electronico">
-            <input required="" class="input" type="password" name="password" id="password" placeholder="Contraseña"><br>
+
+        <!-- Formulario -->
+        <div class="form">
+            <input class="input" type="email" id="emailLogin" placeholder="Correo electrónico" autocomplete="email">
+            <input class="input" type="password" id="password" placeholder="Contraseña" autocomplete="current-password">
+            <br>
             <span class="forgot-password"><a href="#">¿Olvidó su contraseña?</a></span>
             <button class="login-button" id="btnLogin" type="button">Iniciar sesión</button>
-
-        </form>
-
+        </div>
     </div>
-   <script type="module">
-    import { login } from "./auth.js";
-    import { redirigirSesionActiva } from "./proteger.js";
 
-    // Muestra loading mientras verifica sesión
-    const btn = document.getElementById("btnLogin");
-    btn.disabled = true;
-    btn.textContent = "Verificando...";
-
-    try {
-        await redirigirSesionActiva();
-    } catch(e) {
-        console.error('Error verificando sesión:', e);
-    }
-
-    // Reactiva el botón siempre
-    btn.disabled = false;
-    btn.textContent = "Iniciar sesión";
-
-    btn.addEventListener("click", async () => {
-        btn.disabled = true;
-        btn.textContent = "Entrando...";
-        try {
-            await login();
-        } catch(e) {
-            console.error('Error en login:', e);
-        }
-        btn.disabled = false;
-        btn.textContent = "Iniciar sesión";
-    });
-</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
+    <!-- Script de login — separado del resto para mayor claridad -->
+    <script type="module">
+        import { login, apiFetch, obtenerToken } from "./auth.js";
 
+        const btn           = document.getElementById("btnLogin");
+        const alertContainer = document.getElementById("alert-container");
+
+        // ── Helpers UI ───────────────────────────────────────────
+        function setLoading(texto) {
+            btn.disabled = true;
+            btn.textContent = texto;
+        }
+
+        function setReady() {
+            btn.disabled = false;
+            btn.textContent = "Iniciar sesión";
+        }
+
+        function mostrarError(msg) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${msg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+        }
+
+        // ── 1. Verificar si ya hay sesión activa ─────────────────
+        // Si hay token guardado, verificarlo con el backend.
+        // Si es válido, redirigir directo al dashboard.
+        const tokenGuardado = obtenerToken();
+
+        if (tokenGuardado) {
+            setLoading("Verificando...");
+            try {
+                const sesion = await apiFetch("/api/auth/me");
+                if (sesion?.ok) {
+                    // Sesión válida → redirigir
+                    if (sesion.rol === "admin") {
+                        window.location.href = "/admin/dashboard.html";
+                    } else if (sesion.rol === "fisioterapeuta") {
+                        window.location.href = "/cliente/dashboard.html";
+                    } else {
+                        setReady();
+                    }
+                } else {
+                    // Token inválido o expirado → limpiar y mostrar login normal
+                    setReady();
+                }
+            } catch (e) {
+                console.error("Error verificando sesión:", e);
+                setReady();
+            }
+        }
+        // Sin token → botón ya está listo por defecto (no deshabilitar)
+
+        // ── 2. Click en el botón ─────────────────────────────────
+        btn.addEventListener("click", async () => {
+            const email    = document.getElementById("emailLogin").value.trim();
+            const password = document.getElementById("password").value;
+
+            alertContainer.innerHTML = "";
+
+            if (!email || !password) {
+                mostrarError("Por favor ingresa tu correo y contraseña.");
+                return;
+            }
+
+            setLoading("Entrando...");
+
+            try {
+                await login();
+                // Si login() no redirige (error de rol u otro), reactivar botón
+            } catch (e) {
+                console.error("Error en login:", e);
+                mostrarError("Ocurrió un error inesperado. Intenta de nuevo.");
+            } finally {
+                setReady();
+            }
+        });
+
+        // ── 3. Permitir Enter en los campos ──────────────────────
+        document.getElementById("password").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") btn.click();
+        });
+        document.getElementById("emailLogin").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") btn.click();
+        });
+    </script>
+
+</body>
 </html>

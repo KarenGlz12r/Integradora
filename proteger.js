@@ -1,68 +1,65 @@
-// ES PARA PROTEGER LOS ENDPOINTS
+// proteger.js — RAÍZ DEL PROYECTO FRONTEND
+// Ahora verifica el JWT contra el backend en lugar de Supabase directamente.
+// Reemplaza las llamadas a supabase.from("perfiles") para verificar rol.
 
-import { supabase } from "./auth.js";
+import { supabase, apiFetch, obtenerToken, limpiarSesion } from "./auth.js";
 
+// ── protegerRuta ─────────────────────────────────────────────────
+// Llama al backend para verificar que el token sea válido y el rol correcto.
+// Si falla, redirige al login.
 export async function protegerRuta(rolRequerido = null) {
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const token = obtenerToken();
 
-    // SI NO HAY SESIÓN, REDIRIGE AL LOGIN
-    if (!user) {
+    // Sin token → login
+    if (!token) {
         window.location.href = "/Login.html";
         return;
     }
 
-    // ROL EN ESPECIFICO
-    if (rolRequerido) {
-        const { data: perfil } = await supabase
-            .from("perfiles")
-            .select("rol")
-            .eq("id", user.id)
-            .single();
+    // Verificar token y obtener rol desde el backend
+    const data = await apiFetch("/api/auth/me");
 
-        if (!perfil || perfil.rol !== rolRequerido) {
-            window.location.href = "/Login.html";
-            return;
-        }
+    if (!data || !data.ok) {
+        limpiarSesion();
+        window.location.href = "/Login.html";
+        return;
+    }
 
-        // SI ES FISIOTERAPEUTA, VERIFICAR QUE ESTÉ ACTIVO
-        if (rolRequerido === "fisioterapeuta") {
-            const { data: fisio } = await supabase
-                .from("fisioterapeutas")
-                .select("activo")
-                .eq("user_id", user.id)
-                .single();
+    // Verificar rol específico
+    if (rolRequerido && data.rol !== rolRequerido) {
+        window.location.href = "/Login.html";
+        return;
+    }
 
-            if (!fisio || fisio.activo === false) {
-                await supabase.auth.signOut();
-                window.location.href = "/Login.html?inactivo=1";
-                return;
-            }
+    // Sincronizar sesión con el cliente Supabase local
+    // para que las queries directas a Supabase sigan funcionando
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) {
+        // Restaurar sesión de Supabase con el token guardado
+        const refresh = localStorage.getItem("mc_refresh");
+        if (refresh) {
+            await supabase.auth.setSession({
+                access_token:  token,
+                refresh_token: refresh
+            });
         }
     }
 }
 
-// FUNCIÓN PARA REDIRIGIR SEGÚN EL ROL SI HAY SESIÓNACTIVA
+// ── redirigirSesionActiva ────────────────────────────────────────
+// Si ya hay sesión, redirige al dashboard correspondiente.
+// Úsala en el Login.html para evitar que usuarios autenticados vean el login.
+export async function redirigirSesionActiva() {
+    const token = obtenerToken();
+    if (!token) return;
 
-export async function redirigirSesionActiva(){
+    const data = await apiFetch("/api/auth/me");
+    if (!data?.ok) return;
 
-    const {data: {user}} = await supabase.auth.getUser();
-
-    // SI NO HAY SESIÓN NO HACE NADA
-
-    if(!user) return;
-
-    const {data: perfil} = await supabase.from("perfiles")
-    .select("rol")
-    .eq("id", user.id)
-    .single();
-
-    if(!perfil) return;
-
-    if(perfil.rol === "admin"){
-        window.location ="/admin/dashboard.html";
-    }else if(perfil.rol === "fisioterapeuta"){
-        window.location ="/cliente/dashboard.html";
+    if (data.rol === "admin") {
+        window.location.href = "/admin/dashboard.html";
+    } else if (data.rol === "fisioterapeuta") {
+        window.location.href = "/cliente/dashboard.html";
     }
-    
 }

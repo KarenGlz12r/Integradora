@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navbar</title>
-
 </head>
 
 <body>
@@ -29,7 +28,6 @@
             </a>
             <!-- DROPDOWN -->
             <div class="user-menu">
-
                 <div class="user-avatar" onclick="toggleDropdown()">
                     <img src="/cliente/icons/user-svgrepo-com.svg" alt="" id="user-foto">
                 </div>
@@ -39,7 +37,7 @@
                             <img src="/cliente/icons/user-svgrepo-com.svg" alt="">
                             <span>Editar foto de perfil</span>
                         </li>
-                        <li onclick="cerrarSesion()">
+                        <li onclick="abrirModalCerrarSesion()">
                             <img src="/cliente/icons/logout-svgrepo-com.svg" alt="">
                             <span>Cerrar sesión</span>
                         </li>
@@ -50,6 +48,7 @@
             </div>
         </div>
     </header>
+
     <div class="sidebar" id="sidebar">
         <nav>
             <div class="sidebar-logo">
@@ -57,40 +56,39 @@
             </div>
             <ul>
                 <li>
-
-                    <a href="/cliente/dashboard.html" class="selected">
-                    <i class="fa-solid fa-house"></i>
+                    <a href="/cliente/dashboard.html">
+                        <i class="fa-solid fa-house"></i>
                         <span>Inicio</span>
                     </a>
                 </li>
                 <li>
                     <a href="/cliente/pages/pacientes/pacientes.html">
-                      <i class="fa-solid fa-users"></i>
+                        <i class="fa-solid fa-users"></i>
                         <span>Pacientes</span>
                     </a>
                 </li>
                 <li>
                     <a href="/cliente/pages/rutinas/rutinas.html">
-                     <i class="fa-solid fa-folder"></i>
+                        <i class="fa-solid fa-folder"></i>
                         <span>Rutinas</span>
                     </a>
                 </li>
                 <li>
                     <a href="/cliente/pages/ejercicios/ejercicios.html">
-                    <i class="fa-solid fa-video"></i>
+                        <i class="fa-solid fa-video"></i>
                         <span>Ejercicios</span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                    <i class="fa-solid fa-chart-line"></i>
+                        <i class="fa-solid fa-chart-line"></i>
                         <span>Seguimiento</span>
                     </a>
                 </li>
                 <li>
                     <a href="/cliente/pages/Agenda/agenda.html">
-                       <i class="fa-solid fa-calendar"></i>
-                           <span>Agenda</span>
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Agenda</span>
                     </a>
                 </li>
                 <li>
@@ -101,15 +99,28 @@
                 </li>
                 <li>
                     <a href="/cliente/pages/ganancias/ganancias.html">
-                    <i class="fa-solid fa-money-bill"></i>
+                        <i class="fa-solid fa-money-bill"></i>
                         <span>Ingresos</span>
                     </a>
                 </li>
             </ul>
         </nav>
     </div>
-    <script type="module" src="Navbar.js"></script>
 
+    <!-- Modal confirmación cerrar sesión -->
+    <div class="modal-overlay" id="modal-logout">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+            <h3>¿Cerrar sesión?</h3>
+            <p>¿Estás seguro de que deseas cerrar tu sesión?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-confirmar" onclick="cerrarSesion()">Sí, salir</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="Navbar.js"></script>
 </body>
 
 </html>
