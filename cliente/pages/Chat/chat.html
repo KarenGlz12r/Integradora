@@ -207,12 +207,9 @@
                 ultimo: null
             };
 
-            // Agregar a la lista si no está ya
+            // Agregar a la lista si no está ya (sin re-renderizar, solo actualizar estado)
             const yaEsta = todasConvs.find(c => c.id_conv === convId);
-            if (!yaEsta) {
-                todasConvs.unshift(conv);
-                renderConvs(todasConvs);
-            }
+            if (!yaEsta) todasConvs.unshift(conv);
 
             abrirConv(yaEsta || conv);
         }
@@ -273,7 +270,8 @@
 
         function renderConvs(lista) {
             const el = document.getElementById('chatConvList');
-            document.getElementById('chatConvLoading').style.display = 'none';
+            const loading = document.getElementById('chatConvLoading');
+            if (loading) loading.style.display = 'none';
             el.innerHTML = '';
 
             if (!lista.length) {
