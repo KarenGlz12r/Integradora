@@ -196,7 +196,7 @@ async function cargarPacientes(fisioId) {
       </div>
       <button
         class="btn-chat-paciente"
-        onclick="abrirChat('${cita.usuario?.user_id}', '${cita.usuario?.us_nom}')">
+        onclick="abrirChat('${cita.usuario?.id_us}', '${cita.usuario?.us_nom}')">
         <i class="bi bi-chat-dots-fill"></i> Mensaje
       </button>
     </div>
