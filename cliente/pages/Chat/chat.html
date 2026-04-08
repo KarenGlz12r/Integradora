@@ -2,89 +2,116 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../Navbar/Navbar.css">
-    <link rel="stylesheet" href="./chat.css">
+    <title>Panel MotriCare - Fisioterapeuta</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #fdf2f8; display: flex; height: 100vh; }
+        .sidebar { width: 250px; background: #9b1b6e; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .main-chat { flex: 1; display: flex; flex-direction: column; background: white; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 60%; font-size: 14px; line-height: 1.4; position: relative; }
+        .fisio { align-self: flex-end; background: #9b1b6e; color: white; border-bottom-right-radius: 2px; }
+        .paciente { align-self: flex-start; background: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+        .input-area { padding: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; }
+        button { background: #9b1b6e; color: white; border: none; padding: 0 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #7a1556; }
+        h2 { margin-top: 0; font-size: 1.2rem; }
+    </style>
 </head>
 <body>
-    <div id="navbar"></div>
 
-    <main class="main-content">
-        <div class="page-header">
-            <div class="text">
-                <i class="bi bi-chat-dots"></i>
-                <p>Mensajes</p>
-            </div>
+    <div class="sidebar">
+        <h2>MotriCare Chat</h2>
+        <p>Sesión: Fisioterapeuta</p>
+        <hr style="opacity: 0.3">
+        <p style="font-size: 0.8rem;">Estado: <span id="status">Conectando...</span></p>
+    </div>
+
+    <div class="main-chat">
+        <div id="chat-window"></div>
+        <div class="input-area">
+            <input type="text" id="mensajeInput" placeholder="Escribe un mensaje al paciente..." autocomplete="off">
+            <button onclick="enviarMensaje()">Enviar</button>
         </div>
-
-        <div id="talkjs-container" class="chat-container">
-
-            <!-- Panel de usuarios conectados -->
-            <div id="usuarios-panel">
-                <p class="usuarios-titulo">
-                    <i class="bi bi-people-fill"></i>
-                    Conectados
-                </p>
-                <ul id="lista-usuarios"></ul>
-            </div>
-
-            <!-- Área principal -->
-            <div class="chat-main">
-                <div id="chat-titulo" class="chat-destinatario">
-                    <i class="bi bi-chat-dots-fill"></i>
-                    Canal general
-                </div>
-
-                <div id="mensajes" class="mensajes-lista"></div>
-
-                <div id="typing-indicator" class="typing-indicator"></div>
-
-                <!-- Barra de preview de archivo -->
-                <div id="preview-bar" class="preview-bar" style="display:none;">
-                    <i class="bi bi-paperclip"></i>
-                    <span id="preview-nombre" class="preview-nombre"></span>
-                    <button onclick="cancelarArchivo()" class="btn-cancelar-archivo">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-
-                <!-- Input -->
-                <div class="input-area">
-                    <label class="btn-adjuntar" title="Adjuntar archivo">
-                        <input type="file" id="file-input" style="display:none"
-                            accept="image/*,.pdf,.txt,.doc,.docx,.zip"
-                            onchange="archivoSeleccionado(this)" />
-                        <i class="bi bi-paperclip fs-5"></i>
-                    </label>
-                    <textarea id="msg-input" class="msg-input"
-                        placeholder="Escribe un mensaje..."
-                        rows="1"
-                        onkeydown="handleKey(event)"
-                        oninput="autoResize(this); handleTyping()"></textarea>
-                    <button id="btn-enviar" class="btn-enviar" onclick="enviarMensaje()">
-                        <i class="bi bi-send-fill"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        fetch('../../Navbar/Navbar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = '../../Navbar/Navbar.js';
-                document.body.appendChild(script);
+        // 1. CONFIGURACIÓN DE SUPABASE (Copia tus datos de Supabase aquí)
+        const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsqsb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ID fijo para el Fisio (puedes usar un UUID real de tu tabla auth.users)
+        const ID_FISIO = '00000000-0000-0000-0000-000000000001'; 
+        const chatWindow = document.getElementById('chat-window');
+
+        // 2. FUNCIÓN PARA PINTAR MENSAJES EN PANTALLA
+        function dibujarMensaje(texto, emisorId) {
+            const div = document.createElement('div');
+            // Si el ID del emisor es el del fisio, va a la derecha, si no, a la izquierda
+            const clase = (emisorId === ID_FISIO) ? 'fisio' : 'paciente';
+            div.className = 'msg ' + clase;
+            div.innerText = texto;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // 3. CARGAR MENSAJES ANTIGUOS (HISTORIAL)
+        async function cargarHistorial() {
+            const { data, error } = await _supabase
+                .from('mensajes')
+                .select('*')
+                .order('msg_fecha', { ascending: true });
+
+            if (data) {
+                data.forEach(m => dibujarMensaje(m.msg_texto, m.id_emisor));
+                document.getElementById('status').innerText = 'En línea';
+            }
+        }
+
+        // 4. ESCUCHAR MENSAJES NUEVOS EN TIEMPO REAL
+        _supabase.channel('chat_motricare')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, payload => {
+                const nuevo = payload.new;
+                // Solo lo dibujamos si NO lo enviamos nosotros (porque ya se dibuja al dar clic en enviar)
+                if (nuevo.id_emisor !== ID_FISIO) {
+                    dibujarMensaje(nuevo.msg_texto, nuevo.id_emisor);
+                }
+            })
+            .subscribe();
+
+        // 5. FUNCIÓN PARA ENVIAR MENSAJE
+        async function enviarMensaje() {
+            const input = document.getElementById('mensajeInput');
+            const texto = input.value.trim();
+
+            if (texto === "") return;
+
+            // Guardar en la tabla real de mensajes
+            const { error } = await _supabase.from('mensajes').insert({
+                id_emisor: ID_FISIO,
+                msg_texto: texto,
+                msg_leido: false,
+                id_conv: '00000000-0000-0000-0000-000000000000' // UUID de la conversación
             });
+
+            if (!error) {
+                dibujarMensaje(texto, ID_FISIO);
+                input.value = '';
+            } else {
+                console.error("Error al enviar:", error.message);
+                alert("Error al enviar el mensaje.");
+            }
+        }
+
+        // Permitir enviar con la tecla ENTER
+        document.getElementById('mensajeInput').addEventListener("keypress", (e) => {
+            if (e.key === "Enter") enviarMensaje();
+        });
+
+        // Iniciar carga
+        cargarHistorial();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-    <script type="module" src="./chat.js"></script>
 </body>
 </html>
