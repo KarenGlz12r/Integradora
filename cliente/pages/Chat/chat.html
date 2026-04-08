@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        
+    </style>
 </head>
 
 <body>
@@ -242,11 +246,21 @@
 
             // ── Header avatar: foto o iniciales ──
             const headerAv = document.getElementById('chatHeaderAvatar');
+            headerAv.innerHTML = '';
             if (conv.fotoUrl) {
-                headerAv.innerHTML = `<img src="${chatEscAttr(conv.fotoUrl)}" alt="${chatEscAttr(conv.nombre)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.textContent='${conv.iniciales}'">`;
+                const img = document.createElement('img');
+                img.src = conv.fotoUrl;
+                img.alt = conv.nombre;
+                img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+                img.onerror = () => {
+                    headerAv.innerHTML = '';
+                    headerAv.textContent = conv.iniciales;
+                    headerAv.style.background = chatColorAvatar(conv.iniciales);
+                };
+                headerAv.appendChild(img);
                 headerAv.style.background = 'transparent';
             } else {
-                headerAv.innerHTML = conv.iniciales;
+                headerAv.textContent = conv.iniciales;
                 headerAv.style.background = chatColorAvatar(conv.iniciales);
             }
 
@@ -317,35 +331,43 @@
                 ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
                 : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-            // ── Avatar del mensaje ──
-            let avatarEl = '';
-            if (esFisio) {
-                // Foto del fisio
-                if (FISIO_FOTO) {
-                    avatarEl = `<img class="chat-msg-avatar" src="${chatEscAttr(FISIO_FOTO)}" alt="Tú" onerror="this.style.display='none'">`;
-                } else {
-                    avatarEl = `<div class="chat-msg-avatar-placeholder" style="background:var(--color-primary)">Yo</div>`;
-                }
+            // ── Mini-avatar circular (DOM, nunca innerHTML con img grande) ──
+            const avDiv = document.createElement('div');
+            avDiv.className = 'chat-msg-av';
+
+            const fotoUrl  = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
+            const ini      = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
+            const bgColor  = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
+
+            if (fotoUrl) {
+                const img = document.createElement('img');
+                img.src = fotoUrl;
+                img.alt = ini;
+                // Fallback a iniciales si la foto falla
+                img.onerror = () => {
+                    avDiv.innerHTML = '';
+                    avDiv.textContent = ini;
+                    avDiv.style.background = bgColor;
+                };
+                avDiv.appendChild(img);
             } else {
-                // Foto del paciente activo
-                if (convActiva?.fotoUrl) {
-                    avatarEl = `<img class="chat-msg-avatar" src="${chatEscAttr(convActiva.fotoUrl)}" alt="${chatEscAttr(convActiva.nombre)}" onerror="this.style.display='none'">`;
-                } else {
-                    avatarEl = `<div class="chat-msg-avatar-placeholder" style="background:${chatColorAvatar(convActiva?.iniciales || 'P')}">${convActiva?.iniciales || 'P'}</div>`;
-                }
+                avDiv.textContent = ini;
+                avDiv.style.background = bgColor;
             }
 
-            row.innerHTML = `
-                ${avatarEl}
-                <div class="chat-bubble">
-                    ${chatEscHTML(m.msg_texto)}
-                    <div class="chat-bubble-meta">
-                        <span class="chat-bubble-time">${hora}</span>
-                        ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
-                    </div>
+            // ── Burbuja ──
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.innerHTML = `
+                ${chatEscHTML(m.msg_texto)}
+                <div class="chat-bubble-meta">
+                    <span class="chat-bubble-time">${hora}</span>
+                    ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
                 </div>
             `;
 
+            row.appendChild(avDiv);
+            row.appendChild(bubble);
             area.appendChild(row);
         }
 
