@@ -1,5 +1,5 @@
 import { supabase } from "../../../auth.js";
-
+// PACIENTES.JS
 // ── Obtener fisioterapeuta una sola vez ──────────────────────────
 async function getFisioId() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -35,7 +35,7 @@ async function cargarTotalPacientesConfirmados(fisioId) {
         </div>`;
 }
 
-// 2. PACIENTES NUEVOS ESTE MES  ← nombre corregido
+// 2. PACIENTES NUEVOS ESTE MES  
 async function cargarPacientesNuevosMes(fisioId) {
     const ahora = new Date();
     const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-01`;
@@ -135,82 +135,87 @@ async function cargarProximaCita(fisioId) {
 }
 
 // CARGAR LOS PACIENTES Y SU INFORMACIÓN DE CITA
-
-// CARGAR LOS PACIENTES Y SU INFORMACIÓN DE CITA
 async function cargarPacientes(fisioId) {
-    const { data: citas, error } = await supabase
-        .from('citas')
-        .select(`
-            id,
-            fecha,
-            hora_inicio,
-            motivo,
-            estado,
-            usuario:usuario_id (
-                id_us,
-                us_nom,
-                us_correo,
-                us_telefono
-            )
-        `)
-        .eq('fisioterapeuta_id', fisioId)
-        .order('fecha', { ascending: false });
-
-    if (error) { console.error('Error cargando pacientes:', error); return; }
-
-    const seccion = document.getElementById('lista-pacientes');
-
-    if (!citas || citas.length === 0) {
-        seccion.innerHTML = `<p class="sin-pacientes">No tienes pacientes registrados aún.</p>`;
-        return;
-    }
-
-    seccion.innerHTML = citas.map(cita => `
-        <div class="paciente-card">
-            <div class="paciente-avatar">
-                <i class="bi bi-person-circle"></i>
-            </div>
-            <div class="paciente-info">
-                <h4 class="paciente-nombre">${cita.usuario?.us_nom ?? 'Sin nombre'}</h4>
-                <p class="paciente-correo">
-                    <i class="bi bi-envelope"></i> ${cita.usuario?.us_correo ?? '—'}
-                </p>
-                <p class="paciente-telefono">
-                    <i class="bi bi-telephone"></i> ${cita.usuario?.us_telefono ?? '—'}
-                </p>
-            </div>
-            <div class="paciente-cita">
-                <span class="cita-fecha">
-                    <i class="bi bi-calendar3"></i>
-                    ${new Date(cita.fecha + 'T00:00:00').toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-                <span class="cita-hora">
-                    <i class="bi bi-clock"></i> ${cita.hora_inicio}
-                </span>
-                <span class="cita-motivo">
-                    <i class="bi bi-clipboard2-pulse"></i> ${cita.motivo}
-                </span>
-                <span class="cita-estado estado-${cita.estado}">
-                    ${cita.estado.replace('_', ' ')}
-                </span>
-            </div>
-            <!-- ← BOTÓN NUEVO -->
-            <button 
-                class="btn-chat-paciente" 
-                onclick="abrirChat('${cita.usuario?.id_us}', '${cita.usuario?.us_nom}')">
-                <i class="bi bi-chat-dots-fill"></i> Mensaje
-            </button>
-        </div>
-    `).join('');
+  const { data: citas, error } = await supabase
+    .from('citas')
+    .select(`
+      id,
+      fecha,
+      hora_inicio,
+      motivo,
+      estado,
+      usuario:usuario_id (
+        id_us,
+        user_id,        
+        us_nom,
+        us_correo,
+        us_telefono
+      )
+    `)
+    .eq('fisioterapeuta_id', fisioId)
+    .order('fecha', { ascending: false });
+ 
+  if (error) { console.error('Error cargando pacientes:', error); return; }
+ 
+  const seccion = document.getElementById('lista-pacientes');
+ 
+  if (!citas || citas.length === 0) {
+    seccion.innerHTML = `<p class="sin-pacientes">No tienes pacientes registrados aún.</p>`;
+    return;
+  }
+ 
+  seccion.innerHTML = citas.map(cita => `
+    <div class="paciente-card">
+      <div class="paciente-avatar">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div class="paciente-info">
+        <h4 class="paciente-nombre">${cita.usuario?.us_nom ?? 'Sin nombre'}</h4>
+        <p class="paciente-correo">
+          <i class="bi bi-envelope"></i> ${cita.usuario?.us_correo ?? '—'}
+        </p>
+        <p class="paciente-telefono">
+          <i class="bi bi-telephone"></i> ${cita.usuario?.us_telefono ?? '—'}
+        </p>
+      </div>
+      <div class="paciente-cita">
+        <span class="cita-fecha">
+          <i class="bi bi-calendar3"></i>
+          ${new Date(cita.fecha + 'T00:00:00').toLocaleDateString('es-MX', {
+            day: 'numeric', month: 'short', year: 'numeric'
+          })}
+        </span>
+        <span class="cita-hora">
+          <i class="bi bi-clock"></i> ${cita.hora_inicio}
+        </span>
+        <span class="cita-motivo">
+          <i class="bi bi-clipboard2-pulse"></i> ${cita.motivo}
+        </span>
+        <span class="cita-estado estado-${cita.estado}">
+          ${cita.estado.replace('_', ' ')}
+        </span>
+      </div>
+      <button
+        class="btn-chat-paciente"
+        onclick="abrirChat('${cita.usuario?.user_id}', '${cita.usuario?.us_nom}')">
+        <i class="bi bi-chat-dots-fill"></i> Mensaje
+      </button>
+    </div>
+  `).join('');
 }
 
-// ← FUNCIÓN NUEVA al final del archivo, antes de inicializar()
-window.abrirChat = function(pacienteId, pacienteNombre) {
-    if (!pacienteId) return;
-    sessionStorage.setItem('chatPacienteId', pacienteId);
-    sessionStorage.setItem('chatPacienteNombre', pacienteNombre);
-    window.location.href = '../Chat/chat.html';
-}
+
+// FUNCION DE CARGAR EL CHAT
+window.abrirChat = function(pacienteUserId, pacienteNombre) {
+  if (!pacienteUserId || pacienteUserId === 'undefined') {
+    alert('Este paciente no tiene cuenta activa en el sistema.');
+    return;
+  }
+  // Guarda el user_id (uuid de auth.users) — es lo que el chat usa para la sala
+  sessionStorage.setItem('chatPacienteId', pacienteUserId);
+  sessionStorage.setItem('chatPacienteNombre', pacienteNombre);
+  window.location.href = '../Chat/chat.html';
+};
 
 // ── TIEMPO REAL ──────────────────────────────────────────────────
 function activarTiempoReal(fisioId) {
