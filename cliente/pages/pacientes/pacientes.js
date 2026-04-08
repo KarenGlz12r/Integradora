@@ -145,8 +145,7 @@ async function cargarPacientes(fisioId) {
       motivo,
       estado,
       usuario:usuario_id (
-        id_us,
-        user_id,        
+        id_us,        
         us_nom,
         us_correo,
         us_telefono
