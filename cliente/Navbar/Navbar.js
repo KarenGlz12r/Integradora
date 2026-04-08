@@ -4,7 +4,7 @@
 import { protegerRuta } from "../../proteger.js";
 await protegerRuta("fisioterapeuta");
 
-import supabase  from "../../auth.js";
+import supabase from "../../auth.js";
 
 const menu = document.getElementById('menu');
 const sidebar = document.getElementById('sidebar');
@@ -14,17 +14,15 @@ menu.addEventListener('click', () => {
     sidebar.classList.toggle('menu-toggle');
     menu.classList.toggle('menu-toggle');
     mainContent.classList.toggle('menu-toggle');
-
 });
 
 
 // FUNCION DEL DROPDOWN
-
 function toggleDropdown() {
     document.getElementById("dropdown").classList.toggle("active");
 }
-// CERRAR AL HACER CLICK AFUERA
 
+// CERRAR AL HACER CLICK AFUERA
 document.addEventListener("click", (e) => {
     const userMenu = document.querySelector(".user-menu");
     if (userMenu && !userMenu.contains(e.target)) {
@@ -33,7 +31,6 @@ document.addEventListener("click", (e) => {
 });
 
 // FOTO DE PERFIL
-
 function abrirSelectorFoto() {
     document.getElementById("input-foto").click();
 }
@@ -49,39 +46,25 @@ async function subirFoto(event) {
     const extension = archivo.name.split(".").pop();
     const nombreArchivo = `${user.id}.${extension}`;
 
-    // SUBIR A SUPABASE STORAGE
-
     const { error } = await supabase.storage
         .from("avatars")
         .upload(nombreArchivo, archivo, { upsert: true });
 
-    if (error) {
-        console.error("Error al subir la foto", error);
-        return;
-    }
-
-    // OBTENER URL PÚBLICA
+    if (error) { console.error("Error al subir la foto", error); return; }
 
     const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(nombreArchivo);
 
-    // TIMESTAMP A LA URL
     const urlConTimestamp = `${urlData.publicUrl}?t=${Date.now()}`;
 
-    // MOSTRAR EN EL NAVBAR
     document.getElementById("user-foto").src = urlConTimestamp;
-
-    // GUARDAR EN LA TABLA SEGUN EL ROL
 
     await supabase.from("perfiles").update({ foto_url: urlConTimestamp }).eq("id", user.id);
     document.getElementById("dropdown").classList.remove("active");
 
-      const fotoDashboard = document.getElementById("foto-doctor");
-    if (fotoDashboard) {
-        fotoDashboard.src = urlConTimestamp;
-
-        }
+    const fotoDashboard = document.getElementById("foto-doctor");
+    if (fotoDashboard) fotoDashboard.src = urlConTimestamp;
 }
 
 // CARGAR FOTO
@@ -101,7 +84,6 @@ async function cargarFotoPerfil() {
             : `${perfil.foto_url}?t=${Date.now()}`;
         document.getElementById("user-foto").src = url;
 
-        // ACTUALIZA LA FOTO DEL DASHBOARD SI EXISTE
         const fotoDashboard = document.getElementById("foto-doctor");
         if (fotoDashboard) fotoDashboard.src = url;
     }
@@ -112,21 +94,16 @@ cargarFotoPerfil();
 // MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
 function marcarEnlaceActivo() {
     const urlActual = window.location.pathname;
-
     const enlaces = document.querySelectorAll(".sidebar nav ul li a");
 
     enlaces.forEach(enlace => {
         enlace.classList.remove("selected");
-
         const href = enlace.getAttribute("href");
-
-        //  SI LA URL ACTUAL CONTIENE LA RUTA DEL ENLACE
         if (href && urlActual.includes(href)) {
             enlace.classList.add("selected");
         }
     });
 
-    // CASO ESPECIAL: DASHBOARD ES LA RAÍZ
     if (urlActual === "/cliente/dashboard.html" || urlActual === "/cliente/") {
         document.querySelector('a[href="/cliente/dashboard.html"]')
             ?.classList.add("selected");
@@ -135,36 +112,31 @@ function marcarEnlaceActivo() {
 
 marcarEnlaceActivo();
 
-// / ── MODAL CERRAR SESIÓN ──────────────────────────────────────────
- 
+// ── MODAL CERRAR SESIÓN ──
 function abrirModalCerrarSesion() {
     document.getElementById("dropdown")?.classList.remove("active");
     document.getElementById("modal-logout").classList.add("active");
 }
- 
+
 function cerrarModal() {
     document.getElementById("modal-logout").classList.remove("active");
 }
- 
-// Cerrar modal al hacer clic en el overlay (fuera de la card)
+
 document.getElementById("modal-logout").addEventListener("click", (e) => {
     if (e.target === document.getElementById("modal-logout")) cerrarModal();
 });
- 
-// Cerrar modal con Escape
+
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") cerrarModal();
 });
- 
+
 async function cerrarSesion() {
-    // Llamar al backend para invalidar el token
     await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    // Limpiar localStorage y sesión de Supabase local
     limpiarSesion();
     await supabase.auth.signOut();
     window.location.href = "/index.html";
 }
- 
+
 window.toggleDropdown         = toggleDropdown;
 window.abrirSelectorFoto      = abrirSelectorFoto;
 window.subirFoto              = subirFoto;
@@ -173,26 +145,13 @@ window.cerrarModal            = cerrarModal;
 window.cerrarSesion           = cerrarSesion;
 
 
-// ── CAMPANA DE MENSAJES NO LEÍDOS (TalkJS) ──────────────────────
+// ── CAMPANA: MENSAJES NO LEÍDOS EN TIEMPO REAL CON SUPABASE ──
 
-const APP_ID_NAVBAR = "twddIXRo"; // mismo App ID que chat.js
-
-function loadTalkJSNavbar() {
-    return new Promise(resolve => {
-        if (window.Talk) { resolve(); return; }
-        const s = document.createElement("script");
-        s.src = "https://cdn.talkjs.com/talk.js";
-        s.async = true;
-        s.defer = true;
-        s.onload = resolve;
-        document.head.appendChild(s);
-    });
-}
+let _badgeChannel = null;
 
 function actualizarBadge(count) {
     const badge = document.getElementById("bell-badge");
     if (!badge) return;
-
     if (count > 0) {
         badge.textContent = count > 99 ? "99+" : count;
         badge.style.display = "flex";
@@ -201,40 +160,49 @@ function actualizarBadge(count) {
     }
 }
 
+async function cargarMensajesNoLeidos(userId) {
+    // Cuenta todos los mensajes no leídos que NO son del fisio (= mensajes de pacientes)
+    const { count } = await supabase
+        .from('mensajes')
+        .select('*', { count: 'exact', head: true })
+        .eq('msg_leido', false)
+        .neq('id_emisor', userId);
+
+    actualizarBadge(count || 0);
+}
+
 async function iniciarCampana() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: fisio } = await supabase
-        .from("fisioterapeutas")
-        .select("nombre, apellido_paterno")
-        .eq("user_id", user.id)
-        .single();
+    // Carga inicial
+    await cargarMensajesNoLeidos(user.id);
 
-    if (!fisio) return;
+    // Escucha en tiempo real: cada INSERT en mensajes recalcula el badge
+    if (_badgeChannel) supabase.removeChannel(_badgeChannel);
 
-    await loadTalkJSNavbar();
-
-    await Talk.ready;
-
-    const me = new Talk.User({
-        id:    user.id,
-        name:  `${fisio.nombre} ${fisio.apellido_paterno}`,
-        email: user.email,
-        role:  "fisioterapeuta"
-    });
-
-    const session = new Talk.Session({
-        appId: APP_ID_NAVBAR,
-        me
-    });
-
-    // Escucha cambios en no-leídos en tiempo real
-    session.unreads.onChange(conversaciones => {
-        const total = conversaciones.reduce((acc, c) => acc + c.unreadMessageCount, 0);
-        actualizarBadge(total);
-    });
+    _badgeChannel = supabase
+        .channel('navbar_badge_rt')
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'mensajes' },
+            async (payload) => {
+                const m = payload.new;
+                // Solo contar mensajes de otros (pacientes), no los del propio fisio
+                if (m.id_emisor !== user.id) {
+                    await cargarMensajesNoLeidos(user.id);
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'mensajes' },
+            async () => {
+                // Cuando se marcan como leídos, actualizar el badge
+                await cargarMensajesNoLeidos(user.id);
+            }
+        )
+        .subscribe();
 }
 
 iniciarCampana();
-
