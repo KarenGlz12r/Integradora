@@ -42,8 +42,9 @@
         const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ID fijo para el Fisio (puedes usar un UUID real de tu tabla auth.users)
-        const ID_FISIO = '00000000-0000-0000-0000-000000000001'; 
+      const { data: { user } } = await _supabase.auth.getUser();
+
+const ID_FISIO = user.id;
         const chatWindow = document.getElementById('chat-window');
 
         // 2. FUNCIÓN PARA PINTAR MENSAJES EN PANTALLA
