@@ -119,8 +119,9 @@
         const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
         const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let FISIO_ID = null;
-        let FISIO_FOTO = null; // ← foto de perfil del fisioterapeuta
+        let FISIO_ID = null;      // auth.users.id  — para mensajes (id_emisor)
+        let FISIO_REAL_ID = null; // fisioterapeutas.id — para conversaciones (id_fisio)
+        let FISIO_FOTO = null;
         let convActiva = null;
         let todasConvs = [];
         let rtChannel = null;
@@ -129,6 +130,15 @@
             const { data: { user }, error } = await _sb.auth.getUser();
             if (error || !user) { mostrarToastChat('⚠️ Sin sesión activa'); return; }
             FISIO_ID = user.id;
+
+            // ── Obtener el id interno del fisioterapeuta ──
+            const { data: fisioRow } = await _sb
+                .from('fisioterapeutas')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+            if (!fisioRow) { mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado'); return; }
+            FISIO_REAL_ID = fisioRow.id;
 
             // ── Cargar foto del fisio desde perfiles ──
             const { data: perfil } = await _sb
@@ -157,7 +167,7 @@
             const { data: convExistente } = await _sb
                 .from('conversaciones')
                 .select('id')
-                .eq('id_fisio', FISIO_ID)
+                .eq('id_fisio', FISIO_REAL_ID)
                 .eq('id_paciente', pacienteUserId)
                 .maybeSingle();
 
@@ -167,7 +177,7 @@
             if (!convId) {
                 const { data: nueva, error: errConv } = await _sb
                     .from('conversaciones')
-                    .insert({ id_fisio: FISIO_ID, id_paciente: pacienteUserId })
+                    .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteUserId })
                     .select('id')
                     .single();
 
@@ -212,7 +222,7 @@
             const { data: convRows, error } = await _sb
                 .from('conversaciones')
                 .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
-                .eq('id_fisio', FISIO_ID)
+                .eq('id_fisio', FISIO_REAL_ID)
                 .order('ultimo_mensaje_fecha', { ascending: false });
 
             if (error) { console.error(error); return; }
