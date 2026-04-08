@@ -14,9 +14,7 @@
     <link rel="stylesheet" href="./chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        
-    </style>
+
 </head>
 
 <body>
@@ -142,36 +140,97 @@
 
             await cargarConvs();
             chatEscucharRT();
+
+            // ── Si venimos desde Pacientes, abrir esa conv automáticamente ──
+            const pacienteIdPendiente = sessionStorage.getItem('chatPacienteId');
+            const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
+            if (pacienteIdPendiente) {
+                sessionStorage.removeItem('chatPacienteId');
+                sessionStorage.removeItem('chatPacienteNombre');
+                await abrirOCrearConvPaciente(pacienteIdPendiente, pacienteNombrePendiente);
+            }
+        }
+
+        // ── Busca o crea una conversación con ese paciente y la abre ──
+        async function abrirOCrearConvPaciente(pacienteUserId, pacienteNombre) {
+            // Buscar si ya existe una conv entre este fisio y este paciente
+            const { data: convExistente } = await _sb
+                .from('conversaciones')
+                .select('id')
+                .eq('id_fisio', FISIO_ID)
+                .eq('id_paciente', pacienteUserId)
+                .maybeSingle();
+
+            let convId = convExistente?.id;
+
+            // Si no existe, crearla
+            if (!convId) {
+                const { data: nueva, error: errConv } = await _sb
+                    .from('conversaciones')
+                    .insert({ id_fisio: FISIO_ID, id_paciente: pacienteUserId })
+                    .select('id')
+                    .single();
+
+                if (errConv) { console.error('Error creando conversación:', errConv); return; }
+                convId = nueva.id;
+            }
+
+            // Obtener datos del paciente (foto, iniciales)
+            const { data: u } = await _sb
+                .from('usuario')
+                .select('us_nom, url_foto')
+                .eq('id_us', pacienteUserId)
+                .single();
+
+            const nombre   = u?.us_nom || pacienteNombre || 'Paciente';
+            const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const fotoUrl  = u?.url_foto || null;
+
+            // Construir objeto conv y abrirlo
+            const conv = {
+                id_conv:     convId,
+                paciente_id: pacienteUserId,
+                nombre,
+                iniciales,
+                fotoUrl,
+                sinLeer: 0,
+                ultimo: null
+            };
+
+            // Agregar a la lista si no está ya
+            const yaEsta = todasConvs.find(c => c.id_conv === convId);
+            if (!yaEsta) {
+                todasConvs.unshift(conv);
+                renderConvs(todasConvs);
+            }
+
+            abrirConv(yaEsta || conv);
         }
 
         async function cargarConvs() {
-            const { data, error } = await _sb
-                .from('mensajes')
-                .select('id_conv, id_emisor, msg_texto, msg_fecha, msg_leido')
-                .order('msg_fecha', { ascending: false });
+            // ── Usar tabla conversaciones como fuente principal ──
+            const { data: convRows, error } = await _sb
+                .from('conversaciones')
+                .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
+                .eq('id_fisio', FISIO_ID)
+                .order('ultimo_mensaje_fecha', { ascending: false });
 
             if (error) { console.error(error); return; }
 
-            const map = {};
-            data.forEach(m => { if (!map[m.id_conv]) map[m.id_conv] = m; });
-
             const convs = [];
-            for (const [convId, ultimo] of Object.entries(map)) {
-                // El paciente es quien NO es el fisio
-                const pacienteId = ultimo.id_emisor !== FISIO_ID ? ultimo.id_emisor : null;
-                let nombre = 'Paciente', iniciales = 'P', sinLeer = 0, fotoUrl = null;
+            for (const row of (convRows || [])) {
+                const pacienteId = row.id_paciente;
+                let nombre = 'Paciente', iniciales = 'P', fotoUrl = null;
 
+                // Contar no leídos de este paciente en esta conv
                 const { count } = await _sb
                     .from('mensajes')
                     .select('*', { count: 'exact', head: true })
-                    .eq('id_conv', convId)
+                    .eq('id_conv', row.id)
                     .eq('msg_leido', false)
                     .neq('id_emisor', FISIO_ID);
 
-                sinLeer = count || 0;
-
                 if (pacienteId) {
-                    // ── Obtener nombre Y foto desde tabla usuario ──
                     const { data: u } = await _sb
                         .from('usuario')
                         .select('us_nom, url_foto')
@@ -179,13 +238,23 @@
                         .single();
 
                     if (u) {
-                        nombre = u.us_nom || 'Paciente';
+                        nombre   = u.us_nom || 'Paciente';
                         iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        fotoUrl = u.url_foto || null;
+                        fotoUrl  = u.url_foto || null;
                     }
                 }
 
-                convs.push({ id_conv: convId, paciente_id: pacienteId, nombre, iniciales, fotoUrl, ultimo, sinLeer });
+                convs.push({
+                    id_conv:     row.id,
+                    paciente_id: pacienteId,
+                    nombre,
+                    iniciales,
+                    fotoUrl,
+                    sinLeer: count || 0,
+                    ultimo: row.ultimo_mensaje
+                        ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
+                        : null
+                });
             }
 
             todasConvs = convs;
@@ -300,7 +369,7 @@
             let ultimaFecha = null;
             data.forEach(m => {
                 const fechaStr = m.msg_fecha
-                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
+                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City' })
                     : '';
                 if (fechaStr !== ultimaFecha) {
                     const sep = document.createElement('div');
@@ -324,7 +393,7 @@
             if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
             const hora = m.msg_fecha
-                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City' })
                 : '';
 
             const checkIcon = m.msg_leido
@@ -381,15 +450,18 @@
             input.value = '';
             input.style.height = 'auto';
 
+            const ahora = new Date().toISOString();
+
             chatAgregarBubble({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
-                msg_fecha: new Date().toISOString(),
+                msg_fecha: ahora,
                 msg_leido: false,
                 id_conv: convActiva.id_conv
             }, true);
             chatScrollAbajo();
 
+            // Insertar mensaje
             const { error } = await _sb.from('mensajes').insert({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
@@ -397,7 +469,13 @@
                 id_conv: convActiva.id_conv
             });
 
-            if (error) { console.error(error); mostrarToastChat('Error al enviar'); }
+            if (error) { console.error(error); mostrarToastChat('Error al enviar'); return; }
+
+            // Actualizar ultimo_mensaje en conversaciones para ordenar el sidebar
+            await _sb.from('conversaciones').update({
+                ultimo_mensaje:       texto,
+                ultimo_mensaje_fecha: ahora
+            }).eq('id', convActiva.id_conv);
         }
 
         function chatEscucharRT() {
@@ -489,11 +567,14 @@
 
         function chatFormatHora(fecha) {
             if (!fecha) return '';
-            const d = new Date(fecha);
-            const hoy = new Date();
-            if (d.toDateString() === hoy.toDateString())
-                return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' });
+            const TZ = 'America/Mexico_City';
+            const d   = new Date(fecha);
+            // Comparar "hoy" en la zona correcta
+            const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
+            const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
+            if (dStr === hoyStr)
+                return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
+            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', timeZone: TZ });
         }
 
         function chatColorAvatar(ini) {
