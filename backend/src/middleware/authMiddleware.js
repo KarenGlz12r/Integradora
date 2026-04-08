@@ -6,7 +6,7 @@
 //   router.get("/ruta", verificarJWT, handler)
 //   router.get("/solo-admin", verificarJWT, soloAdmin, handler)
 
-import { supabase } from "../supabaseClient.js";
+import { supabase,supabaseAdmin } from "../supabaseClient.js";
 
 // ── 1. Verifica que el token sea válido ──────────────────────────
 export async function verificarJWT(req, res, next) {
@@ -33,7 +33,7 @@ export async function verificarJWT(req, res, next) {
 // Úsalo DESPUÉS de verificarJWT
 export function soloRol(...rolesPermitidos) {
     return async (req, res, next) => {
-        const { data: perfil, error } = await supabase
+        const { data: perfil, error } = await supabaseAdmin
             .from("perfiles")
             .select("rol")
             .eq("id", req.user.id)

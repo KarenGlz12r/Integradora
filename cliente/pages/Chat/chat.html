@@ -4,231 +4,921 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel MotriCare - Fisioterapeuta</title>
+    <title>MotriCare – Chat</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Tu navbar CSS (ajusta la ruta según tu proyecto) -->
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #fdf2f8;
+        /* ══════════════════════════════════════
+           VARIABLES DEL CHAT
+        ══════════════════════════════════════ */
+        :root {
+            --chat-verde: #1D9E75;
+            --chat-verde-light: #E1F5EE;
+            --chat-verde-dark: #0F6E56;
+            --chat-bubble-fisio: #E1F5EE;
+            --chat-bubble-paciente: #ffffff;
+            --chat-border: rgba(0, 0, 0, 0.08);
+            --chat-text-primary: #1a1a1a;
+            --chat-text-secondary: #6b6b6b;
+            --chat-text-hint: #a0a0a0;
+            --chat-input-bg: #f7f7f5;
+            --chat-bg: #f0ece4;
+            --chat-header-bg: #ffffff;
+        }
+
+        /* ══════════════════════════════════════
+           CONTENEDOR PRINCIPAL
+           Respeta el navbar: top 3.5rem, left 4rem
+        ══════════════════════════════════════ */
+        .main-content {
+            margin-top: 3.5rem;
+            margin-left: 4rem;
+            height: calc(100vh - 3.5rem);
             display: flex;
-            height: 100vh;
+            flex-direction: row;   /* sidebar-chat + panel-chat lado a lado */
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
         }
 
-        .sidebar {
-            width: 250px;
-            background: #9b1b6e;
-            color: white;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        .main-content.menu-toggle {
+            margin-left: 18.75rem;
         }
 
-        .main-chat {
-            flex: 1;
+        /* ══════════════════════════════════════
+           SIDEBAR DEL CHAT  (renombrado a .chat-sidebar)
+        ══════════════════════════════════════ */
+        .chat-sidebar {
+            width: 320px;
+            min-width: 260px;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #ffffff;
+            border-right: 1px solid var(--chat-border);
         }
 
-        #chat-window {
+        .chat-sidebar-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--chat-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--chat-header-bg);
+        }
+
+        .chat-sidebar-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--chat-verde);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-avatar.md {
+            width: 46px;
+            height: 46px;
+            font-size: 16px;
+        }
+
+        .chat-sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--chat-text-primary);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-sidebar-subtitle {
+            font-size: 11px;
+            color: var(--chat-verde);
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            color: var(--chat-text-secondary);
+            display: flex;
+            align-items: center;
+            transition: background 0.15s;
+        }
+
+        .chat-icon-btn:hover {
+            background: var(--chat-input-bg);
+        }
+
+        .chat-search-box {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--chat-border);
+        }
+
+        .chat-search-box input {
+            width: 100%;
+            background: var(--chat-input-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--chat-text-primary);
+            outline: none;
+        }
+
+        .chat-search-box input::placeholder {
+            color: var(--chat-text-hint);
+        }
+
+        .chat-conv-list {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+        }
+
+        .chat-conv-list::-webkit-scrollbar { width: 3px; }
+        .chat-conv-list::-webkit-scrollbar-thumb { background: var(--chat-border); border-radius: 2px; }
+
+        .chat-conv-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--chat-border);
+            transition: background 0.12s;
+        }
+
+        .chat-conv-item:hover { background: #f7f7f5; }
+        .chat-conv-item.active { background: #e8f5f0; }
+
+        .chat-conv-info { flex: 1; min-width: 0; }
+
+        .chat-conv-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--chat-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-conv-last {
+            font-size: 12px;
+            color: var(--chat-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-conv-meta {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
         }
 
-        .msg {
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 60%;
-            font-size: 14px;
-            line-height: 1.4;
-            position: relative;
+        .chat-conv-time {
+            font-size: 11px;
+            color: var(--chat-text-hint);
+            font-family: 'DM Sans', sans-serif;
         }
 
-        .fisio {
-            align-self: flex-end;
-            background: #9b1b6e;
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .paciente {
-            align-self: flex-start;
-            background: #f1f5f9;
-            color: #1e293b;
-            border: 1px solid #e2e8f0;
-            border-bottom-left-radius: 2px;
-        }
-
-        .input-area {
-            padding: 20px;
-            border-top: 1px solid #eee;
+        .chat-badge {
+            background: var(--chat-verde);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
         }
 
-        input {
+        /* ══════════════════════════════════════
+           PANEL PRINCIPAL DEL CHAT
+        ══════════════════════════════════════ */
+        .chat-main {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            background: var(--chat-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-bg-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 50 L5 50 Z' fill='%230F6E56'/%3E%3C/svg%3E");
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Estado vacío */
+        .chat-empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            z-index: 1;
+        }
+
+        .chat-empty-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--chat-verde-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-empty-state h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--chat-text-primary);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-empty-state p {
+            font-size: 13px;
+            color: var(--chat-text-secondary);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Panel activo */
+        .chat-active-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .chat-panel-header {
+            background: var(--chat-header-bg);
+            padding: 11px 18px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-bottom: 1px solid var(--chat-border);
+            flex-shrink: 0;
+        }
+
+        .chat-panel-header-info { flex: 1; }
+
+        .chat-panel-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--chat-text-primary);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chat-panel-status {
+            font-size: 11px;
+            color: var(--chat-verde);
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Área de mensajes */
+        .chat-messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .chat-messages-area::-webkit-scrollbar { width: 3px; }
+        .chat-messages-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+
+        /* Separador de fecha */
+        .chat-date-sep {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .chat-date-sep span {
+            background: rgba(255,255,255,0.85);
+            font-size: 11px;
+            color: var(--chat-text-secondary);
+            padding: 3px 10px;
             border-radius: 8px;
-            outline: none;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Burbujas */
+        .chat-msg-row {
+            display: flex;
+            margin-bottom: 1px;
+        }
+
+        .chat-msg-row.fisio { justify-content: flex-end; }
+        .chat-msg-row.paciente { justify-content: flex-start; }
+
+        .chat-bubble {
+            max-width: 65%;
+            padding: 7px 11px;
+            border-radius: 12px;
             font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            font-family: 'DM Sans', sans-serif;
         }
 
-        button {
-            background: #9b1b6e;
-            color: white;
+        .chat-msg-row.fisio .chat-bubble {
+            background: var(--chat-bubble-fisio);
+            border-bottom-right-radius: 3px;
+            color: var(--chat-text-primary);
+        }
+
+        .chat-msg-row.paciente .chat-bubble {
+            background: var(--chat-bubble-paciente);
+            border-bottom-left-radius: 3px;
+            color: var(--chat-text-primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+        }
+
+        .chat-bubble-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 3px;
+            margin-top: 2px;
+        }
+
+        .chat-bubble-time {
+            font-size: 10px;
+            color: var(--chat-text-hint);
+        }
+
+        .chat-check { display: flex; align-items: center; color: var(--chat-verde); }
+
+        /* Input area */
+        .chat-input-area {
+            background: var(--chat-header-bg);
+            padding: 10px 14px;
+            display: flex;
+            align-items: flex-end;
+            gap: 9px;
+            border-top: 1px solid var(--chat-border);
+            flex-shrink: 0;
+        }
+
+        .chat-input-wrap {
+            flex: 1;
+            background: var(--chat-input-bg);
+            border-radius: 22px;
+            display: flex;
+            align-items: flex-end;
+            padding: 5px 14px;
+        }
+
+        .chat-input-wrap textarea {
+            flex: 1;
+            background: none;
             border: none;
-            padding: 0 25px;
-            border-radius: 8px;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--chat-text-primary);
+            resize: none;
+            max-height: 110px;
+            line-height: 1.5;
+            padding: 4px 0;
+        }
+
+        .chat-input-wrap textarea::placeholder { color: var(--chat-text-hint); }
+
+        .chat-send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: var(--chat-verde);
+            color: white;
             cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.15s, transform 0.1s;
         }
 
-        button:hover {
-            background: #7a1556;
+        .chat-send-btn:hover { background: var(--chat-verde-dark); }
+        .chat-send-btn:active { transform: scale(0.94); }
+
+        /* Skeleton */
+        .chat-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: chatShimmer 1.2s infinite;
+            border-radius: 10px;
         }
 
-        h2 {
-            margin-top: 0;
-            font-size: 1.2rem;
+        @keyframes chatShimmer { to { background-position: -200% 0; } }
+        @keyframes chatFadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+        /* Toast */
+        .chat-toast {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%) translateY(70px);
+            background: #2c2c2c;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 22px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform 0.28s;
+            z-index: 9999;
+        }
+
+        .chat-toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Responsive móvil */
+        @media (max-width: 680px) {
+            .main-content { margin-left: 0 !important; }
+            .chat-sidebar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; width: 100%; display: none; }
+            .chat-sidebar.show { display: flex; }
+            .chat-main.hide { display: none; }
+            #chatBackBtn { display: flex !important; }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="sidebar">
-        <h2>MotriCare Chat</h2>
-        <p>Sesión: Fisioterapeuta</p>
-        <hr style="opacity: 0.3">
-        <p style="font-size: 0.8rem;">Estado: <span id="status">Conectando...</span></p>
-    </div>
+    <!-- ── NAVBAR (se inyecta desde Navbar.html / fetch) ── -->
+    <div id="navbar-container"></div>
 
-    <div class="main-chat">
-        <div id="chat-window"></div>
-        <div class="input-area">
-            <input type="text" id="mensajeInput" placeholder="Escribe un mensaje al paciente..." autocomplete="off">
-            <button onclick="enviarMensaje()">Enviar</button>
-        </div>
-    </div>
+    <div class="chat-toast" id="chatToast"></div>
+
+    <div class="main-content" id="mainContent">
+
+        <!-- ── SIDEBAR DEL CHAT ── -->
+        <aside class="chat-sidebar" id="chatSidebar">
+            <div class="chat-sidebar-header">
+                <div class="chat-sidebar-header-left">
+                    <div class="chat-avatar">
+                        <i class="fa-solid fa-comments" style="font-size:16px;"></i>
+                    </div>
+                    <div>
+                        <div class="chat-sidebar-title">Mensajes</div>
+                        <div class="chat-sidebar-subtitle">Fisioterapeuta</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-search-box">
+                <input type="text" placeholder="Buscar paciente..." id="chatSearch" oninput="filtrarConvs()">
+            </div>
+
+            <div class="chat-conv-list" id="chatConvList">
+                <div id="chatConvLoading"
+                    style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">
+                    Cargando conversaciones...
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── PANEL PRINCIPAL ── -->
+        <main class="chat-main" id="chatMain">
+            <div class="chat-bg-pattern"></div>
+
+            <!-- Estado vacío -->
+            <div class="chat-empty-state" id="chatEmptyState">
+                <div class="chat-empty-icon">
+                    <i class="fa-solid fa-message" style="font-size:28px;color:var(--chat-verde);"></i>
+                </div>
+                <h2>MotriCare Chat</h2>
+                <p>Selecciona un paciente para iniciar la conversación</p>
+            </div>
+
+            <!-- Panel activo -->
+            <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
+
+                <div class="chat-panel-header">
+                    <button class="chat-icon-btn" id="chatBackBtn" style="display:none;"
+                        onclick="volverSidebarChat()">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="chat-avatar md" id="chatHeaderAvatar">P</div>
+                    <div class="chat-panel-header-info">
+                        <div class="chat-panel-name" id="chatHeaderName">Paciente</div>
+                        <div class="chat-panel-status" id="chatHeaderStatus">en línea</div>
+                    </div>
+                    <button class="chat-icon-btn" title="Info del paciente"
+                        onclick="mostrarToastChat('Perfil del paciente: próximamente')">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                </div>
+
+                <div class="chat-messages-area" id="chatMessagesArea"></div>
+
+                <div class="chat-input-area">
+                    <button class="chat-icon-btn" title="Adjuntar"
+                        onclick="mostrarToastChat('Adjuntar archivos: próximamente')">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <div class="chat-input-wrap">
+                        <textarea id="chatMsgInput" rows="1" placeholder="Escribe un mensaje..."
+                            oninput="chatAutoResize(this)" onkeydown="chatHandleKey(event)"></textarea>
+                    </div>
+                    <button class="chat-send-btn" onclick="chatEnviarMensaje()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+    </div><!-- fin .main-content -->
+
+    <!-- Navbar JS (ajusta la ruta) -->
+    <script type="module" src="../../Navbar/Navbar.js"></script>
 
     <script>
-    // 1. CONFIGURACIÓN DE SUPABASE
-    const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq'; // ⚠️ asegúrate que sea correcta
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // ══════════════════════════════════════
+        // SUPABASE
+        // ══════════════════════════════════════
+        const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
+        const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let ID_FISIO = null;
-    const chatWindow = document.getElementById('chat-window');
+        // ══════════════════════════════════════
+        // ESTADO
+        // ══════════════════════════════════════
+        let FISIO_ID = null;
+        let convActiva = null;
+        let todasConvs = [];
+        let rtChannel = null;
 
-    // 2. INICIALIZACIÓN PRINCIPAL
-    async function init() {
-        const { data: { user }, error } = await _supabase.auth.getUser();
-
-        if (error || !user) {
-            console.error("Error de auth:", error);
-            alert("No hay usuario autenticado");
-            return;
+        // ══════════════════════════════════════
+        // INIT
+        // ══════════════════════════════════════
+        async function chatInit() {
+            const { data: { user }, error } = await _sb.auth.getUser();
+            if (error || !user) { mostrarToastChat('⚠️ Sin sesión activa'); return; }
+            FISIO_ID = user.id;
+            await cargarConvs();
+            chatEscucharRT();
         }
 
-        ID_FISIO = user.id;
+        // ══════════════════════════════════════
+        // CARGAR CONVERSACIONES
+        // ══════════════════════════════════════
+        async function cargarConvs() {
+            const { data, error } = await _sb
+                .from('mensajes')
+                .select('id_conv, id_emisor, msg_texto, msg_fecha, msg_leido')
+                .order('msg_fecha', { ascending: false });
 
-        await cargarHistorial();
-        escucharTiempoReal();
-    }
+            if (error) { console.error(error); return; }
 
-    // 3. DIBUJAR MENSAJES
-    function dibujarMensaje(texto, emisorId) {
-        const div = document.createElement('div');
-        const clase = (emisorId === ID_FISIO) ? 'fisio' : 'paciente';
-        div.className = 'msg ' + clase;
-        div.innerText = texto;
+            // Agrupar: primer registro por id_conv = último mensaje
+            const map = {};
+            data.forEach(m => { if (!map[m.id_conv]) map[m.id_conv] = m; });
 
-        chatWindow.appendChild(div);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+            const convs = [];
+            for (const [convId, ultimo] of Object.entries(map)) {
+                const pacienteId = ultimo.id_emisor !== FISIO_ID ? ultimo.id_emisor : null;
 
-    // 4. CARGAR HISTORIAL
-    async function cargarHistorial() {
-        const { data, error } = await _supabase
-            .from('mensajes')
-            .select('*')
-            .order('msg_fecha', { ascending: true });
+                let nombre = 'Paciente', iniciales = 'P', sinLeer = 0;
 
-        if (error) {
-            console.error("Error cargando historial:", error);
-            return;
-        }
+                const { count } = await _sb
+                    .from('mensajes')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('id_conv', convId)
+                    .eq('msg_leido', false)
+                    .neq('id_emisor', FISIO_ID);
 
-        chatWindow.innerHTML = "";
+                sinLeer = count || 0;
 
-        data.forEach(m => {
-            dibujarMensaje(m.msg_texto, m.id_emisor);
-        });
-
-        document.getElementById('status').innerText = 'En línea';
-    }
-
-    // 5. REALTIME
-    function escucharTiempoReal() {
-        _supabase.channel('chat_motricare')
-            .on('postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'mensajes' },
-                payload => {
-                    const nuevo = payload.new;
-
-                    if (nuevo.id_emisor !== ID_FISIO) {
-                        dibujarMensaje(nuevo.msg_texto, nuevo.id_emisor);
+                if (pacienteId) {
+                    const { data: u } = await _sb
+                        .from('usuario')
+                        .select('us_nom')
+                        .eq('id_us', pacienteId)
+                        .single();
+                    if (u) {
+                        nombre = u.us_nom;
+                        iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
                     }
                 }
-            )
-            .subscribe();
-    }
 
-    // 6. ENVIAR MENSAJE
-    async function enviarMensaje() {
-        if (!ID_FISIO) {
-            alert("Usuario no cargado aún");
-            return;
+                convs.push({ id_conv: convId, paciente_id: pacienteId, nombre, iniciales, ultimo, sinLeer });
+            }
+
+            todasConvs = convs;
+            renderConvs(convs);
         }
 
-        const input = document.getElementById('mensajeInput');
-        const texto = input.value.trim();
+        // ══════════════════════════════════════
+        // RENDER LISTA
+        // ══════════════════════════════════════
+        function renderConvs(lista) {
+            const el = document.getElementById('chatConvList');
+            document.getElementById('chatConvLoading').style.display = 'none';
+            el.innerHTML = '';
 
-        if (texto === "") return;
+            if (!lista.length) {
+                el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">Sin conversaciones aún</div>';
+                return;
+            }
 
-        const { error } = await _supabase.from('mensajes').insert({
-            id_emisor: ID_FISIO,
-            msg_texto: texto,
-            msg_leido: false,
-            id_conv: '00000000-0000-0000-0000-000000000000'
-        });
+            lista.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
+                item.dataset.convId = c.id_conv;
 
-        if (error) {
-            console.error("Error completo:", error);
-            alert("Error al enviar el mensaje.");
-            return;
+                const hora = chatFormatHora(c.ultimo?.msg_fecha);
+                const preview = c.ultimo
+                    ? c.ultimo.msg_texto.substring(0, 42) + (c.ultimo.msg_texto.length > 42 ? '…' : '')
+                    : '';
+
+                item.innerHTML = `
+                    <div class="chat-avatar" style="background:${chatColorAvatar(c.iniciales)}">${c.iniciales}</div>
+                    <div class="chat-conv-info">
+                        <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
+                        <div class="chat-conv-last">${chatEscHTML(preview)}</div>
+                    </div>
+                    <div class="chat-conv-meta">
+                        <span class="chat-conv-time">${hora}</span>
+                        ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
+                    </div>
+                `;
+                item.addEventListener('click', () => abrirConv(c));
+                el.appendChild(item);
+            });
         }
 
-        dibujarMensaje(texto, ID_FISIO);
-        input.value = '';
-    }
+        // ══════════════════════════════════════
+        // ABRIR CONVERSACIÓN
+        // ══════════════════════════════════════
+        async function abrirConv(conv) {
+            convActiva = conv;
 
-    // 7. ENTER PARA ENVIAR
-    document.getElementById('mensajeInput').addEventListener("keypress", (e) => {
-        if (e.key === "Enter") enviarMensaje();
-    });
+            document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
-    // 8. INICIAR APP
-    init();
-</script>
+            document.getElementById('chatEmptyState').style.display = 'none';
+            document.getElementById('chatActivePanel').style.display = 'flex';
+
+            document.getElementById('chatHeaderName').textContent = conv.nombre;
+            document.getElementById('chatHeaderAvatar').textContent = conv.iniciales;
+            document.getElementById('chatHeaderAvatar').style.background = chatColorAvatar(conv.iniciales);
+            document.getElementById('chatHeaderStatus').textContent = 'en línea';
+
+            // Móvil
+            document.getElementById('chatMain').classList.remove('hide');
+            document.getElementById('chatSidebar').classList.remove('show');
+
+            await cargarMsgs(conv.id_conv);
+            chatMarcarLeidos(conv.id_conv);
+
+            // Quitar badge
+            const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
+            if (badge) badge.remove();
+        }
+
+        // ══════════════════════════════════════
+        // CARGAR MENSAJES
+        // ══════════════════════════════════════
+        async function cargarMsgs(convId) {
+            const area = document.getElementById('chatMessagesArea');
+            area.innerHTML = `
+                <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:3px 0;"></div>
+                <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:3px 0;"></div>
+            `;
+
+            const { data, error } = await _sb
+                .from('mensajes')
+                .select('*')
+                .eq('id_conv', convId)
+                .order('msg_fecha', { ascending: true });
+
+            area.innerHTML = '';
+
+            if (error) { console.error(error); return; }
+            if (!data.length) {
+                area.innerHTML = '<div style="text-align:center;color:var(--chat-text-hint);font-size:13px;margin-top:40px;">Inicia la conversación 👋</div>';
+                return;
+            }
+
+            let ultimaFecha = null;
+            data.forEach(m => {
+                const fechaStr = m.msg_fecha
+                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
+                    : '';
+                if (fechaStr !== ultimaFecha) {
+                    const sep = document.createElement('div');
+                    sep.className = 'chat-date-sep';
+                    sep.innerHTML = `<span>${fechaStr}</span>`;
+                    area.appendChild(sep);
+                    ultimaFecha = fechaStr;
+                }
+                chatAgregarBubble(m, false);
+            });
+
+            chatScrollAbajo();
+        }
+
+        // ══════════════════════════════════════
+        // AGREGAR BURBUJA
+        // ══════════════════════════════════════
+        function chatAgregarBubble(m, animar = true) {
+            const area = document.getElementById('chatMessagesArea');
+            const esFisio = m.id_emisor === FISIO_ID;
+
+            const row = document.createElement('div');
+            row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
+            if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
+
+            const hora = m.msg_fecha
+                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+                : '';
+
+            const checkIcon = m.msg_leido
+                ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
+                : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+            row.innerHTML = `
+                <div class="chat-bubble">
+                    ${chatEscHTML(m.msg_texto)}
+                    <div class="chat-bubble-meta">
+                        <span class="chat-bubble-time">${hora}</span>
+                        ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            area.appendChild(row);
+        }
+
+        // ══════════════════════════════════════
+        // ENVIAR MENSAJE
+        // ══════════════════════════════════════
+        async function chatEnviarMensaje() {
+            if (!FISIO_ID || !convActiva) { mostrarToastChat('Selecciona una conversación'); return; }
+
+            const input = document.getElementById('chatMsgInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Optimistic UI
+            chatAgregarBubble({
+                id_emisor: FISIO_ID,
+                msg_texto: texto,
+                msg_fecha: new Date().toISOString(),
+                msg_leido: false,
+                id_conv: convActiva.id_conv
+            }, true);
+            chatScrollAbajo();
+
+            const { error } = await _sb.from('mensajes').insert({
+                id_emisor: FISIO_ID,
+                msg_texto: texto,
+                msg_leido: false,
+                id_conv: convActiva.id_conv
+            });
+
+            if (error) { console.error(error); mostrarToastChat('Error al enviar'); }
+        }
+
+        // ══════════════════════════════════════
+        // REALTIME
+        // ══════════════════════════════════════
+        function chatEscucharRT() {
+            if (rtChannel) _sb.removeChannel(rtChannel);
+            rtChannel = _sb.channel('motricare_chat_rt')
+                .on('postgres_changes',
+                    { event: 'INSERT', schema: 'public', table: 'mensajes' },
+                    payload => {
+                        const m = payload.new;
+                        if (m.id_emisor === FISIO_ID) return;
+
+                        if (convActiva && m.id_conv === convActiva.id_conv) {
+                            chatAgregarBubble(m, true);
+                            chatScrollAbajo();
+                            chatMarcarLeidos(convActiva.id_conv);
+                        } else {
+                            mostrarToastChat('💬 Nuevo mensaje recibido');
+                            cargarConvs();
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
+        // ══════════════════════════════════════
+        // MARCAR LEÍDOS
+        // ══════════════════════════════════════
+        async function chatMarcarLeidos(convId) {
+            await _sb.from('mensajes')
+                .update({ msg_leido: true })
+                .eq('id_conv', convId)
+                .neq('id_emisor', FISIO_ID);
+        }
+
+        // ══════════════════════════════════════
+        // BÚSQUEDA
+        // ══════════════════════════════════════
+        function filtrarConvs() {
+            const q = document.getElementById('chatSearch').value.toLowerCase();
+            renderConvs(todasConvs.filter(c => c.nombre.toLowerCase().includes(q)));
+        }
+
+        // ══════════════════════════════════════
+        // HELPERS
+        // ══════════════════════════════════════
+        function chatScrollAbajo() {
+            const area = document.getElementById('chatMessagesArea');
+            requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
+        }
+
+        function chatAutoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+        }
+
+        function chatHandleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatEnviarMensaje(); }
+        }
+
+        function volverSidebarChat() {
+            document.getElementById('chatSidebar').classList.add('show');
+            document.getElementById('chatMain').classList.add('hide');
+        }
+
+        function chatFormatHora(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            const hoy = new Date();
+            if (d.toDateString() === hoy.toDateString())
+                return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' });
+        }
+
+        function chatColorAvatar(ini) {
+            const cols = ['#1D9E75', '#185FA5', '#BA7517', '#D85A30', '#3B6D11', '#993556', '#534AB7'];
+            let s = 0;
+            for (const c of (ini || 'P')) s += c.charCodeAt(0);
+            return cols[s % cols.length];
+        }
+
+        function chatEscHTML(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+        }
+
+        function mostrarToastChat(msg) {
+            const el = document.getElementById('chatToast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        window.toast = mostrarToastChat;
+
+        // ── ARRANCAR ──
+        chatInit();
+    </script>
 
 </body>
-
 </html>
