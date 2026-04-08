@@ -7,147 +7,114 @@
     <title>MotriCare – Chat</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Tu navbar CSS (ajusta la ruta según tu proyecto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         /* ══════════════════════════════════════
-           VARIABLES DEL CHAT
+           VARIABLES — colores del sistema
         ══════════════════════════════════════ */
         :root {
-            --chat-verde: #1D9E75;
-            --chat-verde-light: #E1F5EE;
-            --chat-verde-dark: #0F6E56;
-            --chat-bubble-fisio: #E1F5EE;
-            --chat-bubble-paciente: #ffffff;
-            --chat-border: rgba(0, 0, 0, 0.08);
-            --chat-text-primary: #1a1a1a;
-            --chat-text-secondary: #6b6b6b;
-            --chat-text-hint: #a0a0a0;
-            --chat-input-bg: #f7f7f5;
-            --chat-bg: #f0ece4;
-            --chat-header-bg: #ffffff;
+            --color-primary:    #9b1b6e;
+            --color-primary-dk: #7a1254;
+            --color-primary-lt: #fce4f3;
+            --color-hover:      #f7c9e8;
+            --color-text-dark:  #3d0030;
+            --color-border:     #e8a0d0;
+            --color-white:      #ffffff;
+
+            --chat-bubble-fisio: #f5d0ea;
+            --chat-bubble-pac:   #ffffff;
+            --chat-bg:           #fdf0f8;
+            --chat-border:       var(--color-border);
+            --chat-text:         #1a1a1a;
+            --chat-text-sec:     #6b6b6b;
+            --chat-text-hint:    #a0a0a0;
+            --chat-input-bg:     #faf4f8;
+            --chat-header-bg:    #ffffff;
         }
 
         /* ══════════════════════════════════════
-           CONTENEDOR PRINCIPAL
-           Respeta el navbar: top 3.5rem, left 4rem
+           .main-content — Navbar.css ya pone
+           margin-top:3.5rem y margin-left:4rem.
+           Solo cambiamos flex-direction a row.
         ══════════════════════════════════════ */
         .main-content {
-            margin-top: 3.5rem;
-            margin-left: 4rem;
-            height: calc(100vh - 3.5rem);
-            display: flex;
-            flex-direction: row;   /* sidebar-chat + panel-chat lado a lado */
+            flex-direction: row !important;
+            padding: 0 !important;
             overflow: hidden;
-            transition: margin-left 0.3s ease;
-        }
-
-        .main-content.menu-toggle {
-            margin-left: 18.75rem;
         }
 
         /* ══════════════════════════════════════
-           SIDEBAR DEL CHAT  (renombrado a .chat-sidebar)
+           SIDEBAR DEL CHAT
         ══════════════════════════════════════ */
         .chat-sidebar {
-            width: 320px;
-            min-width: 260px;
+            width: 300px;
+            min-width: 240px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            background: #ffffff;
+            background: #fff;
             border-right: 1px solid var(--chat-border);
+            height: 100%;
         }
 
-        .chat-sidebar-header {
-            padding: 14px 18px;
+        .chat-sb-header {
+            padding: 14px 16px;
             border-bottom: 1px solid var(--chat-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--chat-header-bg);
-        }
-
-        .chat-sidebar-header-left {
             display: flex;
             align-items: center;
             gap: 10px;
+            background: var(--color-primary-lt);
         }
 
-        .chat-avatar {
-            width: 38px;
-            height: 38px;
+        .chat-sb-icon {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: var(--chat-verde);
+            background: var(--color-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
             color: #fff;
+            font-size: 15px;
             flex-shrink: 0;
-            font-family: 'DM Sans', sans-serif;
         }
 
-        .chat-avatar.md {
-            width: 46px;
-            height: 46px;
-            font-size: 16px;
+        .chat-sb-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--color-text-dark);
         }
 
-        .chat-sidebar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--chat-text-primary);
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .chat-sidebar-subtitle {
+        .chat-sb-sub {
             font-size: 11px;
-            color: var(--chat-verde);
-            font-weight: 500;
-            font-family: 'DM Sans', sans-serif;
+            color: var(--color-primary);
+            font-weight: 600;
         }
 
-        .chat-icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            color: var(--chat-text-secondary);
-            display: flex;
-            align-items: center;
-            transition: background 0.15s;
-        }
-
-        .chat-icon-btn:hover {
-            background: var(--chat-input-bg);
-        }
-
-        .chat-search-box {
+        .chat-sb-search {
             padding: 10px 14px;
             border-bottom: 1px solid var(--chat-border);
+            background: #fff;
         }
 
-        .chat-search-box input {
+        .chat-sb-search input {
             width: 100%;
             background: var(--chat-input-bg);
-            border: none;
+            border: 1px solid var(--chat-border);
             border-radius: 20px;
             padding: 7px 14px;
             font-size: 13px;
-            font-family: 'DM Sans', sans-serif;
-            color: var(--chat-text-primary);
+            font-family: inherit;
+            color: var(--chat-text);
             outline: none;
+            transition: border-color 0.15s;
         }
 
-        .chat-search-box input::placeholder {
-            color: var(--chat-text-hint);
-        }
+        .chat-sb-search input:focus { border-color: var(--color-primary); }
+        .chat-sb-search input::placeholder { color: var(--chat-text-hint); }
 
         .chat-conv-list {
             flex: 1;
@@ -161,35 +128,52 @@
             display: flex;
             align-items: center;
             gap: 11px;
-            padding: 11px 18px;
+            padding: 11px 16px;
             cursor: pointer;
-            border-bottom: 1px solid var(--chat-border);
+            border-bottom: 1px solid rgba(232,160,208,0.3);
             transition: background 0.12s;
         }
 
-        .chat-conv-item:hover { background: #f7f7f5; }
-        .chat-conv-item.active { background: #e8f5f0; }
+        .chat-conv-item:hover { background: var(--color-primary-lt); }
+        .chat-conv-item.active {
+            background: var(--color-hover);
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .chat-c-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .chat-c-avatar.md { width: 40px; height: 40px; font-size: 14px; }
+        .chat-c-avatar.hd { width: 42px; height: 42px; font-size: 15px; }
 
         .chat-conv-info { flex: 1; min-width: 0; }
 
         .chat-conv-name {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--chat-text-primary);
+            font-weight: 700;
+            color: var(--chat-text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-family: 'DM Sans', sans-serif;
         }
 
         .chat-conv-last {
             font-size: 12px;
-            color: var(--chat-text-secondary);
+            color: var(--chat-text-sec);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-top: 2px;
-            font-family: 'DM Sans', sans-serif;
         }
 
         .chat-conv-meta {
@@ -200,14 +184,10 @@
             flex-shrink: 0;
         }
 
-        .chat-conv-time {
-            font-size: 11px;
-            color: var(--chat-text-hint);
-            font-family: 'DM Sans', sans-serif;
-        }
+        .chat-conv-time { font-size: 11px; color: var(--chat-text-hint); }
 
         .chat-badge {
-            background: var(--chat-verde);
+            background: var(--color-primary);
             color: #fff;
             font-size: 10px;
             font-weight: 700;
@@ -221,7 +201,7 @@
         }
 
         /* ══════════════════════════════════════
-           PANEL PRINCIPAL DEL CHAT
+           PANEL PRINCIPAL
         ══════════════════════════════════════ */
         .chat-main {
             flex: 1;
@@ -230,19 +210,19 @@
             background: var(--chat-bg);
             position: relative;
             overflow: hidden;
+            height: 100%;
         }
 
         .chat-bg-pattern {
             position: absolute;
             inset: 0;
-            opacity: 0.035;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 50 L5 50 Z' fill='%230F6E56'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='8' fill='%239b1b6e'/%3E%3C/svg%3E");
             background-size: 40px 40px;
             pointer-events: none;
         }
 
-        /* Estado vacío */
-        .chat-empty-state {
+        .chat-empty {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -256,36 +236,26 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: var(--chat-verde-light);
+            background: var(--color-primary-lt);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .chat-empty-state h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--chat-text-primary);
-            font-family: 'DM Sans', sans-serif;
-        }
+        .chat-empty h2 { font-size: 18px; font-weight: 800; color: var(--color-text-dark); }
+        .chat-empty p  { font-size: 13px; color: var(--chat-text-sec); }
 
-        .chat-empty-state p {
-            font-size: 13px;
-            color: var(--chat-text-secondary);
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        /* Panel activo */
         .chat-active-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
             z-index: 1;
+            overflow: hidden;
         }
 
         .chat-panel-header {
             background: var(--chat-header-bg);
-            padding: 11px 18px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
             gap: 11px;
@@ -295,21 +265,27 @@
 
         .chat-panel-header-info { flex: 1; }
 
-        .chat-panel-name {
+        .chat-panel-name   { font-size: 15px; font-weight: 700; color: var(--chat-text); }
+        .chat-panel-status { font-size: 11px; color: var(--color-primary); font-weight: 600; }
+
+        .chat-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 7px;
+            border-radius: 50%;
+            color: var(--chat-text-sec);
+            display: flex;
+            align-items: center;
+            transition: background 0.15s;
             font-size: 15px;
-            font-weight: 600;
-            color: var(--chat-text-primary);
-            font-family: 'DM Sans', sans-serif;
         }
 
-        .chat-panel-status {
-            font-size: 11px;
-            color: var(--chat-verde);
-            font-weight: 500;
-            font-family: 'DM Sans', sans-serif;
+        .chat-icon-btn:hover {
+            background: var(--color-primary-lt);
+            color: var(--color-primary);
         }
 
-        /* Área de mensajes */
         .chat-messages-area {
             flex: 1;
             overflow-y: auto;
@@ -320,54 +296,43 @@
         }
 
         .chat-messages-area::-webkit-scrollbar { width: 3px; }
-        .chat-messages-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+        .chat-messages-area::-webkit-scrollbar-thumb { background: var(--chat-border); border-radius: 2px; }
 
-        /* Separador de fecha */
-        .chat-date-sep {
-            text-align: center;
-            margin: 10px 0;
-        }
+        .chat-date-sep { text-align: center; margin: 10px 0; }
 
         .chat-date-sep span {
-            background: rgba(255,255,255,0.85);
+            background: rgba(155,27,110,0.1);
             font-size: 11px;
-            color: var(--chat-text-secondary);
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-family: 'DM Sans', sans-serif;
+            color: var(--color-primary-dk);
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-weight: 600;
         }
 
-        /* Burbujas */
-        .chat-msg-row {
-            display: flex;
-            margin-bottom: 1px;
-        }
-
-        .chat-msg-row.fisio { justify-content: flex-end; }
-        .chat-msg-row.paciente { justify-content: flex-start; }
+        .chat-msg-row { display: flex; margin-bottom: 2px; }
+        .chat-msg-row.fisio   { justify-content: flex-end; }
+        .chat-msg-row.paciente{ justify-content: flex-start; }
 
         .chat-bubble {
             max-width: 65%;
-            padding: 7px 11px;
-            border-radius: 12px;
+            padding: 8px 12px;
+            border-radius: 14px;
             font-size: 14px;
             line-height: 1.5;
             word-wrap: break-word;
-            font-family: 'DM Sans', sans-serif;
         }
 
         .chat-msg-row.fisio .chat-bubble {
             background: var(--chat-bubble-fisio);
             border-bottom-right-radius: 3px;
-            color: var(--chat-text-primary);
+            color: var(--color-text-dark);
         }
 
         .chat-msg-row.paciente .chat-bubble {
-            background: var(--chat-bubble-paciente);
+            background: var(--chat-bubble-pac);
             border-bottom-left-radius: 3px;
-            color: var(--chat-text-primary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+            color: var(--chat-text);
+            box-shadow: 0 1px 2px rgba(155,27,110,0.08);
         }
 
         .chat-bubble-meta {
@@ -375,17 +340,12 @@
             align-items: center;
             justify-content: flex-end;
             gap: 3px;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
-        .chat-bubble-time {
-            font-size: 10px;
-            color: var(--chat-text-hint);
-        }
+        .chat-bubble-time { font-size: 10px; color: var(--chat-text-hint); }
+        .chat-check { display: flex; align-items: center; color: var(--color-primary); }
 
-        .chat-check { display: flex; align-items: center; color: var(--chat-verde); }
-
-        /* Input area */
         .chat-input-area {
             background: var(--chat-header-bg);
             padding: 10px 14px;
@@ -400,19 +360,23 @@
             flex: 1;
             background: var(--chat-input-bg);
             border-radius: 22px;
+            border: 1px solid var(--chat-border);
             display: flex;
             align-items: flex-end;
             padding: 5px 14px;
+            transition: border-color 0.15s;
         }
+
+        .chat-input-wrap:focus-within { border-color: var(--color-primary); }
 
         .chat-input-wrap textarea {
             flex: 1;
             background: none;
             border: none;
             outline: none;
-            font-family: 'DM Sans', sans-serif;
+            font-family: inherit;
             font-size: 14px;
-            color: var(--chat-text-primary);
+            color: var(--chat-text);
             resize: none;
             max-height: 110px;
             line-height: 1.5;
@@ -426,42 +390,41 @@
             height: 42px;
             border-radius: 50%;
             border: none;
-            background: var(--chat-verde);
+            background: var(--color-primary);
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            font-size: 15px;
             transition: background 0.15s, transform 0.1s;
         }
 
-        .chat-send-btn:hover { background: var(--chat-verde-dark); }
+        .chat-send-btn:hover  { background: var(--color-primary-dk); }
         .chat-send-btn:active { transform: scale(0.94); }
 
-        /* Skeleton */
         .chat-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background: linear-gradient(90deg, #f5d0ea 25%, #fce4f3 50%, #f5d0ea 75%);
             background-size: 200% 100%;
             animation: chatShimmer 1.2s infinite;
             border-radius: 10px;
         }
 
         @keyframes chatShimmer { to { background-position: -200% 0; } }
-        @keyframes chatFadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+        @keyframes chatFadeIn  { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
 
-        /* Toast */
         .chat-toast {
             position: fixed;
             bottom: 22px;
             left: 50%;
             transform: translateX(-50%) translateY(70px);
-            background: #2c2c2c;
+            background: var(--color-primary-dk);
             color: white;
-            padding: 9px 18px;
+            padding: 9px 20px;
             border-radius: 22px;
             font-size: 13px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: inherit;
             transition: transform 0.28s;
             z-index: 9999;
         }
@@ -471,7 +434,13 @@
         /* Responsive móvil */
         @media (max-width: 680px) {
             .main-content { margin-left: 0 !important; }
-            .chat-sidebar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; width: 100%; display: none; }
+            .chat-sidebar {
+                position: absolute;
+                left: 0; top: 0; bottom: 0;
+                z-index: 10;
+                width: 100%;
+                display: none;
+            }
             .chat-sidebar.show { display: flex; }
             .chat-main.hide { display: none; }
             #chatBackBtn { display: flex !important; }
@@ -481,28 +450,31 @@
 
 <body>
 
-    <!-- ── NAVBAR (se inyecta desde Navbar.html / fetch) ── -->
-    <div id="navbar-container"></div>
-
     <div class="chat-toast" id="chatToast"></div>
 
+    <!--
+        .main-content es el mismo elemento que busca Navbar.js con:
+            const mainContent = document.querySelector('.main-content');
+        Por eso DEBE existir en el DOM antes de que corra Navbar.js.
+        Navbar.css ya le aplica: margin-top:3.5rem, margin-left:4rem,
+        height:calc(100vh - 3.5rem). Aquí solo lo ponemos en flex-row.
+    -->
     <div class="main-content" id="mainContent">
 
         <!-- ── SIDEBAR DEL CHAT ── -->
         <aside class="chat-sidebar" id="chatSidebar">
-            <div class="chat-sidebar-header">
-                <div class="chat-sidebar-header-left">
-                    <div class="chat-avatar">
-                        <i class="fa-solid fa-comments" style="font-size:16px;"></i>
-                    </div>
-                    <div>
-                        <div class="chat-sidebar-title">Mensajes</div>
-                        <div class="chat-sidebar-subtitle">Fisioterapeuta</div>
-                    </div>
+
+            <div class="chat-sb-header">
+                <div class="chat-sb-icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div>
+                    <div class="chat-sb-title">Mensajes</div>
+                    <div class="chat-sb-sub">Fisioterapeuta</div>
                 </div>
             </div>
 
-            <div class="chat-search-box">
+            <div class="chat-sb-search">
                 <input type="text" placeholder="Buscar paciente..." id="chatSearch" oninput="filtrarConvs()">
             </div>
 
@@ -512,6 +484,7 @@
                     Cargando conversaciones...
                 </div>
             </div>
+
         </aside>
 
         <!-- ── PANEL PRINCIPAL ── -->
@@ -519,9 +492,9 @@
             <div class="chat-bg-pattern"></div>
 
             <!-- Estado vacío -->
-            <div class="chat-empty-state" id="chatEmptyState">
+            <div class="chat-empty" id="chatEmptyState">
                 <div class="chat-empty-icon">
-                    <i class="fa-solid fa-message" style="font-size:28px;color:var(--chat-verde);"></i>
+                    <i class="fa-solid fa-message" style="font-size:28px;color:var(--color-primary);"></i>
                 </div>
                 <h2>MotriCare Chat</h2>
                 <p>Selecciona un paciente para iniciar la conversación</p>
@@ -531,13 +504,12 @@
             <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
 
                 <div class="chat-panel-header">
-                    <button class="chat-icon-btn" id="chatBackBtn" style="display:none;"
-                        onclick="volverSidebarChat()">
+                    <button class="chat-icon-btn" id="chatBackBtn" style="display:none;" onclick="volverSidebarChat()">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <div class="chat-avatar md" id="chatHeaderAvatar">P</div>
+                    <div class="chat-c-avatar hd" id="chatHeaderAvatar">P</div>
                     <div class="chat-panel-header-info">
-                        <div class="chat-panel-name" id="chatHeaderName">Paciente</div>
+                        <div class="chat-panel-name"   id="chatHeaderName">Paciente</div>
                         <div class="chat-panel-status" id="chatHeaderStatus">en línea</div>
                     </div>
                     <button class="chat-icon-btn" title="Info del paciente"
@@ -561,33 +533,38 @@
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
-            </div>
+
+            </div><!-- fin chat-active-panel -->
         </main>
 
     </div><!-- fin .main-content -->
 
-    <!-- Navbar JS (ajusta la ruta) -->
-    <script type="module" src="../../Navbar/Navbar.js"></script>
+    <!--
+        Navbar.js va DESPUÉS del .main-content para que
+        document.querySelector('.main-content') no devuelva null.
+    -->
+       <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '../../Navbar/Navbar.js';
+                document.body.appendChild(script);
+            })
+    </script>
 
     <script>
-        // ══════════════════════════════════════
-        // SUPABASE
-        // ══════════════════════════════════════
         const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
         const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ══════════════════════════════════════
-        // ESTADO
-        // ══════════════════════════════════════
-        let FISIO_ID = null;
+        let FISIO_ID   = null;
         let convActiva = null;
         let todasConvs = [];
-        let rtChannel = null;
+        let rtChannel  = null;
 
-        // ══════════════════════════════════════
-        // INIT
-        // ══════════════════════════════════════
         async function chatInit() {
             const { data: { user }, error } = await _sb.auth.getUser();
             if (error || !user) { mostrarToastChat('⚠️ Sin sesión activa'); return; }
@@ -596,9 +573,6 @@
             chatEscucharRT();
         }
 
-        // ══════════════════════════════════════
-        // CARGAR CONVERSACIONES
-        // ══════════════════════════════════════
         async function cargarConvs() {
             const { data, error } = await _sb
                 .from('mensajes')
@@ -607,14 +581,12 @@
 
             if (error) { console.error(error); return; }
 
-            // Agrupar: primer registro por id_conv = último mensaje
             const map = {};
             data.forEach(m => { if (!map[m.id_conv]) map[m.id_conv] = m; });
 
             const convs = [];
             for (const [convId, ultimo] of Object.entries(map)) {
                 const pacienteId = ultimo.id_emisor !== FISIO_ID ? ultimo.id_emisor : null;
-
                 let nombre = 'Paciente', iniciales = 'P', sinLeer = 0;
 
                 const { count } = await _sb
@@ -633,7 +605,7 @@
                         .eq('id_us', pacienteId)
                         .single();
                     if (u) {
-                        nombre = u.us_nom;
+                        nombre    = u.us_nom;
                         iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
                     }
                 }
@@ -645,9 +617,6 @@
             renderConvs(convs);
         }
 
-        // ══════════════════════════════════════
-        // RENDER LISTA
-        // ══════════════════════════════════════
         function renderConvs(lista) {
             const el = document.getElementById('chatConvList');
             document.getElementById('chatConvLoading').style.display = 'none';
@@ -663,13 +632,13 @@
                 item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
                 item.dataset.convId = c.id_conv;
 
-                const hora = chatFormatHora(c.ultimo?.msg_fecha);
+                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
                 const preview = c.ultimo
-                    ? c.ultimo.msg_texto.substring(0, 42) + (c.ultimo.msg_texto.length > 42 ? '…' : '')
+                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
                     : '';
 
                 item.innerHTML = `
-                    <div class="chat-avatar" style="background:${chatColorAvatar(c.iniciales)}">${c.iniciales}</div>
+                    <div class="chat-c-avatar md" style="background:${chatColorAvatar(c.iniciales)}">${c.iniciales}</div>
                     <div class="chat-conv-info">
                         <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
                         <div class="chat-conv-last">${chatEscHTML(preview)}</div>
@@ -684,43 +653,35 @@
             });
         }
 
-        // ══════════════════════════════════════
-        // ABRIR CONVERSACIÓN
-        // ══════════════════════════════════════
         async function abrirConv(conv) {
             convActiva = conv;
 
             document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
             document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
-            document.getElementById('chatEmptyState').style.display = 'none';
+            document.getElementById('chatEmptyState').style.display  = 'none';
             document.getElementById('chatActivePanel').style.display = 'flex';
 
-            document.getElementById('chatHeaderName').textContent = conv.nombre;
-            document.getElementById('chatHeaderAvatar').textContent = conv.iniciales;
+            document.getElementById('chatHeaderName').textContent        = conv.nombre;
+            document.getElementById('chatHeaderAvatar').textContent      = conv.iniciales;
             document.getElementById('chatHeaderAvatar').style.background = chatColorAvatar(conv.iniciales);
-            document.getElementById('chatHeaderStatus').textContent = 'en línea';
+            document.getElementById('chatHeaderStatus').textContent      = 'en línea';
 
-            // Móvil
             document.getElementById('chatMain').classList.remove('hide');
             document.getElementById('chatSidebar').classList.remove('show');
 
             await cargarMsgs(conv.id_conv);
             chatMarcarLeidos(conv.id_conv);
 
-            // Quitar badge
             const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
             if (badge) badge.remove();
         }
 
-        // ══════════════════════════════════════
-        // CARGAR MENSAJES
-        // ══════════════════════════════════════
         async function cargarMsgs(convId) {
             const area = document.getElementById('chatMessagesArea');
             area.innerHTML = `
-                <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:3px 0;"></div>
-                <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:3px 0;"></div>
+                <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:4px 0;"></div>
+                <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:4px 0;"></div>
             `;
 
             const { data, error } = await _sb
@@ -740,7 +701,7 @@
             let ultimaFecha = null;
             data.forEach(m => {
                 const fechaStr = m.msg_fecha
-                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
+                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' })
                     : '';
                 if (fechaStr !== ultimaFecha) {
                     const sep = document.createElement('div');
@@ -755,11 +716,8 @@
             chatScrollAbajo();
         }
 
-        // ══════════════════════════════════════
-        // AGREGAR BURBUJA
-        // ══════════════════════════════════════
         function chatAgregarBubble(m, animar = true) {
-            const area = document.getElementById('chatMessagesArea');
+            const area    = document.getElementById('chatMessagesArea');
             const esFisio = m.id_emisor === FISIO_ID;
 
             const row = document.createElement('div');
@@ -767,7 +725,7 @@
             if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
             const hora = m.msg_fecha
-                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' })
                 : '';
 
             const checkIcon = m.msg_leido
@@ -787,9 +745,6 @@
             area.appendChild(row);
         }
 
-        // ══════════════════════════════════════
-        // ENVIAR MENSAJE
-        // ══════════════════════════════════════
         async function chatEnviarMensaje() {
             if (!FISIO_ID || !convActiva) { mostrarToastChat('Selecciona una conversación'); return; }
 
@@ -800,13 +755,12 @@
             input.value = '';
             input.style.height = 'auto';
 
-            // Optimistic UI
             chatAgregarBubble({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_fecha: new Date().toISOString(),
                 msg_leido: false,
-                id_conv: convActiva.id_conv
+                id_conv:   convActiva.id_conv
             }, true);
             chatScrollAbajo();
 
@@ -814,15 +768,12 @@
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_leido: false,
-                id_conv: convActiva.id_conv
+                id_conv:   convActiva.id_conv
             });
 
             if (error) { console.error(error); mostrarToastChat('Error al enviar'); }
         }
 
-        // ══════════════════════════════════════
-        // REALTIME
-        // ══════════════════════════════════════
         function chatEscucharRT() {
             if (rtChannel) _sb.removeChannel(rtChannel);
             rtChannel = _sb.channel('motricare_chat_rt')
@@ -837,7 +788,7 @@
                             chatScrollAbajo();
                             chatMarcarLeidos(convActiva.id_conv);
                         } else {
-                            mostrarToastChat('💬 Nuevo mensaje recibido');
+                            mostrarToastChat('💬 Nuevo mensaje de un paciente');
                             cargarConvs();
                         }
                     }
@@ -845,9 +796,6 @@
                 .subscribe();
         }
 
-        // ══════════════════════════════════════
-        // MARCAR LEÍDOS
-        // ══════════════════════════════════════
         async function chatMarcarLeidos(convId) {
             await _sb.from('mensajes')
                 .update({ msg_leido: true })
@@ -855,17 +803,11 @@
                 .neq('id_emisor', FISIO_ID);
         }
 
-        // ══════════════════════════════════════
-        // BÚSQUEDA
-        // ══════════════════════════════════════
         function filtrarConvs() {
             const q = document.getElementById('chatSearch').value.toLowerCase();
             renderConvs(todasConvs.filter(c => c.nombre.toLowerCase().includes(q)));
         }
 
-        // ══════════════════════════════════════
-        // HELPERS
-        // ══════════════════════════════════════
         function chatScrollAbajo() {
             const area = document.getElementById('chatMessagesArea');
             requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
@@ -887,15 +829,15 @@
 
         function chatFormatHora(fecha) {
             if (!fecha) return '';
-            const d = new Date(fecha);
+            const d   = new Date(fecha);
             const hoy = new Date();
             if (d.toDateString() === hoy.toDateString())
-                return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' });
+                return d.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+            return d.toLocaleDateString('es-MX', { day:'2-digit', month:'2-digit' });
         }
 
         function chatColorAvatar(ini) {
-            const cols = ['#1D9E75', '#185FA5', '#BA7517', '#D85A30', '#3B6D11', '#993556', '#534AB7'];
+            const cols = ['#9b1b6e','#7a1254','#b5357f','#c4629a','#6d1249','#d4539e','#531040'];
             let s = 0;
             for (const c of (ini || 'P')) s += c.charCodeAt(0);
             return cols[s % cols.length];
@@ -903,8 +845,8 @@
 
         function chatEscHTML(str) {
             return String(str || '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+                .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
         }
 
         function mostrarToastChat(msg) {
@@ -915,8 +857,6 @@
         }
 
         window.toast = mostrarToastChat;
-
-        // ── ARRANCAR ──
         chatInit();
     </script>
 
