@@ -13,8 +13,18 @@
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
+    <style>
+        /* ── Crítico: posición de burbujas — no depende del CSS externo ── */
+        .chat-msg-row                { display:flex; align-items:flex-end; gap:8px; margin-bottom:2px; }
+        .chat-msg-row.fisio          { justify-content:flex-end; flex-direction:row-reverse; }
+        .chat-msg-row.paciente       { justify-content:flex-start; }
+        /* ── Mini-avatar ── */
+        .chat-msg-av                 { width:28px; height:28px; min-width:28px; border-radius:50%; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; }
+        .chat-msg-av img             { width:28px; height:28px; border-radius:50%; object-fit:cover; display:block; }
+        /* ── Avatares sidebar/header ── */
+        .chat-c-avatar               { overflow:hidden; }
+        .chat-c-avatar img           { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    </style>
 </head>
 
 <body>
@@ -300,13 +310,25 @@
                     ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
                     : '';
 
-                // ── Avatar: foto si existe, iniciales si no ──
-                const avatarHTML = c.fotoUrl
-                    ? `<div class="chat-c-avatar md"><img src="${chatEscAttr(c.fotoUrl)}" alt="${chatEscAttr(c.nombre)}" onerror="this.parentElement.innerHTML='${c.iniciales}';this.parentElement.style.background='${chatColorAvatar(c.iniciales)}'"></div>`
-                    : `<div class="chat-c-avatar md" style="background:${chatColorAvatar(c.iniciales)}">${c.iniciales}</div>`;
+                // ── Avatar del sidebar: DOM-safe, sin onerror inline ──
+                const avDiv = document.createElement('div');
+                avDiv.className = 'chat-c-avatar md';
+                if (c.fotoUrl) {
+                    const img = document.createElement('img');
+                    img.src = c.fotoUrl;
+                    img.alt = c.nombre;
+                    img.onerror = () => {
+                        avDiv.innerHTML = '';
+                        avDiv.textContent = c.iniciales;
+                        avDiv.style.background = chatColorAvatar(c.iniciales);
+                    };
+                    avDiv.appendChild(img);
+                } else {
+                    avDiv.textContent = c.iniciales;
+                    avDiv.style.background = chatColorAvatar(c.iniciales);
+                }
 
                 item.innerHTML = `
-                    ${avatarHTML}
                     <div class="chat-conv-info">
                         <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
                         <div class="chat-conv-last">${chatEscHTML(preview)}</div>
@@ -316,6 +338,7 @@
                         ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
                     </div>
                 `;
+                item.prepend(avDiv);
                 item.addEventListener('click', () => abrirConv(c));
                 el.appendChild(item);
             });
