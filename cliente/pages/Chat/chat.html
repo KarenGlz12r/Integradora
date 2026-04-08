@@ -163,7 +163,8 @@
 
         // ── Busca o crea una conversación con ese paciente y la abre ──
         async function abrirOCrearConvPaciente(pacienteUserId, pacienteNombre) {
-            // Buscar si ya existe una conv entre este fisio y este paciente
+
+            // 1. Buscar en tabla conversaciones (datos nuevos)
             const { data: convExistente } = await _sb
                 .from('conversaciones')
                 .select('id')
@@ -173,7 +174,27 @@
 
             let convId = convExistente?.id;
 
-            // Si no existe, crearla
+            // 2. Si no está en conversaciones, buscar id_conv en mensajes existentes
+            //    (mensajes del paciente en cualquier conv donde el fisio también participó)
+            if (!convId) {
+                const { data: msgExistente } = await _sb
+                    .from('mensajes')
+                    .select('id_conv')
+                    .eq('id_emisor', pacienteUserId)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (msgExistente?.id_conv) {
+                    convId = msgExistente.id_conv;
+                    // Registrar esta conv en la tabla conversaciones para futuras búsquedas
+                    await _sb.from('conversaciones').upsert(
+                        { id: convId, id_fisio: FISIO_REAL_ID, id_paciente: pacienteUserId },
+                        { onConflict: 'id' }
+                    );
+                }
+            }
+
+            // 3. Si no existe ningún mensaje previo, crear una conv nueva vacía
             if (!convId) {
                 const { data: nueva, error: errConv } = await _sb
                     .from('conversaciones')
@@ -181,33 +202,23 @@
                     .select('id')
                     .single();
 
-                if (errConv) { console.error('Error creando conversación:', errConv); return; }
+                if (errConv) { console.error('Error creando conversación:', errConv); mostrarToastChat('Error al abrir chat'); return; }
                 convId = nueva.id;
             }
 
-            // Obtener datos del paciente (foto, iniciales)
+            // 4. Obtener datos del paciente
             const { data: u } = await _sb
                 .from('usuario')
                 .select('us_nom, url_foto')
                 .eq('id_us', pacienteUserId)
                 .single();
 
-            const nombre   = u?.us_nom || pacienteNombre || 'Paciente';
+            const nombre    = u?.us_nom || pacienteNombre || 'Paciente';
             const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            const fotoUrl  = u?.url_foto || null;
+            const fotoUrl   = u?.url_foto || null;
 
-            // Construir objeto conv y abrirlo
-            const conv = {
-                id_conv:     convId,
-                paciente_id: pacienteUserId,
-                nombre,
-                iniciales,
-                fotoUrl,
-                sinLeer: 0,
-                ultimo: null
-            };
+            const conv = { id_conv: convId, paciente_id: pacienteUserId, nombre, iniciales, fotoUrl, sinLeer: 0, ultimo: null };
 
-            // Agregar a la lista si no está ya (sin re-renderizar, solo actualizar estado)
             const yaEsta = todasConvs.find(c => c.id_conv === convId);
             if (!yaEsta) todasConvs.unshift(conv);
 
