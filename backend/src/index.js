@@ -26,10 +26,10 @@ const PORT = process.env.PORT || 4000;
 // ══════════════════════════════════════════════════════════════════
 // 1. CORS — PRIMERO DE TODO (antes de rutas y middlewares)
 // ══════════════════════════════════════════════════════════════════
-const origenesPermitidos = (process.env.FRONTEND_URL || "http://localhost:5500")
+const origenesPermitidos = (process.env.FRONTEND_URL || "http://localhost:5500,http://127.0.0.1:5500")
     .split(",")
     .map(o => o.trim());
-
+console.log("Origenes permitidos cargados:",origenesPermitidos);
 app.use(cors({
     origin: (origin, callback) => {
         // Permitir sin origin (Postman, apps móviles, etc.)
@@ -38,6 +38,7 @@ app.use(cors({
         if (origenesPermitidos.includes(origin)) {
             return callback(null, true);
         }
+        console.log("Peticion bloqueada por CORS desde el origen:",origin);
         return callback(new Error(`CORS bloqueado para: ${origin}`));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

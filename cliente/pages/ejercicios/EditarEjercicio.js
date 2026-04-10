@@ -9,6 +9,107 @@ import { supabase } from "../../../auth.js";
 const param = new URLSearchParams(window.location.search);
 const id = param.get("id");
 
+//Motor de inteligencia artificial
+let detectorIA=null;
+async function cargarIA(){
+    await tf.ready();
+    const detectorConfig={modelType:poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING};
+    detectorIA=await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
+    console.log("Motor IA MoveNet cargado y listo");
+}
+cargarIA();
+
+//Formula de trigonometria
+function calcularAngulo(p1, p2, p3){
+    const radianes=Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x -p2.x);
+    let angulo=Math.abs(radianes*180.0/Math.PI);
+    if(angulo >180.0) angulo=360.0-angulo;
+    return angulo;
+}
+
+const DICCIONARIO_ARTICULACIONES={
+    'codo_izq':['left_shoulder', 'left_elbow', 'left_wrist'],
+    'codo_der':['right_shoulder', 'right_elbow', 'right_wrist'],
+    'rodilla_izq':['left_hip', 'left_knee', 'left_ankle'],
+    'rodilla_der':['right_hip', 'right_knee', 'right_ankle'],
+    'cadera_izq':['left_shoulder', 'left_hip', 'left_knee'],
+    'cadera_der':['right_shoulder', 'right_hip', 'right_knee']
+};
+
+//Auto-detector de articulaciones
+document.getElementById("eje_nom").addEventListener("input", function(e){
+    const texto=e.target.value.toLowerCase();
+    const setArticulacion=document.getElementById("eje_articulacion");
+    let lado="";
+    let parte="";
+    if(texto.includes("izq")|| texto.includes("izquierda")||texto.includes("izquierdo")){
+        lado="_izq";
+    }else if(texto.includes("der") || texto.includes("derecha") || texto.includes("derecho")){
+        lado="_der";
+    }
+    if(texto.includes("codo")||texto.includes("biceps")||texto.includes("bíceps")||texto.includes("triceps")||texto.includes("brazo")){
+        parte="codo";
+    }else if(texto.includes("rodilla")||texto.includes("sentadilla")||texto.includes("pierna")||texto.includes("cuadriceps")){
+        parte="rodilla";
+    }else if(texto.includes("cadera") || texto.includes("gluteo")|| texto.includes("glúteo")){
+        parte="cadera";
+    }
+
+    if(parte!=="" && lado!==""){
+        const valorDetectado=`${parte}${lado}`;
+        const opcionExiste=Array.from(selectArticulacion.options).some(opt=>opt.value===valorDetectado);
+        if(opcionExiste){
+            selectArticulacion.value=valorDetectado;
+            selectArticulacion.style.borderColor="#00FF00";
+            setTimeout(()=>selectArticulacion.style.borderColor="var(--color-border)",1000);
+        }
+    }
+})
+
+//Promesa que analiza el video cuadro por cuadro
+function analizarVideoMovenet(archivoVideo, articulacion){
+    return new Promise((resolve)=>{
+        if(!detectorIA){
+            console.warn("La IA aun no ha cargado");
+            return resolve(null);
+        }
+        const videoElement=document.getElementById("videoPlayerOculto");
+        videoElement.src=URL.createObjectURL(archivoVideo);
+        let anguloMax=0;
+        let anguloMin=180;
+        const puntosBuscados=DICCIONARIO_ARTICULACIONES[articulacion];
+        videoElement.onloadeddata=()=>{
+            videoElement.play();
+            analizarCuadro();
+        };
+        async function analizarCuadro(){
+            if(!videoElement.paused && !videoElement.ended){
+                const poses=await detectorIA.estimatePoses(videoElement);
+                if(poses.length>0){
+                    const ptos=poses[0].keypoints;
+                    const p1=ptos.find(p=>p.name===puntosBuscados[0]);
+                    const p2=ptos.find(p=>p.name===puntosBuscados[1]);
+                    const p3=ptos.find(p=>p.name===puntosBuscados[2]);
+
+                    if(p1?.score>0.5 && p2?.score>0.5 && p3?.score>0.5){
+                        const angulo=calcularAngulo(p1,p2,p3);
+                        if(angulo>anguloMax) anguloMax=angulo;
+                        if(angulo<anguloMin) anguloMin=angulo;
+                    }
+                }
+                requestAnimationFrame(analizarCuadro);
+            }else if(videoElement.ended){
+                resolve({
+                    articulacion_objetivo:articulacion,
+                    angulo_contraccion:Math.round(anguloMin),
+                    angulo_reposo:Math.round(anguloMax),
+                    tolerancia:15
+                });
+            }
+        }
+    });
+}
+
 // ══════════════════════════════════════════
 // CARGAR RUTINAS EN EL SELECT
 // ══════════════════════════════════════════
@@ -76,6 +177,10 @@ async function CargarEjercicio() {
     document.getElementById("eje_nom").value = eje.eje_nom ?? "";
     document.getElementById("eje_desc").value = eje.eje_desc ?? "";
     document.getElementById("eje_video").value = eje.eje_video ?? "";
+
+    if(eje.articulacion_objetivo){
+        document.getElementById("eje_articulacion").value=eje.articulacion.objetivo;
+    }
 }
 
 // ══════════════════════════════════════════
@@ -89,14 +194,16 @@ async function GuardarCambios() {
     const urlVideo = document.getElementById("eje_video").value.trim();
     const videoInput = document.getElementById("rut_video_file");
     const video = videoInput ? videoInput.files[0] : null;
+    const articulacionSeleccionada=document.getElementById("eje_articulacion").value;
 
-    if (!nombreEje || !descEje || !rutAsignar) {
+    if (!nombreEje || !descEje || !rutAsignar || !articulacionSeleccionada) {
         mostrarAlerta("Complete todos los campos requeridos", "warning");
         return;
     }
 
     // Mantener el video actual si no se cambia nada
     let videoFinal = urlVideo || null;
+    let angulosMetaNuevos=null;
 
     // ══════════════════════════════════════════
     // CASO 1: URL DE VIDEO (YouTube o Drive)
@@ -132,6 +239,8 @@ async function GuardarCambios() {
             return;
         }
 
+        mostrarAlerta("Analizando el nuevo video con IA. Por favor, espere un momento", "info");
+        angulosMetaNuevos= await analizarVideoMovenet(video, articulacionSeleccionada);
         const fileExt = video.name.split('.').pop();
         const fileName = `ejercicios/${Date.now()}.${fileExt}`;
 
@@ -195,13 +304,18 @@ async function GuardarCambios() {
     // ══════════════════════════════════════════
     // ACTUALIZAR EJERCICIO
     // ══════════════════════════════════════════
+    const datosActualizar={
+        eje_nom:nombreEje,
+        eje_desc:descEje,
+        eje_video:videoFinal,
+        articulacion_objetivo:articulacionSeleccionada
+    };
+    if(angulosMetaNuevos){
+        datosActualizar.angulos_meta=angulosMetaNuevos;
+    }
     const { error: ejercicioError } = await supabase
         .from("ejercicios")
-        .update({
-            eje_nom: nombreEje,
-            eje_desc: descEje,
-            eje_video: videoFinal
-        })
+        .update(datosActualizar)
         .eq("id_eje", id);
 
     if (ejercicioError) {

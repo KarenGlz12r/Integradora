@@ -11,6 +11,8 @@
 
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./ejercicios.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
 </head>
 
 <body>
@@ -56,6 +58,19 @@
                 <p id="noResult" class="no-result" style="display:none;">No se encontraron resultados</p>
             </div>
 
+            <div class="field-group">
+                <label class="field-label" for="eje_articulacion">Articulacion a evaluar</label>
+                <select id="eje_articulacion" class="field-select" required>
+                    <option value="">Seleccionar articulacion</option>
+                    <option value="codo_izq">Codo izquierdo (Bíceps/Tríceps)</option>
+                    <option value="codo_der">Codo derecho (Bíceps/Tríceps)</option>
+                    <option value="rodilla_izq">Rodilla izquierda (Sentadilla/Extensión)</option>
+                    <option value="rodilla_der">Rodilla derecha (Sentadilla/Extensión)</option>
+                    <option value="cadera_izq">Cadera izquierda (Flexión de pierna)</option>
+                    <option value="cadera_der">Cadera derecha (Flexión de pierna)</option>
+                </select>
+            </div>
+
             <!-- Descripción -->
             <div class="field-group">
                 <label class="field-label" for="rut_desc">Descripción</label>
@@ -88,11 +103,12 @@
             <label class="label-file">
                 <input id="rut_video_file" type="file" accept="video/*" class="input-file">
                 <i class="bi bi-cloud-arrow-up-fill"></i>
-                <span>Arrastra o haz clic para subir</span>
+                <span id="video_file_label">Arrastra o haz clic para subir</span>
             </label>
             <p id="video_file_feedback" style="display:none; color: green; font-size: 0.85rem;">
                 Archivo subido <span id="video_file_name"></span>
             </p>
+            <video id="videoPlayerOculto" style="display: none;" muted playsinline></video>
             <!-- Botones -->
             <div class="form-actions">
                 <a href="./ejercicios.html" class="btn-cancelar">Cancelar</a>

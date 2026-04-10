@@ -11,6 +11,8 @@
 
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./ejercicios.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
 </head>
 
 <body>
@@ -49,6 +51,18 @@
                     <input id="eje_nom" type="text" class="field-input" placeholder="Ej. Flexión de rodilla" required>
                 </div>
                 <div class="field-group">
+                    <label class="field-label" for="eje_articulacion">Articulación a evaluar</label>
+                    <select id="eje_articulacion" class="field-select" required>
+                        <option value="">Seleccionar articulación</option>
+                        <option value="codo_izq">Codo Izquierdo (Bíceps/Tríceps)</option>
+                        <option value="codo_der">Codo Derecho (Bíceps/Tríceps)</option>
+                        <option value="rodilla_izq">Rodilla Izquierda (Sentadilla/Extensión)</option>
+                        <option value="rodilla_der">Rodilla Derecha (Sentadilla/Extensión)</option>
+                        <option value="cadera_izq">Cadera Izquierda (Flexión de pierna)</option>
+                        <option value="cadera_der">Cadera Derecha (Flexión de pierna)</option>
+                    </select>
+                </div>
+                <div class="field-group">
                     <label class="field-label" for="id_rut">Rutina a asignar</label>
                     <select id="id_rut" class="field-select" required>
                         <option value="">Seleccionar rutina</option>
@@ -82,6 +96,10 @@
                 ✅ <span id="video_file_name"></span>
             </p>
 
+            <p id="video_file_feedback" style="display:none; color:green; font-size:0.85rem;">
+                <span id="video_file_name"></span>
+            </p>
+            <video id="videoPlayerOculto" style="display:none;" muted playsinline></video>
             <!-- Botones -->
             <div class="form-actions">
                 <a href="./ejercicios.html" class="btn-cancelar">Cancelar</a>
