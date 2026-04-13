@@ -403,12 +403,12 @@ body {
 }
 
 .chat-msg-row.fisio {
-    justify-content: flex-end;
+    justify-content: end;
     flex-direction: row-reverse;
 }
 
 .chat-msg-row.paciente {
-    justify-content: flex-start;
+    justify-content: start;
 }
 
 /* ── Mini-avatar circular en burbujas ── */

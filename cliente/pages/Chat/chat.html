@@ -14,14 +14,16 @@
     <link rel="stylesheet" href="./chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ── Crítico: posición de burbujas — no depende del CSS externo ── */
+        /* ── Posición de burbujas: fisio a la derecha, paciente a la izquierda ── */
         .chat-msg-row                { display:flex; align-items:flex-end; gap:8px; margin-bottom:2px; }
         .chat-msg-row.fisio          { justify-content:flex-end; flex-direction:row-reverse; }
         .chat-msg-row.paciente       { justify-content:flex-start; }
-        /* ── Mini-avatar ── */
+
+        /* ── Mini-avatar circular junto a cada burbuja ── */
         .chat-msg-av                 { width:28px; height:28px; min-width:28px; border-radius:50%; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; }
         .chat-msg-av img             { width:28px; height:28px; border-radius:50%; object-fit:cover; display:block; }
-        /* ── Avatares sidebar/header ── */
+
+        /* ── Avatar en sidebar y header del chat ── */
         .chat-c-avatar               { overflow:hidden; }
         .chat-c-avatar img           { width:100%; height:100%; object-fit:cover; border-radius:50%; }
     </style>
@@ -32,7 +34,9 @@
     <main class="main-content">
         <div class="chat-toast" id="chatToast"></div>
 
-        <!-- ── SIDEBAR DEL CHAT ── -->
+        <!-- ══════════════════════════════════════════════════════
+             SIDEBAR: lista de conversaciones con pacientes
+        ══════════════════════════════════════════════════════ -->
         <aside class="chat-sidebar" id="chatSidebar">
 
             <div class="chat-sb-header">
@@ -49,6 +53,7 @@
                 <input type="text" placeholder="Buscar paciente..." id="chatSearch" oninput="filtrarConvs()">
             </div>
 
+            <!-- Lista dinámica de conversaciones (se rellena desde JS) -->
             <div class="chat-conv-list" id="chatConvList">
                 <div id="chatConvLoading"
                     style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">
@@ -58,11 +63,13 @@
 
         </aside>
 
-        <!-- ── PANEL PRINCIPAL ── -->
+        <!-- ══════════════════════════════════════════════════════
+             PANEL PRINCIPAL: mensajes de la conversación activa
+        ══════════════════════════════════════════════════════ -->
         <main class="chat-main" id="chatMain">
             <div class="chat-bg-pattern"></div>
 
-            <!-- Estado vacío -->
+            <!-- Estado vacío: se muestra cuando ninguna conv está abierta -->
             <div class="chat-empty" id="chatEmptyState">
                 <div class="chat-empty-icon">
                     <i class="fa-solid fa-message" style="font-size:28px;color:var(--color-primary);"></i>
@@ -71,14 +78,15 @@
                 <p>Selecciona un paciente para iniciar la conversación</p>
             </div>
 
-            <!-- Panel activo -->
+            <!-- Panel activo: visible cuando hay una conversación abierta -->
             <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
 
                 <div class="chat-panel-header">
+                    <!-- Botón "volver" visible solo en móvil -->
                     <button class="chat-icon-btn" id="chatBackBtn" style="display:none;" onclick="volverSidebarChat()">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <!-- Avatar del header: puede mostrar foto o iniciales -->
+                    <!-- Avatar del paciente en el header (foto o iniciales) -->
                     <div class="chat-c-avatar hd" id="chatHeaderAvatar">P</div>
                     <div class="chat-panel-header-info">
                         <div class="chat-panel-name" id="chatHeaderName">Paciente</div>
@@ -90,8 +98,10 @@
                     </button>
                 </div>
 
+                <!-- Área donde se renderizan las burbujas de mensajes -->
                 <div class="chat-messages-area" id="chatMessagesArea"></div>
 
+                <!-- Barra de escritura inferior -->
                 <div class="chat-input-area">
                     <button class="chat-icon-btn" title="Adjuntar"
                         onclick="mostrarToastChat('Adjuntar archivos: próximamente')">
@@ -106,12 +116,14 @@
                     </button>
                 </div>
 
-            </div><!-- fin chat-active-panel -->
+            </div><!-- /chat-active-panel -->
         </main>
     </main>
 
 
-
+    <!-- ══════════════════════════════════════════════════════
+         Carga dinámica del Navbar
+    ══════════════════════════════════════════════════════ -->
     <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
@@ -121,36 +133,62 @@
                 script.type = 'module';
                 script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
-            })
+            });
     </script>
 
+
+    <!-- ══════════════════════════════════════════════════════
+         LÓGICA PRINCIPAL DEL CHAT
+    ══════════════════════════════════════════════════════ -->
     <script>
+        /* ─────────────────────────────────────────────────────
+           CONFIGURACIÓN DE SUPABASE
+        ───────────────────────────────────────────────────── */
         const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
         const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let FISIO_ID = null;      // auth.users.id  — para mensajes (id_emisor)
-        let FISIO_REAL_ID = null; // fisioterapeutas.id — para conversaciones (id_fisio)
-        let FISIO_FOTO = null;
-        let convActiva = null;
-        let todasConvs = [];
-        let rtChannel = null;
+        /* ─────────────────────────────────────────────────────
+           VARIABLES GLOBALES DE SESIÓN
+        ───────────────────────────────────────────────────── */
+        let FISIO_ID      = null;  // auth.users.id  → se usa como id_emisor en mensajes
+        let FISIO_REAL_ID = null;  // fisioterapeutas.id → se usa en la tabla conversaciones
+        let FISIO_FOTO    = null;  // URL de la foto de perfil del fisioterapeuta
 
+        let convActiva  = null;  // Objeto de la conversación actualmente abierta
+        let todasConvs  = [];    // Array con todas las conversaciones cargadas
+        let rtChannel   = null;  // Canal de tiempo real de Supabase
+
+
+        /* ═══════════════════════════════════════════════════════
+           INICIALIZACIÓN
+           Se llama al cargar la página. Obtiene la sesión,
+           carga conversaciones y escucha mensajes en tiempo real.
+        ═══════════════════════════════════════════════════════ */
         async function chatInit() {
+            // Verificar sesión activa en Supabase Auth
             const { data: { user }, error } = await _sb.auth.getUser();
-            if (error || !user) { mostrarToastChat('⚠️ Sin sesión activa'); return; }
+            if (error || !user) {
+                mostrarToastChat('⚠️ Sin sesión activa');
+                return;
+            }
             FISIO_ID = user.id;
 
-            // ── Obtener el id interno del fisioterapeuta ──
+            // Obtener el ID interno del fisioterapeuta (tabla fisioterapeutas)
+            // Es distinto del auth.users.id y se usa en la tabla conversaciones
             const { data: fisioRow } = await _sb
                 .from('fisioterapeutas')
                 .select('id')
                 .eq('user_id', user.id)
                 .single();
-            if (!fisioRow) { mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado'); return; }
+
+            if (!fisioRow) {
+                mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado');
+                return;
+            }
             FISIO_REAL_ID = fisioRow.id;
 
-            // ── Cargar foto del fisio desde perfiles ──
+            // Cargar foto del fisioterapeuta desde la tabla perfiles
             const { data: perfil } = await _sb
                 .from('perfiles')
                 .select('foto_url')
@@ -158,11 +196,15 @@
                 .single();
             if (perfil?.foto_url) FISIO_FOTO = perfil.foto_url;
 
+            // Cargar lista de conversaciones en el sidebar
             await cargarConvs();
+
+            // Activar escucha de mensajes nuevos en tiempo real
             chatEscucharRT();
 
-            // ── Si venimos desde Pacientes, abrir esa conv automáticamente ──
-            const pacienteIdPendiente = sessionStorage.getItem('chatPacienteId');
+            // Si venimos redirigidos desde la vista de Pacientes,
+            // sessionStorage tiene el ID y nombre del paciente a abrir
+            const pacienteIdPendiente     = sessionStorage.getItem('chatPacienteId');
             const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
             if (pacienteIdPendiente) {
                 sessionStorage.removeItem('chatPacienteId');
@@ -171,10 +213,17 @@
             }
         }
 
-        // ── Busca o crea una conversación con ese paciente y la abre ──
+
+        /* ═══════════════════════════════════════════════════════
+           ABRIR O CREAR CONVERSACIÓN CON UN PACIENTE
+           Usado cuando se llega desde la pantalla de Pacientes.
+           1. Busca en tabla conversaciones
+           2. Busca en mensajes existentes
+           3. Si no existe, crea una conv nueva vacía
+        ═══════════════════════════════════════════════════════ */
         async function abrirOCrearConvPaciente(pacienteUserId, pacienteNombre) {
 
-            // 1. Buscar en tabla conversaciones (datos nuevos)
+            // Paso 1: buscar conversación existente entre este fisio y este paciente
             const { data: convExistente } = await _sb
                 .from('conversaciones')
                 .select('id')
@@ -184,8 +233,8 @@
 
             let convId = convExistente?.id;
 
-            // 2. Si no está en conversaciones, buscar id_conv en mensajes existentes
-            //    (mensajes del paciente en cualquier conv donde el fisio también participó)
+            // Paso 2: si no hay registro en conversaciones, buscar en mensajes
+            // (compatibilidad con chats anteriores al uso de la tabla conversaciones)
             if (!convId) {
                 const { data: msgExistente } = await _sb
                     .from('mensajes')
@@ -196,7 +245,7 @@
 
                 if (msgExistente?.id_conv) {
                     convId = msgExistente.id_conv;
-                    // Registrar esta conv en la tabla conversaciones para futuras búsquedas
+                    // Registrar esta conv para que futuras búsquedas la encuentren
                     await _sb.from('conversaciones').upsert(
                         { id: convId, id_fisio: FISIO_REAL_ID, id_paciente: pacienteUserId },
                         { onConflict: 'id' }
@@ -204,7 +253,7 @@
                 }
             }
 
-            // 3. Si no existe ningún mensaje previo, crear una conv nueva vacía
+            // Paso 3: si no existe nada, crear una conversación vacía nueva
             if (!convId) {
                 const { data: nueva, error: errConv } = await _sb
                     .from('conversaciones')
@@ -212,11 +261,15 @@
                     .select('id')
                     .single();
 
-                if (errConv) { console.error('Error creando conversación:', errConv); mostrarToastChat('Error al abrir chat'); return; }
+                if (errConv) {
+                    console.error('Error creando conversación:', errConv);
+                    mostrarToastChat('Error al abrir chat');
+                    return;
+                }
                 convId = nueva.id;
             }
 
-            // 4. Obtener datos del paciente
+            // Obtener datos del paciente para mostrar en el header
             const { data: u } = await _sb
                 .from('usuario')
                 .select('us_nom, url_foto')
@@ -227,16 +280,33 @@
             const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
             const fotoUrl   = u?.url_foto || null;
 
-            const conv = { id_conv: convId, paciente_id: pacienteUserId, nombre, iniciales, fotoUrl, sinLeer: 0, ultimo: null };
+            const conv = {
+                id_conv:     convId,
+                paciente_id: pacienteUserId,
+                nombre,
+                iniciales,
+                fotoUrl,
+                sinLeer: 0,
+                ultimo: null
+            };
 
+            // Agregar al array local si no estaba ya
             const yaEsta = todasConvs.find(c => c.id_conv === convId);
             if (!yaEsta) todasConvs.unshift(conv);
 
+            // Abrir la conversación en el panel
             abrirConv(yaEsta || conv);
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           CARGAR TODAS LAS CONVERSACIONES DEL SIDEBAR
+           Fuente principal: tabla conversaciones.
+           Para cada conv obtiene nombre del paciente y conteo de no leídos.
+        ═══════════════════════════════════════════════════════ */
         async function cargarConvs() {
-            // ── Usar tabla conversaciones como fuente principal ──
+            // Traer todas las conversaciones de este fisioterapeuta, ordenadas por
+            // la fecha del último mensaje (las más recientes arriba)
             const { data: convRows, error } = await _sb
                 .from('conversaciones')
                 .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
@@ -246,11 +316,13 @@
             if (error) { console.error(error); return; }
 
             const convs = [];
+
             for (const row of (convRows || [])) {
                 const pacienteId = row.id_paciente;
                 let nombre = 'Paciente', iniciales = 'P', fotoUrl = null;
 
-                // Contar no leídos de este paciente en esta conv
+                // Contar mensajes no leídos de este paciente en esta conversación
+                // (solo los que NO son del fisio, para no contar los propios)
                 const { count } = await _sb
                     .from('mensajes')
                     .select('*', { count: 'exact', head: true })
@@ -258,6 +330,7 @@
                     .eq('msg_leido', false)
                     .neq('id_emisor', FISIO_ID);
 
+                // Obtener nombre y foto del paciente desde tabla usuario
                 if (pacienteId) {
                     const { data: u } = await _sb
                         .from('usuario')
@@ -266,9 +339,9 @@
                         .single();
 
                     if (u) {
-                        nombre   = u.us_nom || 'Paciente';
+                        nombre    = u.us_nom || 'Paciente';
                         iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        fotoUrl  = u.url_foto || null;
+                        fotoUrl   = u.url_foto || null;
                     }
                 }
 
@@ -279,6 +352,7 @@
                     iniciales,
                     fotoUrl,
                     sinLeer: count || 0,
+                    // Último mensaje para mostrar en el preview del sidebar
                     ultimo: row.ultimo_mensaje
                         ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
                         : null
@@ -289,8 +363,13 @@
             renderConvs(convs);
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           RENDERIZAR LA LISTA DE CONVERSACIONES EN EL SIDEBAR
+           Recibe un array (puede ser filtrado por búsqueda).
+        ═══════════════════════════════════════════════════════ */
         function renderConvs(lista) {
-            const el = document.getElementById('chatConvList');
+            const el      = document.getElementById('chatConvList');
             const loading = document.getElementById('chatConvLoading');
             if (loading) loading.style.display = 'none';
             el.innerHTML = '';
@@ -305,26 +384,28 @@
                 item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
                 item.dataset.convId = c.id_conv;
 
-                const hora = chatFormatHora(c.ultimo?.msg_fecha);
+                // Hora formateada para mostrar en el sidebar (hoy = HH:MM, antes = DD/MM)
+                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
                 const preview = c.ultimo
                     ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
                     : '';
 
-                // ── Avatar del sidebar: DOM-safe, sin onerror inline ──
+                // Construir el avatar del sidebar de forma segura (sin innerHTML con img)
                 const avDiv = document.createElement('div');
                 avDiv.className = 'chat-c-avatar md';
                 if (c.fotoUrl) {
                     const img = document.createElement('img');
-                    img.src = c.fotoUrl;
-                    img.alt = c.nombre;
+                    img.src   = c.fotoUrl;
+                    img.alt   = c.nombre;
+                    // Si la imagen falla, caer a iniciales con color generado
                     img.onerror = () => {
-                        avDiv.innerHTML = '';
+                        avDiv.innerHTML   = '';
                         avDiv.textContent = c.iniciales;
                         avDiv.style.background = chatColorAvatar(c.iniciales);
                     };
                     avDiv.appendChild(img);
                 } else {
-                    avDiv.textContent = c.iniciales;
+                    avDiv.textContent      = c.iniciales;
                     avDiv.style.background = chatColorAvatar(c.iniciales);
                 }
 
@@ -339,61 +420,82 @@
                     </div>
                 `;
                 item.prepend(avDiv);
+                // Al hacer clic en una conversación, abrirla
                 item.addEventListener('click', () => abrirConv(c));
                 el.appendChild(item);
             });
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           ABRIR UNA CONVERSACIÓN
+           Muestra el panel activo, carga mensajes y marca como leídos.
+        ═══════════════════════════════════════════════════════ */
         async function abrirConv(conv) {
             convActiva = conv;
 
+            // Marcar visualmente la conv seleccionada en el sidebar
             document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
             document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
-            document.getElementById('chatEmptyState').style.display = 'none';
+            // Mostrar el panel de mensajes, ocultar el estado vacío
+            document.getElementById('chatEmptyState').style.display  = 'none';
             document.getElementById('chatActivePanel').style.display = 'flex';
 
+            // Actualizar header con nombre del paciente
             document.getElementById('chatHeaderName').textContent = conv.nombre;
 
-            // ── Header avatar: foto o iniciales ──
+            // ── Header avatar: foto si existe, iniciales si no ──
             const headerAv = document.getElementById('chatHeaderAvatar');
             headerAv.innerHTML = '';
             if (conv.fotoUrl) {
                 const img = document.createElement('img');
-                img.src = conv.fotoUrl;
-                img.alt = conv.nombre;
+                img.src   = conv.fotoUrl;
+                img.alt   = conv.nombre;
                 img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
                 img.onerror = () => {
-                    headerAv.innerHTML = '';
-                    headerAv.textContent = conv.iniciales;
+                    headerAv.innerHTML        = '';
+                    headerAv.textContent      = conv.iniciales;
                     headerAv.style.background = chatColorAvatar(conv.iniciales);
                 };
                 headerAv.appendChild(img);
                 headerAv.style.background = 'transparent';
             } else {
-                headerAv.textContent = conv.iniciales;
+                headerAv.textContent      = conv.iniciales;
                 headerAv.style.background = chatColorAvatar(conv.iniciales);
             }
 
             document.getElementById('chatHeaderStatus').textContent = 'en línea';
 
+            // En móvil: mostrar panel y ocultar sidebar
             document.getElementById('chatMain').classList.remove('hide');
             document.getElementById('chatSidebar').classList.remove('show');
 
+            // Cargar mensajes y marcar como leídos
             await cargarMsgs(conv.id_conv);
             chatMarcarLeidos(conv.id_conv);
 
+            // Quitar badge de no leídos del sidebar
             const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
             if (badge) badge.remove();
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           CARGAR MENSAJES DE UNA CONVERSACIÓN
+           Muestra skeleton mientras carga, luego renderiza los mensajes
+           con separadores de fecha estilo WhatsApp.
+        ═══════════════════════════════════════════════════════ */
         async function cargarMsgs(convId) {
             const area = document.getElementById('chatMessagesArea');
+
+            // Mostrar skeleton de carga mientras se obtienen los mensajes
             area.innerHTML = `
                 <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:4px 0;"></div>
                 <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:4px 0;"></div>
             `;
 
+            // Traer todos los mensajes de la conversación, ordenados por fecha ascendente
             const { data, error } = await _sb
                 .from('mensajes')
                 .select('*')
@@ -403,70 +505,88 @@
             area.innerHTML = '';
 
             if (error) { console.error(error); return; }
+
             if (!data.length) {
                 area.innerHTML = '<div style="text-align:center;color:var(--chat-text-hint);font-size:13px;margin-top:40px;">Inicia la conversación 👋</div>';
                 return;
             }
 
-            let ultimaFecha = null;
+            // Iterar mensajes e insertar separadores de fecha cuando cambia el día
+            let ultimaFechaSep = null; // Guarda la etiqueta del último separador insertado
+
             data.forEach(m => {
-                const fechaStr = m.msg_fecha
-                    ? new Date(m.msg_fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City' })
-                    : '';
-                if (fechaStr !== ultimaFecha) {
+                // Obtener la etiqueta de fecha para este mensaje (Hoy, Ayer, día de semana o fecha completa)
+                const etiquetaFecha = chatFormatFechaSep(m.msg_fecha);
+
+                // Solo insertar separador cuando cambia el día respecto al mensaje anterior
+                if (etiquetaFecha !== ultimaFechaSep) {
                     const sep = document.createElement('div');
                     sep.className = 'chat-date-sep';
-                    sep.innerHTML = `<span>${fechaStr}</span>`;
+                    sep.innerHTML = `<span>${etiquetaFecha}</span>`;
                     area.appendChild(sep);
-                    ultimaFecha = fechaStr;
+                    ultimaFechaSep = etiquetaFecha;
                 }
+
+                // Renderizar la burbuja del mensaje (sin animación en carga inicial)
                 chatAgregarBubble(m, false);
             });
 
+            // Hacer scroll al último mensaje
             chatScrollAbajo();
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           RENDERIZAR UNA BURBUJA DE MENSAJE
+           Crea el DOM de una burbuja (fisio o paciente) y la agrega al área.
+           animar: true = aplica animación CSS de entrada
+        ═══════════════════════════════════════════════════════ */
         function chatAgregarBubble(m, animar = true) {
-            const area = document.getElementById('chatMessagesArea');
+            const area    = document.getElementById('chatMessagesArea');
             const esFisio = m.id_emisor === FISIO_ID;
 
+            // Fila que contiene avatar + burbuja
             const row = document.createElement('div');
             row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
             if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
+            // Hora formateada del mensaje (HH:MM en zona México)
             const hora = m.msg_fecha
-                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City' })
+                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
+                    hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
+                  })
                 : '';
 
+            // Icono de doble palomita (leído) o palomita simple (enviado)
             const checkIcon = m.msg_leido
                 ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
                 : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-            // ── Mini-avatar circular (DOM, nunca innerHTML con img grande) ──
-            const avDiv = document.createElement('div');
+            // ── Mini-avatar circular (DOM seguro, sin onerror inline) ──
+            const avDiv   = document.createElement('div');
             avDiv.className = 'chat-msg-av';
 
-            const fotoUrl  = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
-            const ini      = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
-            const bgColor  = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
+            const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
+            const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
+            const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
 
             if (fotoUrl) {
                 const img = document.createElement('img');
-                img.src = fotoUrl;
-                img.alt = ini;
-                // Fallback a iniciales si la foto falla
+                img.src   = fotoUrl;
+                img.alt   = ini;
+                // Si la foto no carga, mostrar iniciales con color generado
                 img.onerror = () => {
-                    avDiv.innerHTML = '';
-                    avDiv.textContent = ini;
+                    avDiv.innerHTML        = '';
+                    avDiv.textContent      = ini;
                     avDiv.style.background = bgColor;
                 };
                 avDiv.appendChild(img);
             } else {
-                avDiv.textContent = ini;
+                avDiv.textContent      = ini;
                 avDiv.style.background = bgColor;
             }
 
-            // ── Burbuja ──
+            // ── Burbuja de texto ──
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble';
             bubble.innerHTML = `
@@ -482,61 +602,89 @@
             area.appendChild(row);
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           ENVIAR UN MENSAJE
+           Inserta en Supabase y actualiza el campo ultimo_mensaje
+           en la tabla conversaciones para mantener el sidebar ordenado.
+        ═══════════════════════════════════════════════════════ */
         async function chatEnviarMensaje() {
-            if (!FISIO_ID || !convActiva) { mostrarToastChat('Selecciona una conversación'); return; }
+            if (!FISIO_ID || !convActiva) {
+                mostrarToastChat('Selecciona una conversación');
+                return;
+            }
 
             const input = document.getElementById('chatMsgInput');
             const texto = input.value.trim();
             if (!texto) return;
 
-            input.value = '';
+            // Limpiar y resetear el textarea
+            input.value        = '';
             input.style.height = 'auto';
 
             const ahora = new Date().toISOString();
 
+            // Mostrar la burbuja de forma optimista (antes de confirmar la inserción)
             chatAgregarBubble({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_fecha: ahora,
                 msg_leido: false,
-                id_conv: convActiva.id_conv
+                id_conv:   convActiva.id_conv
             }, true);
             chatScrollAbajo();
 
-            // Insertar mensaje
+            // Insertar el mensaje en Supabase
             const { error } = await _sb.from('mensajes').insert({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_leido: false,
-                id_conv: convActiva.id_conv
+                id_conv:   convActiva.id_conv
             });
 
-            if (error) { console.error(error); mostrarToastChat('Error al enviar'); return; }
+            if (error) {
+                console.error(error);
+                mostrarToastChat('Error al enviar');
+                return;
+            }
 
-            // Actualizar ultimo_mensaje en conversaciones para ordenar el sidebar
+            // Actualizar último mensaje en tabla conversaciones para ordenar el sidebar
             await _sb.from('conversaciones').update({
                 ultimo_mensaje:       texto,
                 ultimo_mensaje_fecha: ahora
             }).eq('id', convActiva.id_conv);
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           ESCUCHAR MENSAJES EN TIEMPO REAL (Supabase Realtime)
+           Se suscribe a INSERT en la tabla mensajes.
+           Si el mensaje es de la conv activa → renderiza directamente.
+           Si es de otra conv → muestra toast y recarga el sidebar.
+        ═══════════════════════════════════════════════════════ */
         function chatEscucharRT() {
+            // Remover canal anterior si existe (evita duplicados)
             if (rtChannel) _sb.removeChannel(rtChannel);
+
             rtChannel = _sb.channel('motricare_chat_rt')
                 .on('postgres_changes',
                     { event: 'INSERT', schema: 'public', table: 'mensajes' },
                     payload => {
                         const m = payload.new;
+
+                        // Ignorar mensajes propios (ya se muestran optimistamente)
                         if (m.id_emisor === FISIO_ID) return;
 
                         if (convActiva && m.id_conv === convActiva.id_conv) {
+                            // Mensaje de la conversación activa: renderizar y marcar leído
                             chatAgregarBubble(m, true);
                             chatScrollAbajo();
                             chatMarcarLeidos(convActiva.id_conv);
                         } else {
+                            // Mensaje de otra conversación: notificar y actualizar sidebar
                             mostrarToastChat('💬 Nuevo mensaje de un paciente');
                             cargarConvs();
-                            // ── Actualizar campana en el navbar ──
+                            // Incrementar el badge de notificaciones en el navbar
                             actualizarBadgeCampana(1);
                         }
                     }
@@ -544,29 +692,45 @@
                 .subscribe();
         }
 
-        // ── Incrementa el badge de la campana ──
+
+        /* ═══════════════════════════════════════════════════════
+           BADGE DE CAMPANA EN EL NAVBAR
+           Incrementa el contador de notificaciones visibles.
+        ═══════════════════════════════════════════════════════ */
         function actualizarBadgeCampana(incremento = 1) {
             const badge = document.getElementById('bell-badge');
             if (!badge) return;
             const actual = parseInt(badge.textContent) || 0;
-            const nuevo = actual + incremento;
-            badge.textContent = nuevo > 99 ? '99+' : nuevo;
-            badge.style.display = 'flex';
+            const nuevo  = actual + incremento;
+            badge.textContent    = nuevo > 99 ? '99+' : nuevo;
+            badge.style.display  = 'flex';
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           MARCAR MENSAJES COMO LEÍDOS
+           Actualiza msg_leido=true en todos los mensajes recibidos
+           de la conversación activa, y recalcula el badge global.
+        ═══════════════════════════════════════════════════════ */
         async function chatMarcarLeidos(convId) {
             await _sb.from('mensajes')
                 .update({ msg_leido: true })
                 .eq('id_conv', convId)
-                .neq('id_emisor', FISIO_ID);
+                .neq('id_emisor', FISIO_ID); // solo los que no son del fisio
 
-            // Al marcar como leídos, recalcular el badge global
+            // Después de marcar, recalcular el total para la campana
             recalcularBadgeTotal();
         }
 
-        // ── Recalcula el total de no leídos para la campana ──
+
+        /* ═══════════════════════════════════════════════════════
+           RECALCULAR BADGE TOTAL DE NO LEÍDOS
+           Cuenta todos los mensajes no leídos en todas las convs
+           y actualiza el ícono de campana en el navbar.
+        ═══════════════════════════════════════════════════════ */
         async function recalcularBadgeTotal() {
             if (!FISIO_ID) return;
+
             const { count } = await _sb
                 .from('mensajes')
                 .select('*', { count: 'exact', head: true })
@@ -575,50 +739,138 @@
 
             const badge = document.getElementById('bell-badge');
             if (!badge) return;
+
             if (count > 0) {
-                badge.textContent = count > 99 ? '99+' : count;
+                badge.textContent   = count > 99 ? '99+' : count;
                 badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
             }
         }
 
+
+        /* ═══════════════════════════════════════════════════════
+           FILTRAR CONVERSACIONES POR NOMBRE
+           Se activa con cada tecla en el buscador del sidebar.
+        ═══════════════════════════════════════════════════════ */
         function filtrarConvs() {
             const q = document.getElementById('chatSearch').value.toLowerCase();
             renderConvs(todasConvs.filter(c => c.nombre.toLowerCase().includes(q)));
         }
 
-        function chatScrollAbajo() {
-            const area = document.getElementById('chatMessagesArea');
-            requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
-        }
 
-        function chatAutoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-        }
-
-        function chatHandleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatEnviarMensaje(); }
-        }
-
+        /* ═══════════════════════════════════════════════════════
+           VOLVER AL SIDEBAR (móvil)
+           En pantallas pequeñas, oculta el panel de mensajes
+           y muestra el sidebar de conversaciones.
+        ═══════════════════════════════════════════════════════ */
         function volverSidebarChat() {
             document.getElementById('chatSidebar').classList.add('show');
             document.getElementById('chatMain').classList.add('hide');
         }
 
-        function chatFormatHora(fecha) {
+
+        /* ═══════════════════════════════════════════════════════
+           UTILIDADES DE FORMATO Y HELPERS
+        ═══════════════════════════════════════════════════════ */
+
+        /**
+         * chatFormatFechaSep
+         * Devuelve la etiqueta del separador de fecha estilo WhatsApp:
+         *   - "Hoy"           → si el mensaje es de hoy
+         *   - "Ayer"          → si el mensaje es de ayer
+         *   - "lunes"/"martes"→ si es de esta semana (menos de 7 días)
+         *   - "08 de abril de 2026" → si es más antiguo
+         *
+         * Se compara usando toLocaleDateString para evitar problemas
+         * de zona horaria (UTC vs. Mexico_City).
+         */
+        function chatFormatFechaSep(fecha) {
             if (!fecha) return '';
             const TZ = 'America/Mexico_City';
-            const d   = new Date(fecha);
-            // Comparar "hoy" en la zona correcta
+            const d  = new Date(fecha);
+
+            // Fechas de referencia en zona local
+            const hoy  = new Date();
+            const ayer = new Date();
+            ayer.setDate(hoy.getDate() - 1);
+
+            const opts    = { timeZone: TZ };
+            const dStr    = d.toLocaleDateString('es-MX', opts);
+            const hoyStr  = hoy.toLocaleDateString('es-MX', opts);
+            const ayerStr = ayer.toLocaleDateString('es-MX', opts);
+
+            if (dStr === hoyStr)  return 'Hoy';
+            if (dStr === ayerStr) return 'Ayer';
+
+            // Si es de los últimos 7 días, mostrar nombre del día
+            const diffMs   = hoy - d;
+            const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (diffDias < 7) {
+                return d.toLocaleDateString('es-MX', { weekday: 'long', timeZone: TZ });
+            }
+
+            // Para mensajes más antiguos, fecha completa: "08 de abril de 2026"
+            return d.toLocaleDateString('es-MX', {
+                day: '2-digit', month: 'long', year: 'numeric', timeZone: TZ
+            });
+        }
+
+        /**
+         * chatFormatHora
+         * Para el SIDEBAR: muestra HH:MM si es hoy, o DD/MM si es anterior.
+         * Es distinto de chatFormatFechaSep que es para los separadores.
+         */
+        function chatFormatHora(fecha) {
+            if (!fecha) return '';
+            const TZ   = 'America/Mexico_City';
+            const d    = new Date(fecha);
             const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
             const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
-            if (dStr === hoyStr)
+
+            if (dStr === hoyStr) {
                 return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
+            }
             return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', timeZone: TZ });
         }
 
+        /**
+         * chatScrollAbajo
+         * Hace scroll al fondo del área de mensajes con requestAnimationFrame
+         * para garantizar que el DOM ya actualizó antes de medir scrollHeight.
+         */
+        function chatScrollAbajo() {
+            const area = document.getElementById('chatMessagesArea');
+            requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
+        }
+
+        /**
+         * chatAutoResize
+         * Ajusta la altura del textarea automáticamente al escribir,
+         * con un máximo de 110px para no tapar el área de mensajes.
+         */
+        function chatAutoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+        }
+
+        /**
+         * chatHandleKey
+         * Envía el mensaje con Enter (sin Shift).
+         * Shift+Enter inserta salto de línea normal.
+         */
+        function chatHandleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatEnviarMensaje();
+            }
+        }
+
+        /**
+         * chatColorAvatar
+         * Genera un color determinista a partir de las iniciales del paciente.
+         * Mismo input → mismo color siempre (para consistencia visual).
+         */
         function chatColorAvatar(ini) {
             const cols = ['#9b1b6e', '#7a1254', '#b5357f', '#c4629a', '#6d1249', '#d4539e', '#531040'];
             let s = 0;
@@ -626,16 +878,25 @@
             return cols[s % cols.length];
         }
 
+        /**
+         * chatEscHTML
+         * Escapa caracteres especiales de HTML para evitar XSS
+         * al insertar texto del usuario en el DOM.
+         */
         function chatEscHTML(str) {
             return String(str || '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+                .replace(/&/g,  '&amp;')
+                .replace(/</g,  '&lt;')
+                .replace(/>/g,  '&gt;')
+                .replace(/"/g,  '&quot;')
+                .replace(/\n/g, '<br>');
         }
 
-        function chatEscAttr(str) {
-            return String(str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        }
-
+        /**
+         * mostrarToastChat
+         * Muestra un mensaje flotante temporal en la parte superior del chat.
+         * Se oculta automáticamente después de 3 segundos.
+         */
         function mostrarToastChat(msg) {
             const el = document.getElementById('chatToast');
             el.textContent = msg;
@@ -643,10 +904,15 @@
             setTimeout(() => el.classList.remove('show'), 3000);
         }
 
+        // Exponer toast globalmente para que el Navbar pueda usarlo si lo necesita
         window.toast = mostrarToastChat;
+
+
+        /* ═══════════════════════════════════════════════════════
+           PUNTO DE ENTRADA: iniciar el chat al cargar la página
+        ═══════════════════════════════════════════════════════ */
         chatInit();
     </script>
 
 </body>
-
 </html>
