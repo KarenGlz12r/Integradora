@@ -338,7 +338,7 @@
     align-items: center;
     gap: 6px;
     padding: 8px 14px;
-    background: #198754;
+    background: #87197a;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -348,7 +348,7 @@
 }
 
 .btn-asignar-rutina:hover {
-    background: #146c43;
+    background: #6c1446;
 }
 
 /* Contenedor de los dos botones de acción */
