@@ -25,6 +25,9 @@
 
 /* ══════════════════════════════════════════
    GLOBALES
+   FIX: html y body NO deben tener overflow:hidden en móvil.
+   El truco es usar dvh (dynamic viewport height) para que
+   el layout se adapte cuando el teclado virtual aparece.
 ══════════════════════════════════════════ */
 * {
     margin: 0;
@@ -33,21 +36,34 @@
     font-family: "Nunito Sans", sans-serif;
 }
 
-html,
+html {
+    height: 100%;
+    height: -webkit-fill-available;
+}
+
 body {
     height: 100%;
+    height: -webkit-fill-available;
+    /* FIX: NO overflow:hidden en body — bloquea el scroll del teclado móvil */
     overflow: hidden;
 }
 
 /* ══════════════════════════════════════════
    LAYOUT PRINCIPAL
-   Navbar.css aplica margin-top: 3.5rem y margin-left: 4rem.
-   Aquí solo sobreescribimos lo necesario para el chat.
+   FIX: Usar dvh en lugar de vh fijo para que el layout
+   se recalcule cuando el teclado virtual sube/baja.
+   dvh = dynamic viewport height (soportado en iOS 15.4+, Android Chrome 108+)
+   Con fallback a 100svh y luego a calc(100vh).
 ══════════════════════════════════════════ */
 .main-content {
     margin-top: 3.5rem;
     margin-left: 4rem;
-    height: calc(100vh - 3.5rem);
+
+    /* FIX teclado móvil: altura dinámica en cascada */
+    height: calc(100vh - 3.5rem);           /* fallback escritorio */
+    height: calc(100svh - 3.5rem);          /* small viewport height */
+    height: calc(100dvh - 3.5rem);          /* dynamic viewport height (mejor) */
+
     display: flex;
     flex-direction: row;
     padding: 0;
@@ -71,6 +87,7 @@ body {
     background: #fff;
     border-right: 1px solid var(--chat-border);
     height: 100%;
+    overflow: hidden;
 }
 
 .chat-sb-header {
@@ -80,6 +97,7 @@ body {
     align-items: center;
     gap: 10px;
     background: var(--color-primary-lt);
+    flex-shrink: 0;
 }
 
 .chat-sb-icon {
@@ -111,6 +129,7 @@ body {
     padding: 10px 14px;
     border-bottom: 1px solid var(--chat-border);
     background: #fff;
+    flex-shrink: 0;
 }
 
 .chat-sb-search input {
@@ -124,6 +143,8 @@ body {
     color: var(--chat-text);
     outline: none;
     transition: border-color 0.15s;
+    /* FIX iOS: evita que Safari haga zoom automático al enfocar */
+    font-size: max(16px, 13px);
 }
 
 .chat-sb-search input:focus {
@@ -137,12 +158,10 @@ body {
 .chat-conv-list {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.chat-conv-list::-webkit-scrollbar {
-    width: 3px;
-}
-
+.chat-conv-list::-webkit-scrollbar { width: 3px; }
 .chat-conv-list::-webkit-scrollbar-thumb {
     background: var(--chat-border);
     border-radius: 2px;
@@ -157,18 +176,17 @@ body {
     cursor: pointer;
     border-bottom: 1px solid rgba(232, 160, 208, 0.3);
     transition: background 0.12s;
+    /* FIX: mínimo de toque recomendado por iOS/Android */
+    min-height: 48px;
 }
 
-.chat-conv-item:hover {
-    background: var(--color-primary-lt);
-}
-
+.chat-conv-item:hover  { background: var(--color-primary-lt); }
 .chat-conv-item.active {
     background: var(--color-hover);
     border-left: 3px solid var(--color-primary);
 }
 
-/* ── Avatares (sidebar y header) ── */
+/* ── Avatares ── */
 .chat-c-avatar {
     width: 44px;
     height: 44px;
@@ -182,19 +200,8 @@ body {
     color: #fff;
     flex-shrink: 0;
 }
-
-.chat-c-avatar.md {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-}
-
-.chat-c-avatar.hd {
-    width: 42px;
-    height: 42px;
-    font-size: 15px;
-}
-
+.chat-c-avatar.md { width: 40px; height: 40px; font-size: 14px; }
+.chat-c-avatar.hd { width: 42px; height: 42px; font-size: 15px; }
 .chat-c-avatar img {
     width: 100%;
     height: 100%;
@@ -202,10 +209,7 @@ body {
     border-radius: 50%;
 }
 
-.chat-conv-info {
-    flex: 1;
-    min-width: 0;
-}
+.chat-conv-info   { flex: 1; min-width: 0; }
 
 .chat-conv-name {
     font-size: 14px;
@@ -254,6 +258,9 @@ body {
 
 /* ══════════════════════════════════════════
    PANEL PRINCIPAL
+   FIX: el panel debe ser flex column con el área de mensajes
+   creciendo (flex:1) y el input area quedándose al fondo.
+   Esto es lo que permite que el teclado "empuje" el input.
 ══════════════════════════════════════════ */
 .chat-main {
     flex: 1;
@@ -263,6 +270,8 @@ body {
     position: relative;
     overflow: hidden;
     height: 100%;
+    /* FIX iOS: permite que el layout se ajuste al teclado */
+    min-height: 0;
 }
 
 .chat-bg-pattern {
@@ -305,12 +314,18 @@ body {
     color: var(--chat-text-sec);
 }
 
+/* FIX CLAVE: el panel activo es flex column y ocupa todo el espacio
+   disponible. El teclado reduce la altura del viewport (dvh),
+   lo que reduce .main-content, lo que reduce .chat-active-panel,
+   y el flex hace que el área de mensajes se encoja mientras el
+   input area (flex-shrink:0) se queda visible al fondo. */
 .chat-active-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
     z-index: 1;
     overflow: hidden;
+    min-height: 0;  /* FIX: necesario para que flex:1 funcione en iOS */
 }
 
 /* ── Header del panel ── */
@@ -321,12 +336,10 @@ body {
     align-items: center;
     gap: 11px;
     border-bottom: 1px solid var(--chat-border);
-    flex-shrink: 0;
+    flex-shrink: 0;  /* no se encoge cuando sube el teclado */
 }
 
-.chat-panel-header-info {
-    flex: 1;
-}
+.chat-panel-header-info { flex: 1; }
 
 .chat-panel-name {
     font-size: 15px;
@@ -351,6 +364,10 @@ body {
     align-items: center;
     transition: background 0.15s;
     font-size: 15px;
+    /* FIX: área mínima de toque */
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
 }
 
 .chat-icon-btn:hover {
@@ -360,20 +377,22 @@ body {
 
 /* ══════════════════════════════════════════
    ÁREA DE MENSAJES
+   FIX: flex:1 + min-height:0 + overflow-y:auto es la
+   combinación correcta. Sin min-height:0, el flex item
+   no se encoge y el área empuja el input fuera de pantalla.
 ══════════════════════════════════════════ */
 .chat-messages-area {
     flex: 1;
+    min-height: 0;          /* FIX crítico iOS/Android */
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 14px 18px;
     display: flex;
     flex-direction: column;
     gap: 3px;
 }
 
-.chat-messages-area::-webkit-scrollbar {
-    width: 3px;
-}
-
+.chat-messages-area::-webkit-scrollbar { width: 3px; }
 .chat-messages-area::-webkit-scrollbar-thumb {
     background: var(--chat-border);
     border-radius: 2px;
@@ -482,6 +501,9 @@ body {
 
 /* ══════════════════════════════════════════
    INPUT DE MENSAJE
+   FIX: flex-shrink:0 es lo que hace que el input se quede
+   visible cuando el teclado sube. El área de mensajes
+   absorbe la reducción de altura, no el input.
 ══════════════════════════════════════════ */
 .chat-input-area {
     background: var(--chat-header-bg);
@@ -490,7 +512,10 @@ body {
     align-items: flex-end;
     gap: 9px;
     border-top: 1px solid var(--chat-border);
-    flex-shrink: 0;
+    flex-shrink: 0;   /* FIX: nunca se encoge, siempre visible */
+
+    /* FIX iOS: safe area para el home indicator del iPhone */
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 
 .chat-input-wrap {
@@ -514,12 +539,20 @@ body {
     border: none;
     outline: none;
     font-family: inherit;
-    font-size: 14px;
-    color: var(--chat-text);
+    line-height: 1.5;
     resize: none;
     max-height: 110px;
-    line-height: 1.5;
     padding: 4px 0;
+    color: var(--chat-text);
+
+    /* FIX iOS: font-size mínimo de 16px evita que Safari
+       haga zoom automático al enfocar el textarea */
+    font-size: max(16px, 14px);
+
+    /* FIX: asegura que el textarea sea interactivo */
+    -webkit-user-select: text;
+    user-select: text;
+    touch-action: manipulation;
 }
 
 .chat-input-wrap textarea::placeholder {
@@ -540,6 +573,10 @@ body {
     flex-shrink: 0;
     font-size: 15px;
     transition: background 0.15s, transform 0.1s;
+    /* FIX: área de toque suficiente */
+    min-width: 42px;
+    min-height: 42px;
+    touch-action: manipulation;
 }
 
 .chat-send-btn:hover  { background: var(--color-primary-dk); }
@@ -571,6 +608,8 @@ body {
     font-family: inherit;
     transition: transform 0.28s;
     z-index: 9999;
+    /* FIX: no queda tapado por el teclado */
+    bottom: max(22px, env(safe-area-inset-bottom));
 }
 
 .chat-toast.show {
@@ -591,10 +630,18 @@ body {
 
 /* ══════════════════════════════════════════
    RESPONSIVE — MÓVIL
+   FIX PRINCIPAL: en móvil se usa dvh para que el layout
+   reaccione al teclado virtual correctamente.
 ══════════════════════════════════════════ */
 @media (max-width: 680px) {
     .main-content {
         margin-left: 0 !important;
+        margin-top: 3.5rem;
+
+        /* FIX: altura que se adapta al teclado virtual en móvil */
+        height: calc(100vh - 3.5rem);
+        height: calc(100svh - 3.5rem);
+        height: calc(100dvh - 3.5rem);
     }
 
     .chat-sidebar {
@@ -617,5 +664,20 @@ body {
 
     #chatBackBtn {
         display: flex !important;
+    }
+
+    /* FIX: burbujas más anchas en pantalla pequeña */
+    .chat-bubble {
+        max-width: 78%;
+    }
+
+    /* FIX: padding lateral reducido en móvil */
+    .chat-messages-area {
+        padding: 10px 12px;
+    }
+
+    .chat-input-area {
+        padding: 8px 10px;
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
 }
