@@ -331,6 +331,32 @@
 .btn-chat-paciente:hover {
     background: #5f104a;
 }
+
+/* Botón asignar rutina — junto al botón de mensaje */
+.btn-asignar-rutina {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #198754;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-asignar-rutina:hover {
+    background: #146c43;
+}
+
+/* Contenedor de los dos botones de acción */
+.paciente-acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 /* ── MEDIA QUERIES ─────────────────────────────────────────────── */
 
 /* Tablets grandes y laptops pequeñas (max 1200px) */
