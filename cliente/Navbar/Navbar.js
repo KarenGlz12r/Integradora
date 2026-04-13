@@ -140,7 +140,7 @@ document.addEventListener("keydown", (e) => {
 
 async function cerrarSesion() {
     await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    limpiarSesion();
+    // limpiarSesion();
     await supabase.auth.signOut();
     window.location.href = "/index.html";
 }
