@@ -59,7 +59,7 @@ export async function apiFetch(ruta, opciones = {}) {
 
     if (res.status === 401) {
         limpiarSesion();
-        window.location.href = "/Login.html";
+        window.location.href = "/index.html";
         return null;
     }
 
