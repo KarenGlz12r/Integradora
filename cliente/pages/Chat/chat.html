@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
+
 <body>
     <div id="navbar"></div>
     <main class="main-content">
@@ -117,7 +118,7 @@
                 document.getElementById('navbar').innerHTML = html;
                 const script = document.createElement('script');
                 script.type = 'module';
-                script.src  = '../../Navbar/Navbar.js';
+                script.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
             });
     </script>
@@ -137,13 +138,13 @@
         /* ─────────────────────────────────────────────────────
            VARIABLES GLOBALES DE SESIÓN
         ───────────────────────────────────────────────────── */
-        let FISIO_ID      = null;  // auth.users.id → se usa como id_emisor en mensajes
+        let FISIO_ID = null;  // auth.users.id → se usa como id_emisor en mensajes
         let FISIO_REAL_ID = null;  // fisioterapeutas.id → se usa en la tabla conversaciones
-        let FISIO_FOTO    = null;  // URL de la foto de perfil del fisioterapeuta
+        let FISIO_FOTO = null;  // URL de la foto de perfil del fisioterapeuta
 
         let convActiva = null;  // Objeto de la conversación actualmente abierta
         let todasConvs = [];    // Array con todas las conversaciones cargadas
-        let rtChannel  = null;  // Canal de tiempo real de Supabase
+        let rtChannel = null;  // Canal de tiempo real de Supabase
 
 
         /* ═══════════════════════════════════════════════════════
@@ -209,7 +210,7 @@
 
             // Si venimos redirigidos desde la vista de Pacientes,
             // sessionStorage tiene el ID y nombre del paciente a abrir
-            const pacienteIdPendiente     = sessionStorage.getItem('chatPacienteId');
+            const pacienteIdPendiente = sessionStorage.getItem('chatPacienteId');
             const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
             if (pacienteIdPendiente) {
                 sessionStorage.removeItem('chatPacienteId');
@@ -221,107 +222,181 @@
 
         /* ═══════════════════════════════════════════════════════
            ABRIR O CREAR CONVERSACIÓN CON UN PACIENTE
-           Usado cuando se llega desde la pantalla de Pacientes.
-           1. Busca en tabla conversaciones
-           2. Busca en mensajes existentes
-           3. Si no existe, crea una conv nueva vacía
+           
+           FIX CRÍTICO: id_paciente en conversaciones = usuario.id_us
+           NO auth.users.id. Hay que resolver el id_us antes de insertar.
         ═══════════════════════════════════════════════════════ */
         async function abrirOCrearConvPaciente(pacienteUserId, pacienteNombre) {
+            console.log('[abrirOCrearConv] pacienteUserId recibido (auth.users.id):', pacienteUserId);
+            console.log('[abrirOCrearConv] FISIO_REAL_ID:', FISIO_REAL_ID, '| FISIO_ID:', FISIO_ID);
 
-            // Paso 1: buscar conversación existente entre este fisio y este paciente
-            const { data: convExistente } = await _sb
+            if (!pacienteUserId || pacienteUserId === '00000000-0000-0000-0000-000000000000') {
+                console.error('[abrirOCrearConv] ❌ pacienteUserId inválido:', pacienteUserId);
+                mostrarToastChat('⚠️ No se pudo identificar al paciente');
+                return;
+            }
+            if (!FISIO_REAL_ID) {
+                console.error('[abrirOCrearConv] ❌ FISIO_REAL_ID no disponible');
+                mostrarToastChat('⚠️ Sesión del fisioterapeuta no lista');
+                return;
+            }
+
+            // ── PASO CRÍTICO: resolver usuario.id_us a partir de auth.users.id ──────
+            // sessionStorage guarda el auth.users.id del paciente,
+            // pero conversaciones.id_paciente usa usuario.id_us
+            // Primero intentamos con user_id (si usuario tiene ese campo)
+            const { data: usuarioRow, error: usuarioErr } = await _sb
+                .from('usuario')
+                .select('id_us, us_nom, url_foto')
+                .eq('user_id', pacienteUserId)   // buscar por FK a auth.users
+                .maybeSingle();
+
+            console.log('[abrirOCrearConv] Lookup usuario por user_id:', usuarioRow, '| error:', usuarioErr);
+
+            // Si usuario.user_id no existe o no matchea, intentar directo con id_us
+            // (puede que el sessionStorage ya guarde el id_us)
+            let pacienteIdUs = usuarioRow?.id_us || null;
+            let pacienteNomRes = usuarioRow?.us_nom || pacienteNombre || 'Paciente';
+            let pacienteFoto = usuarioRow?.url_foto || null;
+
+            if (!pacienteIdUs) {
+                // Fallback: asumir que pacienteUserId ya es id_us directamente
+                console.warn('[abrirOCrearConv] No se encontró usuario por user_id, intentando id_us directo:', pacienteUserId);
+                const { data: usuarioRow2 } = await _sb
+                    .from('usuario')
+                    .select('id_us, us_nom, url_foto')
+                    .eq('id_us', pacienteUserId)
+                    .maybeSingle();
+
+                console.log('[abrirOCrearConv] Lookup usuario por id_us directo:', usuarioRow2);
+                pacienteIdUs = usuarioRow2?.id_us || null;
+                pacienteNomRes = usuarioRow2?.us_nom || pacienteNombre || 'Paciente';
+                pacienteFoto = usuarioRow2?.url_foto || null;
+            }
+
+            if (!pacienteIdUs) {
+                console.error('[abrirOCrearConv] ❌ No se pudo resolver id_us del paciente para:', pacienteUserId);
+                mostrarToastChat('⚠️ Paciente no encontrado en el sistema');
+                return;
+            }
+
+            console.log('[abrirOCrearConv] ✅ pacienteIdUs resuelto:', pacienteIdUs, '| nombre:', pacienteNomRes);
+
+            // Paso 1: buscar conversación existente usando id_us correcto
+            const { data: convExistente, error: e1 } = await _sb
                 .from('conversaciones')
                 .select('id')
                 .eq('id_fisio', FISIO_REAL_ID)
-                .eq('id_paciente', pacienteUserId)
+                .eq('id_paciente', pacienteIdUs)   // ← usando id_us
                 .maybeSingle();
 
+            console.log('[abrirOCrearConv] Paso 1 - conv existente:', convExistente, '| error:', e1);
             let convId = convExistente?.id;
 
-            // Paso 2: si no hay registro en conversaciones, buscar en mensajes
-            // (compatibilidad con chats anteriores al uso de la tabla conversaciones)
+            // Paso 2: buscar en mensajes si no hay conv registrada
             if (!convId) {
-                const { data: msgExistente } = await _sb
+                console.log('[abrirOCrearConv] Paso 2 - buscando en mensajes...');
+
+                // Buscar mensajes donde id_emisor sea el auth.users.id del paciente
+                // O donde sea su id_us (dependiendo de cómo envía el paciente)
+                const { data: msgPorAuthId } = await _sb
                     .from('mensajes')
                     .select('id_conv')
-                    .eq('id_emisor', pacienteUserId)
+                    .eq('id_emisor', pacienteUserId)  // auth.users.id
                     .limit(1)
                     .maybeSingle();
 
-                if (msgExistente?.id_conv) {
-                    convId = msgExistente.id_conv;
-                    // Registrar esta conv para que futuras búsquedas la encuentren
+                console.log('[abrirOCrearConv] Paso 2a - msg por auth.users.id:', msgPorAuthId);
+
+                const { data: msgPorIdUs } = await _sb
+                    .from('mensajes')
+                    .select('id_conv')
+                    .eq('id_emisor', pacienteIdUs)    // id_us
+                    .limit(1)
+                    .maybeSingle();
+
+                console.log('[abrirOCrearConv] Paso 2b - msg por id_us:', msgPorIdUs);
+
+                const convIdEncontrado = msgPorAuthId?.id_conv || msgPorIdUs?.id_conv;
+
+                if (convIdEncontrado) {
+                    convId = convIdEncontrado;
+                    console.log('[abrirOCrearConv] Conv encontrada en mensajes:', convId, '→ registrando en conversaciones');
                     await _sb.from('conversaciones').upsert(
-                        { id: convId, id_fisio: FISIO_REAL_ID, id_paciente: pacienteUserId },
+                        { id: convId, id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs },
                         { onConflict: 'id' }
                     );
                 }
             }
 
-            // Paso 3: si no existe nada, crear una conversación vacía nueva
+            // Paso 3: crear conv nueva
             if (!convId) {
+                console.log('[abrirOCrearConv] Paso 3 - creando conv nueva:', {
+                    id_fisio: FISIO_REAL_ID,
+                    id_paciente: pacienteIdUs
+                });
                 const { data: nueva, error: errConv } = await _sb
                     .from('conversaciones')
-                    .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteUserId })
+                    .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs })
                     .select('id')
                     .single();
 
+                console.log('[abrirOCrearConv] Resultado INSERT:', nueva, '| error:', errConv);
+
                 if (errConv) {
-                    console.error('Error creando conversación:', errConv);
+                    console.error('[abrirOCrearConv] ❌ Error creando conv:', errConv);
                     mostrarToastChat('Error al abrir chat');
                     return;
                 }
                 convId = nueva.id;
             }
 
-            // Obtener datos del paciente para mostrar en el header
-            const { data: u } = await _sb
-                .from('usuario')
-                .select('us_nom, url_foto')
-                .eq('id_us', pacienteUserId)
-                .single();
+            console.log('[abrirOCrearConv] ✅ convId final:', convId);
 
-            const nombre    = u?.us_nom || pacienteNombre || 'Paciente';
-            const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            const fotoUrl   = u?.url_foto || null;
+            const iniciales = pacienteNomRes.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
             const conv = {
-                id_conv:     convId,
-                paciente_id: pacienteUserId,
-                nombre,
+                id_conv: convId,
+                paciente_id: pacienteIdUs,        // ← siempre guardar id_us
+                nombre: pacienteNomRes,
                 iniciales,
-                fotoUrl,
+                fotoUrl: pacienteFoto,
                 sinLeer: 0,
                 ultimo: null
             };
 
-            // Agregar al array local si no estaba ya
             const yaEsta = todasConvs.find(c => c.id_conv === convId);
             if (!yaEsta) todasConvs.unshift(conv);
-
             abrirConv(yaEsta || conv);
         }
 
 
         /* ═══════════════════════════════════════════════════════
-           CARGAR TODAS LAS CONVERSACIONES DEL SIDEBAR
+           CARGAR CONVERSACIONES — con lookup correcto de usuario
         ═══════════════════════════════════════════════════════ */
         async function cargarConvs() {
+            console.log('[cargarConvs] FISIO_REAL_ID:', FISIO_REAL_ID, '| FISIO_ID:', FISIO_ID);
+
             const { data: convRows, error } = await _sb
                 .from('conversaciones')
                 .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
                 .eq('id_fisio', FISIO_REAL_ID)
-                .order('ultimo_mensaje_fecha', { ascending: false });
+                .order('ultimo_mensaje_fecha', { ascending: false, nullsFirst: false });
 
-            if (error) { console.error(error); return; }
+            if (error) { console.error('[cargarConvs] Error:', error); return; }
+            console.log('[cargarConvs] Rows encontradas:', convRows?.length, convRows);
 
             const convs = [];
 
             for (const row of (convRows || [])) {
-                const pacienteId = row.id_paciente;
-                let nombre = 'Paciente', iniciales = 'P', fotoUrl = null;
+                const pacienteIdUs = row.id_paciente;
+                console.log('[cargarConvs] Procesando conv:', row.id, '| id_paciente (id_us):', pacienteIdUs);
 
-                // Contar mensajes no leídos de este paciente en esta conversación
+                if (!pacienteIdUs || pacienteIdUs === '00000000-0000-0000-0000-000000000000') {
+                    console.warn('[cargarConvs] ⚠️ id_paciente inválido en conv:', row.id, '— omitiendo');
+                    continue;
+                }
+
                 const { count } = await _sb
                     .from('mensajes')
                     .select('*', { count: 'exact', head: true })
@@ -329,26 +404,25 @@
                     .eq('msg_leido', false)
                     .neq('id_emisor', FISIO_ID);
 
-                if (pacienteId) {
-                    const { data: u } = await _sb
-                        .from('usuario')
-                        .select('us_nom, url_foto')
-                        .eq('id_us', pacienteId)
-                        .single();
+                // Buscar datos del paciente usando id_us (campo correcto del schema)
+                const { data: u, error: uErr } = await _sb
+                    .from('usuario')
+                    .select('us_nom, url_foto')
+                    .eq('id_us', pacienteIdUs)
+                    .single();
 
-                    if (u) {
-                        nombre    = u.us_nom || 'Paciente';
-                        iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        fotoUrl   = u.url_foto || null;
-                    }
-                }
+                if (uErr) console.warn('[cargarConvs] No se encontró usuario para id_us:', pacienteIdUs, uErr);
+                console.log('[cargarConvs] Datos usuario:', u);
+
+                let nombre = u?.us_nom || 'Paciente';
+                let iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
                 convs.push({
-                    id_conv:     row.id,
-                    paciente_id: pacienteId,
+                    id_conv: row.id,
+                    paciente_id: pacienteIdUs,
                     nombre,
                     iniciales,
-                    fotoUrl,
+                    fotoUrl: u?.url_foto || null,
                     sinLeer: count || 0,
                     ultimo: row.ultimo_mensaje
                         ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
@@ -356,6 +430,7 @@
                 });
             }
 
+            console.log('[cargarConvs] ✅ Total convs válidas:', convs.length);
             todasConvs = convs;
             renderConvs(convs);
         }
@@ -365,7 +440,7 @@
            RENDERIZAR LA LISTA DE CONVERSACIONES EN EL SIDEBAR
         ═══════════════════════════════════════════════════════ */
         function renderConvs(lista) {
-            const el      = document.getElementById('chatConvList');
+            const el = document.getElementById('chatConvList');
             const loading = document.getElementById('chatConvLoading');
             if (loading) loading.style.display = 'none';
             el.innerHTML = '';
@@ -380,7 +455,7 @@
                 item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
                 item.dataset.convId = c.id_conv;
 
-                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
+                const hora = chatFormatHora(c.ultimo?.msg_fecha);
                 const preview = c.ultimo
                     ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
                     : '';
@@ -389,16 +464,16 @@
                 avDiv.className = 'chat-c-avatar md';
                 if (c.fotoUrl) {
                     const img = document.createElement('img');
-                    img.src   = c.fotoUrl;
-                    img.alt   = c.nombre;
+                    img.src = c.fotoUrl;
+                    img.alt = c.nombre;
                     img.onerror = () => {
-                        avDiv.innerHTML        = '';
-                        avDiv.textContent      = c.iniciales;
+                        avDiv.innerHTML = '';
+                        avDiv.textContent = c.iniciales;
                         avDiv.style.background = chatColorAvatar(c.iniciales);
                     };
                     avDiv.appendChild(img);
                 } else {
-                    avDiv.textContent      = c.iniciales;
+                    avDiv.textContent = c.iniciales;
                     avDiv.style.background = chatColorAvatar(c.iniciales);
                 }
 
@@ -432,7 +507,7 @@
             document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
             // Mostrar panel de mensajes
-            document.getElementById('chatEmptyState').style.display  = 'none';
+            document.getElementById('chatEmptyState').style.display = 'none';
             document.getElementById('chatActivePanel').style.display = 'flex';
 
             document.getElementById('chatHeaderName').textContent = conv.nombre;
@@ -442,18 +517,18 @@
             headerAv.innerHTML = '';
             if (conv.fotoUrl) {
                 const img = document.createElement('img');
-                img.src   = conv.fotoUrl;
-                img.alt   = conv.nombre;
+                img.src = conv.fotoUrl;
+                img.alt = conv.nombre;
                 img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
                 img.onerror = () => {
-                    headerAv.innerHTML        = '';
-                    headerAv.textContent      = conv.iniciales;
+                    headerAv.innerHTML = '';
+                    headerAv.textContent = conv.iniciales;
                     headerAv.style.background = chatColorAvatar(conv.iniciales);
                 };
                 headerAv.appendChild(img);
                 headerAv.style.background = 'transparent';
             } else {
-                headerAv.textContent      = conv.iniciales;
+                headerAv.textContent = conv.iniciales;
                 headerAv.style.background = chatColorAvatar(conv.iniciales);
             }
 
@@ -528,7 +603,7 @@
            RENDERIZAR UNA BURBUJA DE MENSAJE
         ═══════════════════════════════════════════════════════ */
         function chatAgregarBubble(m, animar = true) {
-            const area    = document.getElementById('chatMessagesArea');
+            const area = document.getElementById('chatMessagesArea');
             const esFisio = m.id_emisor === FISIO_ID;
 
             const row = document.createElement('div');
@@ -538,32 +613,32 @@
             const hora = m.msg_fecha
                 ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
                     hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
-                  })
+                })
                 : '';
 
             const checkIcon = m.msg_leido
                 ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
                 : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-            const avDiv   = document.createElement('div');
+            const avDiv = document.createElement('div');
             avDiv.className = 'chat-msg-av';
 
             const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
-            const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
+            const ini = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
             const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
 
             if (fotoUrl) {
                 const img = document.createElement('img');
-                img.src   = fotoUrl;
-                img.alt   = ini;
+                img.src = fotoUrl;
+                img.alt = ini;
                 img.onerror = () => {
-                    avDiv.innerHTML        = '';
-                    avDiv.textContent      = ini;
+                    avDiv.innerHTML = '';
+                    avDiv.textContent = ini;
                     avDiv.style.background = bgColor;
                 };
                 avDiv.appendChild(img);
             } else {
-                avDiv.textContent      = ini;
+                avDiv.textContent = ini;
                 avDiv.style.background = bgColor;
             }
 
@@ -596,7 +671,7 @@
             const texto = input.value.trim();
             if (!texto) return;
 
-            input.value        = '';
+            input.value = '';
             input.style.height = 'auto';
 
             const ahora = new Date().toISOString();
@@ -607,7 +682,7 @@
                 msg_texto: texto,
                 msg_fecha: ahora,
                 msg_leido: false,
-                id_conv:   convActiva.id_conv
+                id_conv: convActiva.id_conv
             }, true);
             chatScrollAbajo();
 
@@ -615,7 +690,7 @@
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_leido: false,
-                id_conv:   convActiva.id_conv
+                id_conv: convActiva.id_conv
             });
 
             if (error) {
@@ -626,7 +701,7 @@
 
             // Actualizar último mensaje en tabla conversaciones para ordenar el sidebar
             await _sb.from('conversaciones').update({
-                ultimo_mensaje:       texto,
+                ultimo_mensaje: texto,
                 ultimo_mensaje_fecha: ahora
             }).eq('id', convActiva.id_conv);
         }
@@ -723,18 +798,18 @@
         function chatFormatFechaSep(fecha) {
             if (!fecha) return '';
             const TZ = 'America/Mexico_City';
-            const d  = new Date(fecha);
+            const d = new Date(fecha);
 
-            const hoy  = new Date();
+            const hoy = new Date();
             const ayer = new Date();
             ayer.setDate(hoy.getDate() - 1);
 
-            const opts    = { timeZone: TZ };
-            const dStr    = d.toLocaleDateString('es-MX', opts);
-            const hoyStr  = hoy.toLocaleDateString('es-MX', opts);
+            const opts = { timeZone: TZ };
+            const dStr = d.toLocaleDateString('es-MX', opts);
+            const hoyStr = hoy.toLocaleDateString('es-MX', opts);
             const ayerStr = ayer.toLocaleDateString('es-MX', opts);
 
-            if (dStr === hoyStr)  return 'Hoy';
+            if (dStr === hoyStr) return 'Hoy';
             if (dStr === ayerStr) return 'Ayer';
 
             // Si es de los últimos 7 días, mostrar nombre del día
@@ -755,10 +830,10 @@
          */
         function chatFormatHora(fecha) {
             if (!fecha) return '';
-            const TZ     = 'America/Mexico_City';
-            const d      = new Date(fecha);
+            const TZ = 'America/Mexico_City';
+            const d = new Date(fecha);
             const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
-            const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
+            const dStr = d.toLocaleDateString('es-MX', { timeZone: TZ });
 
             if (dStr === hoyStr) {
                 return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
@@ -797,10 +872,10 @@
         /** Escapa HTML para evitar XSS al insertar texto en el DOM */
         function chatEscHTML(str) {
             return String(str || '')
-                .replace(/&/g,  '&amp;')
-                .replace(/</g,  '&lt;')
-                .replace(/>/g,  '&gt;')
-                .replace(/"/g,  '&quot;')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
                 .replace(/\n/g, '<br>');
         }
 
@@ -819,4 +894,5 @@
     </script>
 
 </body>
+
 </html>
