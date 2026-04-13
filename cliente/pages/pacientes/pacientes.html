@@ -1,145 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes — Motricare</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./pacientes.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pacientes</title>
 </head>
-
 <body>
 
+    <!-- Navbar dinámico -->
     <div id="navbar"></div>
+
     <main class="main-content">
-        <div class="text">
-            <i class="bi bi-people"></i>
-            <p>Mis pacientes</p>
+
+        <!-- ── Header de página ── -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <i class="bi bi-people-fill"></i>
+                <h1>Mis pacientes</h1>
+            </div>
         </div>
 
-        <!-- ── TARJETAS DE ESTADÍSTICAS ── -->
+        <!-- ── Tarjetas de estadísticas ── -->
         <section class="cards-info">
             <div class="card-stat" id="card-pacientes-confirmados">
-                <div class="card-stat-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
+                <div class="card-stat-icon"><i class="bi bi-people-fill"></i></div>
                 <div class="card-stat-info">
-                    <span class="card-stat-numero">...</span>
-                    <span class="card-stat-label">Cargando...</span>
+                    <span class="card-stat-numero">…</span>
+                    <span class="card-stat-label">Pacientes confirmados</span>
                 </div>
             </div>
-
             <div class="card-stat" id="card-nuevos-mes">
-                <div class="card-stat-icon" style="background:#e8f5e9; color:#2e7d32;">
+                <div class="card-stat-icon" style="background:#e8f5e9;color:#2e7d32;">
                     <i class="bi bi-person-plus-fill"></i>
                 </div>
                 <div class="card-stat-info">
-                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-numero">…</span>
                     <span class="card-stat-label">Pacientes nuevos este mes</span>
                 </div>
             </div>
-
             <div class="card-stat" id="card-pendientes-pago">
-                <div class="card-stat-icon" style="background:#fff3e0; color:#e65100;">
+                <div class="card-stat-icon" style="background:#fff3e0;color:#e65100;">
                     <i class="bi bi-clock-history"></i>
                 </div>
                 <div class="card-stat-info">
-                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-numero">…</span>
                     <span class="card-stat-label">Citas pendientes de pago</span>
                 </div>
             </div>
-
             <div class="card-stat" id="card-proxima-cita">
-                <div class="card-stat-icon" style="background:#e3f2fd; color:#1565c0;">
+                <div class="card-stat-icon" style="background:#e3f2fd;color:#1565c0;">
                     <i class="bi bi-calendar-event-fill"></i>
                 </div>
                 <div class="card-stat-info">
-                    <span class="card-stat-numero">...</span>
+                    <span class="card-stat-numero">…</span>
                     <span class="card-stat-label">Próxima cita</span>
                 </div>
             </div>
         </section>
 
-        <div class="seccion-header">
-            <h2 class="total-badge">Información de las citas</h2>
-        </div>
+        <!-- ══════════════════════════════════════════
+             LAYOUT SPLIT
+        ══════════════════════════════════════════ -->
+        <div class="pacientes-split">
 
-        <!-- Lista de pacientes (se rellena desde JS) -->
-        <section id="lista-pacientes" class="lista-pacientes"></section>
+            <!-- ── Lista lateral ── -->
+            <aside class="pacientes-sidebar">
+                <div class="pacientes-sidebar-header">
+                    <h2>Pacientes</h2>
+                    <div class="pacientes-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="buscarPaciente" placeholder="Buscar paciente…" autocomplete="off">
+                    </div>
+                </div>
+                <!-- Los ítems se generan desde JS -->
+                <div class="pacientes-list" id="listaPacientes">
+                    <!-- Skeleton de carga -->
+                    <div class="sk-item">
+                        <div class="sk-avatar skeleton"></div>
+                        <div class="sk-lines">
+                            <div class="sk-line w70 skeleton"></div>
+                            <div class="sk-line w45 skeleton"></div>
+                        </div>
+                    </div>
+                    <div class="sk-item">
+                        <div class="sk-avatar skeleton"></div>
+                        <div class="sk-lines">
+                            <div class="sk-line w70 skeleton"></div>
+                            <div class="sk-line w45 skeleton"></div>
+                        </div>
+                    </div>
+                    <div class="sk-item">
+                        <div class="sk-avatar skeleton"></div>
+                        <div class="sk-lines">
+                            <div class="sk-line w70 skeleton"></div>
+                            <div class="sk-line w45 skeleton"></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ── Panel de detalle ── -->
+            <section class="paciente-detail" id="panelDetalle">
+
+                <!-- Placeholder inicial -->
+                <div class="detail-placeholder" id="detailPlaceholder">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <h3>Selecciona un paciente</h3>
+                    <p>Elige un paciente de la lista para ver su historial completo.</p>
+                </div>
+
+                <!-- Contenido real (oculto hasta seleccionar paciente) -->
+                <div id="detailContent" style="display:none; flex-direction:column; flex:1; overflow:hidden; min-height:0;">
+
+                    <!-- Header del paciente -->
+                    <div class="detail-header">
+                        <div class="detail-header-avatar" id="detailAvatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="detail-header-info">
+                            <div class="detail-header-nombre" id="detailNombre">—</div>
+                            <div class="detail-header-meta" id="detailMeta"></div>
+                        </div>
+                        <div class="detail-header-actions">
+                            <button class="btn-action btn-secondary-action" id="btnMensaje">
+                                <i class="bi bi-chat-dots-fill"></i> Mensaje
+                            </button>
+                            <button class="btn-action btn-secondary-action" id="btnAsignarRutina">
+                                <i class="bi bi-list-check"></i> Rutina
+                            </button>
+                            <button class="btn-action btn-primary-action" id="btnNuevaNotaHeader">
+                                <i class="bi bi-plus-lg"></i> Nueva nota
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="detail-tabs">
+                        <button class="detail-tab active" data-tab="citas">
+                            <i class="bi bi-calendar3"></i> Historial de citas
+                        </button>
+                        <button class="detail-tab" data-tab="historial">
+                            <i class="bi bi-clipboard2-pulse"></i> Historial clínico
+                        </button>
+                        <button class="detail-tab" data-tab="notas">
+                            <i class="bi bi-journal-text"></i> Notas de evolución
+                        </button>
+                    </div>
+
+                    <!-- Contenido de tabs -->
+                    <div class="detail-content">
+
+                        <!-- Tab: Historial de citas -->
+                        <div class="tab-panel active" id="tab-citas">
+                            <p class="tab-section-title"><i class="bi bi-calendar3"></i> Todas las citas</p>
+                            <div class="citas-timeline" id="citasTimeline">
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Historial clínico -->
+                        <div class="tab-panel" id="tab-historial">
+                            <div id="hcContent">
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Notas de evolución -->
+                        <div class="tab-panel" id="tab-notas">
+                            <div class="notas-list" id="notasList">
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                            </div>
+                        </div>
+
+                    </div><!-- /detail-content -->
+                </div><!-- /detailContent -->
+            </section><!-- /paciente-detail -->
+        </div><!-- /pacientes-split -->
+
     </main>
 
 
-    <!-- ══════════════════════════════════════════════════════════
-         MODAL — ASIGNAR RUTINA A PACIENTE
-         Se abre desde el botón "Asignar rutina" en cada tarjeta.
-         Muestra solo rutinas que tienen al menos un ejercicio.
-    ══════════════════════════════════════════════════════════ -->
-    <div class="modal fade" id="modalAsignarRutina" tabindex="-1" aria-labelledby="modalAsignarRutinaLabel" aria-hidden="true">
+    <!-- ══════════════════════════════════════════
+         MODAL — NOTA DE EVOLUCIÓN
+         Se usa tanto para crear como para editar.
+    ══════════════════════════════════════════ -->
+    <div class="modal-nota-overlay" id="modalNotaOverlay">
+        <div class="modal-nota">
+
+            <div class="modal-nota-header">
+                <div>
+                    <h3><i class="bi bi-journal-plus"></i> <span id="modalNotaTitulo">Nueva nota de evolución</span></h3>
+                    <div class="modal-nota-subtitle" id="modalNotaSubtitulo"></div>
+                </div>
+                <button class="modal-nota-close" id="btnCerrarModalNota" aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-nota-body">
+                <div class="nota-form-grid">
+
+                    <!-- Sección: Evaluación inicial -->
+                    <div class="nota-form-section"><span>Evaluación</span></div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-motivo">Motivo de la sesión</label>
+                        <input type="text" id="nf-motivo" placeholder="Ej. Dolor lumbar crónico">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-estado-paciente">Estado general del paciente</label>
+                        <select id="nf-estado-paciente">
+                            <option value="">Seleccionar…</option>
+                            <option value="Muy bien">Muy bien</option>
+                            <option value="Bien">Bien</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Mal">Mal</option>
+                            <option value="Muy mal">Muy mal</option>
+                        </select>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label>Dolor inicial (0–10)</label>
+                        <div class="dolor-slider-wrap">
+                            <input type="range" id="nf-dolor-inicio" min="0" max="10" value="0">
+                            <span class="dolor-slider-label" id="nf-dolor-inicio-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label>Dolor final (0–10)</label>
+                        <div class="dolor-slider-wrap">
+                            <input type="range" id="nf-dolor-fin" min="0" max="10" value="0">
+                            <span class="dolor-slider-label" id="nf-dolor-fin-val">0</span>
+                        </div>
+                    </div>
+
+                    <div class="nota-form-group full">
+                        <label for="nf-reporte">Reporte del paciente</label>
+                        <textarea id="nf-reporte" placeholder="¿Qué reporta el paciente? Síntomas, cambios desde la última sesión…"></textarea>
+                    </div>
+
+                    <!-- Sección: Evaluación física -->
+                    <div class="nota-form-section"><span>Evaluación física</span></div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-postura">Postura</label>
+                        <input type="text" id="nf-postura" placeholder="Observaciones posturales">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-rango">Rango de movimiento</label>
+                        <input type="text" id="nf-rango" placeholder="Ej. Flexión 80°, Extensión 20°">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-fuerza">Fuerza muscular</label>
+                        <input type="text" id="nf-fuerza" placeholder="Ej. 4/5 miembro inferior">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-pruebas">Pruebas especiales</label>
+                        <input type="text" id="nf-pruebas" placeholder="Ej. Lasègue +, Patrick –">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-signos">Signos vitales</label>
+                        <input type="text" id="nf-signos" placeholder="TA, FC, SpO2 (opcional)">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-diagnostico">Diagnóstico fisioterapéutico</label>
+                        <input type="text" id="nf-diagnostico" placeholder="Diagnóstico de la sesión">
+                    </div>
+
+                    <!-- Sección: Intervención -->
+                    <div class="nota-form-section"><span>Intervención</span></div>
+
+                    <div class="nota-form-group full">
+                        <label for="nf-objetivos">Objetivos de la sesión</label>
+                        <textarea id="nf-objetivos" placeholder="Objetivos terapéuticos de hoy…" style="min-height:55px;"></textarea>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-tecnicas">Técnicas utilizadas</label>
+                        <textarea id="nf-tecnicas" placeholder="Ej. Terapia manual, electroterapia…" style="min-height:55px;"></textarea>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-ejercicios">Ejercicios realizados</label>
+                        <textarea id="nf-ejercicios" placeholder="Ejercicios aplicados en sesión…" style="min-height:55px;"></textarea>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-equipo">Equipo utilizado</label>
+                        <input type="text" id="nf-equipo" placeholder="Ej. TENS, ultrasonido, cama de tracción">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-duracion">Duración (minutos)</label>
+                        <input type="number" id="nf-duracion" min="1" max="300" placeholder="60">
+                    </div>
+
+                    <!-- Sección: Seguimiento -->
+                    <div class="nota-form-section"><span>Seguimiento</span></div>
+
+                    <div class="nota-form-group full">
+                        <label for="nf-respuesta">Respuesta al tratamiento</label>
+                        <textarea id="nf-respuesta" placeholder="Cómo respondió el paciente durante la sesión…" style="min-height:55px;"></textarea>
+                    </div>
+
+                    <div class="nota-form-group full">
+                        <label for="nf-observaciones">Observaciones generales</label>
+                        <textarea id="nf-observaciones" placeholder="Observaciones adicionales…"></textarea>
+                    </div>
+
+                    <div class="nota-form-group full">
+                        <label for="nf-plan">Plan para la siguiente sesión</label>
+                        <textarea id="nf-plan" placeholder="Qué se trabajará en la próxima sesión…" style="min-height:55px;"></textarea>
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-frecuencia">Frecuencia recomendada</label>
+                        <input type="text" id="nf-frecuencia" placeholder="Ej. 2 veces por semana">
+                    </div>
+
+                    <div class="nota-form-group">
+                        <label for="nf-ejercicios-casa">Ejercicios en casa</label>
+                        <input type="text" id="nf-ejercicios-casa" placeholder="Indicaciones para casa">
+                    </div>
+
+                </div><!-- /nota-form-grid -->
+            </div><!-- /modal-nota-body -->
+
+            <div class="modal-nota-footer">
+                <button class="btn-cancel" id="btnCancelarNota">Cancelar</button>
+                <button class="btn-save" id="btnGuardarNota">
+                    <i class="bi bi-check-lg"></i> Guardar nota
+                </button>
+            </div>
+
+        </div><!-- /modal-nota -->
+    </div><!-- /modal-nota-overlay -->
+
+
+    <!-- ══════════════════════════════════════════
+         MODAL — ASIGNAR RUTINA (Bootstrap)
+    ══════════════════════════════════════════ -->
+    <div class="modal fade" id="modalAsignarRutina" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalAsignarRutinaLabel">
-                        <i class="bi bi-list-check"></i> Asignar rutina
-                    </h5>
+                    <h5 class="modal-title"><i class="bi bi-list-check"></i> Asignar rutina</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
-                    <!-- Nombre del paciente seleccionado (se llena dinámicamente) -->
-                    <p class="mb-3">
-                        Paciente: <strong id="modalAsignarNombrePaciente">—</strong>
-                    </p>
-
-                    <label class="form-label" for="selectRutinaAsignar">
-                        Selecciona una rutina con ejercicios:
-                    </label>
-
-                    <!-- Select con rutinas disponibles (solo las que tienen ejercicios) -->
+                    <p class="mb-3">Paciente: <strong id="modalAsignarNombrePaciente">—</strong></p>
+                    <label class="form-label" for="selectRutinaAsignar">Selecciona una rutina con ejercicios:</label>
                     <select class="form-select" id="selectRutinaAsignar">
-                        <option value="">Cargando rutinas...</option>
+                        <option value="">Cargando rutinas…</option>
                     </select>
-
-                    <!-- Aviso si no hay rutinas con ejercicios -->
-                    <p id="avisoSinRutinas" class="text-warning mt-2" style="display:none; font-size:13px;">
+                    <p id="avisoSinRutinas" class="text-warning mt-2" style="display:none;font-size:13px;">
                         <i class="bi bi-exclamation-triangle"></i>
                         No tienes rutinas con ejercicios. Crea una rutina y agrégale ejercicios primero.
                     </p>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success" id="btnConfirmarAsignarRutina">
                         <i class="bi bi-person-check"></i> Asignar
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
 
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ── CARGA DEL NAVBAR ── -->
+    <!-- ── Carga del Navbar ── -->
     <script>
         fetch('../../Navbar/Navbar.html')
-            .then(res => res.text())
+            .then(r => r.text())
             .then(html => {
                 document.getElementById('navbar').innerHTML = html;
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = '../../Navbar/Navbar.js';
-                document.body.appendChild(script);
+                const s = document.createElement('script');
+                s.type = 'module';
+                s.src  = '../../Navbar/Navbar.js';
+                document.body.appendChild(s);
             });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
-        crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./pacientes.js" type="module"></script>
-</body>
 
+</body>
 </html>
