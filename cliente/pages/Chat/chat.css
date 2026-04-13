@@ -629,55 +629,163 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   RESPONSIVE — MÓVIL
-   FIX PRINCIPAL: en móvil se usa dvh para que el layout
-   reaccione al teclado virtual correctamente.
+   RESPONSIVE — TABLET (681px – 900px)
+   El sidebar se vuelve más estrecho, las burbujas
+   un poco más anchas y el layout sigue siendo lateral.
 ══════════════════════════════════════════ */
-@media (max-width: 680px) {
+@media (min-width: 681px) and (max-width: 900px) {
     .main-content {
-        margin-left: 0 !important;
-        margin-top: 3.5rem;
-
-        /* FIX: altura que se adapta al teclado virtual en móvil */
-        height: calc(100vh - 3.5rem);
-        height: calc(100svh - 3.5rem);
-        height: calc(100dvh - 3.5rem);
+        margin-left: 0;
     }
 
+    .main-content.menu-toggle {
+        margin-left: 14rem;
+    }
+
+    /* Sidebar más compacto */
     .chat-sidebar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 10;
-        width: 100%;
-        display: none;
+        width: 240px;
+        min-width: 200px;
     }
 
-    .chat-sidebar.show {
-        display: flex;
-    }
-
-    .chat-main.hide {
-        display: none;
-    }
-
-    #chatBackBtn {
-        display: flex !important;
-    }
-
-    /* FIX: burbujas más anchas en pantalla pequeña */
+    /* Burbujas algo más anchas en tablet */
     .chat-bubble {
-        max-width: 78%;
+        max-width: 72%;
     }
 
-    /* FIX: padding lateral reducido en móvil */
+    /* Header del panel: padding reducido */
+    .chat-panel-header {
+        padding: 8px 12px;
+    }
+
+    /* Padding lateral del área de mensajes */
     .chat-messages-area {
-        padding: 10px 12px;
+        padding: 12px 14px;
+    }
+
+    /* Input más compacto */
+    .chat-input-area {
+        padding: 8px 12px;
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — DESKTOP MEDIANO (901px – 1200px)
+   Layout estándar. Sidebar en su ancho normal.
+   Algunos ajustes de padding y tipografía.
+══════════════════════════════════════════ */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .main-content.menu-toggle {
+        margin-left: 16rem;
+    }
+
+    /* Sidebar en su ancho por defecto (300px) — sin cambios */
+
+    .chat-bubble {
+        max-width: 62%;
+    }
+
+    .chat-messages-area {
+        padding: 16px 20px;
     }
 
     .chat-input-area {
-        padding: 8px 10px;
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
+        padding: 11px 16px;
+        padding-bottom: max(11px, env(safe-area-inset-bottom));
+    }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — DESKTOP ANCHO (> 1200px)
+   Sidebar puede ser más ancho, burbujas más acotadas,
+   más respiro en el área de mensajes.
+══════════════════════════════════════════ */
+@media (min-width: 1201px) {
+    .chat-sidebar {
+        width: 320px;
+    }
+
+    /* Burbujas más angostas en pantalla grande
+       para mantener legibilidad y aspecto de chat */
+    .chat-bubble {
+        max-width: 55%;
+    }
+
+    .chat-messages-area {
+        padding: 20px 28px;
+        /* Limitar el ancho máximo del área de mensajes en pantallas muy anchas */
+        max-width: 960px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .chat-input-area {
+        padding: 12px 20px;
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    /* Input centrado en pantallas muy anchas */
+    .chat-input-wrap textarea {
+        font-size: 14px; /* en desktop no hay riesgo de zoom iOS */
+    }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — PANTALLA MUY ANCHA (> 1600px)
+   Limitar el crecimiento del layout para no perder
+   la sensación de chat en monitores ultrawide.
+══════════════════════════════════════════ */
+@media (min-width: 1601px) {
+    .chat-sidebar {
+        width: 340px;
+    }
+
+    .chat-bubble {
+        max-width: 48%;
+    }
+
+    .chat-messages-area {
+        max-width: 1100px;
+    }
+}
+
+/* ══════════════════════════════════════════
+   ACCESIBILIDAD — REDUCIR MOVIMIENTO
+   Desactiva las animaciones skeleton para usuarios
+   que prefieren menos movimiento.
+══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .chat-skeleton {
+        animation: none;
+        background: var(--color-primary-lt);
+    }
+
+    .chat-toast {
+        transition: none;
+    }
+}
+
+/* ══════════════════════════════════════════
+   ACCESIBILIDAD — ALTO CONTRASTE
+   Refuerza bordes y colores para usuarios con
+   preferencia de alto contraste.
+══════════════════════════════════════════ */
+@media (prefers-contrast: more) {
+    .chat-bubble {
+        border: 1px solid var(--color-border);
+    }
+
+    .chat-msg-row.fisio .chat-bubble {
+        border-color: var(--color-primary-dk);
+    }
+
+    .chat-conv-item.active {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+
+    .chat-send-btn {
+        border: 2px solid var(--color-primary-dk);
     }
 }
