@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
 
+</head>
 <body>
     <div id="navbar"></div>
     <main class="main-content">
@@ -117,7 +117,7 @@
                 document.getElementById('navbar').innerHTML = html;
                 const script = document.createElement('script');
                 script.type = 'module';
-                script.src = '../../Navbar/Navbar.js';
+                script.src  = '../../Navbar/Navbar.js';
                 document.body.appendChild(script);
             });
     </script>
@@ -137,13 +137,32 @@
         /* ─────────────────────────────────────────────────────
            VARIABLES GLOBALES DE SESIÓN
         ───────────────────────────────────────────────────── */
-        let FISIO_ID      = null;  // auth.users.id  → se usa como id_emisor en mensajes
+        let FISIO_ID      = null;  // auth.users.id → se usa como id_emisor en mensajes
         let FISIO_REAL_ID = null;  // fisioterapeutas.id → se usa en la tabla conversaciones
         let FISIO_FOTO    = null;  // URL de la foto de perfil del fisioterapeuta
 
-        let convActiva  = null;  // Objeto de la conversación actualmente abierta
-        let todasConvs  = [];    // Array con todas las conversaciones cargadas
-        let rtChannel   = null;  // Canal de tiempo real de Supabase
+        let convActiva = null;  // Objeto de la conversación actualmente abierta
+        let todasConvs = [];    // Array con todas las conversaciones cargadas
+        let rtChannel  = null;  // Canal de tiempo real de Supabase
+
+
+        /* ═══════════════════════════════════════════════════════
+           BADGE — HELPER CENTRALIZADO
+           
+           El Navbar.js expone window.recalcularBadgeGlobal() como
+           la única función que toca el badge de la campana.
+           
+           El chat NUNCA modifica el badge directamente.
+           Solo llama a este helper, que delega en el Navbar.
+           Así se evita tener dos sistemas paralelos que se pisen.
+        ═══════════════════════════════════════════════════════ */
+        function chatActualizarBadge() {
+            // Pequeño delay para que el UPDATE de msg_leido llegue a Supabase
+            // antes de que el Navbar haga la query de recálculo
+            setTimeout(() => {
+                if (window.recalcularBadgeGlobal) window.recalcularBadgeGlobal();
+            }, 300);
+        }
 
 
         /* ═══════════════════════════════════════════════════════
@@ -280,19 +299,14 @@
             const yaEsta = todasConvs.find(c => c.id_conv === convId);
             if (!yaEsta) todasConvs.unshift(conv);
 
-            // Abrir la conversación en el panel
             abrirConv(yaEsta || conv);
         }
 
 
         /* ═══════════════════════════════════════════════════════
            CARGAR TODAS LAS CONVERSACIONES DEL SIDEBAR
-           Fuente principal: tabla conversaciones.
-           Para cada conv obtiene nombre del paciente y conteo de no leídos.
         ═══════════════════════════════════════════════════════ */
         async function cargarConvs() {
-            // Traer todas las conversaciones de este fisioterapeuta, ordenadas por
-            // la fecha del último mensaje (las más recientes arriba)
             const { data: convRows, error } = await _sb
                 .from('conversaciones')
                 .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
@@ -308,7 +322,6 @@
                 let nombre = 'Paciente', iniciales = 'P', fotoUrl = null;
 
                 // Contar mensajes no leídos de este paciente en esta conversación
-                // (solo los que NO son del fisio, para no contar los propios)
                 const { count } = await _sb
                     .from('mensajes')
                     .select('*', { count: 'exact', head: true })
@@ -316,7 +329,6 @@
                     .eq('msg_leido', false)
                     .neq('id_emisor', FISIO_ID);
 
-                // Obtener nombre y foto del paciente desde tabla usuario
                 if (pacienteId) {
                     const { data: u } = await _sb
                         .from('usuario')
@@ -338,7 +350,6 @@
                     iniciales,
                     fotoUrl,
                     sinLeer: count || 0,
-                    // Último mensaje para mostrar en el preview del sidebar
                     ultimo: row.ultimo_mensaje
                         ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
                         : null
@@ -352,7 +363,6 @@
 
         /* ═══════════════════════════════════════════════════════
            RENDERIZAR LA LISTA DE CONVERSACIONES EN EL SIDEBAR
-           Recibe un array (puede ser filtrado por búsqueda).
         ═══════════════════════════════════════════════════════ */
         function renderConvs(lista) {
             const el      = document.getElementById('chatConvList');
@@ -370,23 +380,20 @@
                 item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
                 item.dataset.convId = c.id_conv;
 
-                // Hora formateada para mostrar en el sidebar (hoy = HH:MM, antes = DD/MM)
                 const hora    = chatFormatHora(c.ultimo?.msg_fecha);
                 const preview = c.ultimo
                     ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
                     : '';
 
-                // Construir el avatar del sidebar de forma segura (sin innerHTML con img)
                 const avDiv = document.createElement('div');
                 avDiv.className = 'chat-c-avatar md';
                 if (c.fotoUrl) {
                     const img = document.createElement('img');
                     img.src   = c.fotoUrl;
                     img.alt   = c.nombre;
-                    // Si la imagen falla, caer a iniciales con color generado
                     img.onerror = () => {
-                        avDiv.innerHTML   = '';
-                        avDiv.textContent = c.iniciales;
+                        avDiv.innerHTML        = '';
+                        avDiv.textContent      = c.iniciales;
                         avDiv.style.background = chatColorAvatar(c.iniciales);
                     };
                     avDiv.appendChild(img);
@@ -406,7 +413,6 @@
                     </div>
                 `;
                 item.prepend(avDiv);
-                // Al hacer clic en una conversación, abrirla
                 item.addEventListener('click', () => abrirConv(c));
                 el.appendChild(item);
             });
@@ -415,23 +421,23 @@
 
         /* ═══════════════════════════════════════════════════════
            ABRIR UNA CONVERSACIÓN
-           Muestra el panel activo, carga mensajes y marca como leídos.
+           Al abrir, se marcan los mensajes como leídos y se
+           actualiza la campana del Navbar a través del helper.
         ═══════════════════════════════════════════════════════ */
         async function abrirConv(conv) {
             convActiva = conv;
 
-            // Marcar visualmente la conv seleccionada en el sidebar
+            // Marcar item del sidebar como activo
             document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
             document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
-            // Mostrar el panel de mensajes, ocultar el estado vacío
+            // Mostrar panel de mensajes
             document.getElementById('chatEmptyState').style.display  = 'none';
             document.getElementById('chatActivePanel').style.display = 'flex';
 
-            // Actualizar header con nombre del paciente
             document.getElementById('chatHeaderName').textContent = conv.nombre;
 
-            // ── Header avatar: foto si existe, iniciales si no ──
+            // ── Header avatar ──
             const headerAv = document.getElementById('chatHeaderAvatar');
             headerAv.innerHTML = '';
             if (conv.fotoUrl) {
@@ -458,10 +464,11 @@
             document.getElementById('chatSidebar').classList.remove('show');
 
             // Cargar mensajes y marcar como leídos
+            // (chatMarcarLeidos también actualizará la campana del Navbar)
             await cargarMsgs(conv.id_conv);
             chatMarcarLeidos(conv.id_conv);
 
-            // Quitar badge de no leídos del sidebar
+            // Quitar badge de no leídos del item en el sidebar
             const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
             if (badge) badge.remove();
         }
@@ -469,19 +476,18 @@
 
         /* ═══════════════════════════════════════════════════════
            CARGAR MENSAJES DE UNA CONVERSACIÓN
-           Muestra skeleton mientras carga, luego renderiza los mensajes
-           con separadores de fecha estilo WhatsApp.
+           Muestra skeleton mientras carga, luego renderiza con
+           separadores de fecha estilo WhatsApp.
         ═══════════════════════════════════════════════════════ */
         async function cargarMsgs(convId) {
             const area = document.getElementById('chatMessagesArea');
 
-            // Mostrar skeleton de carga mientras se obtienen los mensajes
+            // Skeleton de carga
             area.innerHTML = `
                 <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:4px 0;"></div>
                 <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:4px 0;"></div>
             `;
 
-            // Traer todos los mensajes de la conversación, ordenados por fecha ascendente
             const { data, error } = await _sb
                 .from('mensajes')
                 .select('*')
@@ -497,14 +503,12 @@
                 return;
             }
 
-            // Iterar mensajes e insertar separadores de fecha cuando cambia el día
-            let ultimaFechaSep = null; // Guarda la etiqueta del último separador insertado
+            // Insertar separadores de fecha cuando cambia el día (estilo WhatsApp)
+            let ultimaFechaSep = null;
 
             data.forEach(m => {
-                // Obtener la etiqueta de fecha para este mensaje (Hoy, Ayer, día de semana o fecha completa)
                 const etiquetaFecha = chatFormatFechaSep(m.msg_fecha);
 
-                // Solo insertar separador cuando cambia el día respecto al mensaje anterior
                 if (etiquetaFecha !== ultimaFechaSep) {
                     const sep = document.createElement('div');
                     sep.className = 'chat-date-sep';
@@ -513,42 +517,34 @@
                     ultimaFechaSep = etiquetaFecha;
                 }
 
-                // Renderizar la burbuja del mensaje (sin animación en carga inicial)
                 chatAgregarBubble(m, false);
             });
 
-            // Hacer scroll al último mensaje
             chatScrollAbajo();
         }
 
 
         /* ═══════════════════════════════════════════════════════
            RENDERIZAR UNA BURBUJA DE MENSAJE
-           Crea el DOM de una burbuja (fisio o paciente) y la agrega al área.
-           animar: true = aplica animación CSS de entrada
         ═══════════════════════════════════════════════════════ */
         function chatAgregarBubble(m, animar = true) {
             const area    = document.getElementById('chatMessagesArea');
             const esFisio = m.id_emisor === FISIO_ID;
 
-            // Fila que contiene avatar + burbuja
             const row = document.createElement('div');
             row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
             if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
-            // Hora formateada del mensaje (HH:MM en zona México)
             const hora = m.msg_fecha
                 ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
                     hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
                   })
                 : '';
 
-            // Icono de doble palomita (leído) o palomita simple (enviado)
             const checkIcon = m.msg_leido
                 ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
                 : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-            // ── Mini-avatar circular (DOM seguro, sin onerror inline) ──
             const avDiv   = document.createElement('div');
             avDiv.className = 'chat-msg-av';
 
@@ -560,7 +556,6 @@
                 const img = document.createElement('img');
                 img.src   = fotoUrl;
                 img.alt   = ini;
-                // Si la foto no carga, mostrar iniciales con color generado
                 img.onerror = () => {
                     avDiv.innerHTML        = '';
                     avDiv.textContent      = ini;
@@ -572,7 +567,6 @@
                 avDiv.style.background = bgColor;
             }
 
-            // ── Burbuja de texto ──
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble';
             bubble.innerHTML = `
@@ -591,8 +585,6 @@
 
         /* ═══════════════════════════════════════════════════════
            ENVIAR UN MENSAJE
-           Inserta en Supabase y actualiza el campo ultimo_mensaje
-           en la tabla conversaciones para mantener el sidebar ordenado.
         ═══════════════════════════════════════════════════════ */
         async function chatEnviarMensaje() {
             if (!FISIO_ID || !convActiva) {
@@ -604,13 +596,12 @@
             const texto = input.value.trim();
             if (!texto) return;
 
-            // Limpiar y resetear el textarea
             input.value        = '';
             input.style.height = 'auto';
 
             const ahora = new Date().toISOString();
 
-            // Mostrar la burbuja de forma optimista (antes de confirmar la inserción)
+            // Mostrar burbuja optimista antes de confirmar la inserción
             chatAgregarBubble({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
@@ -620,7 +611,6 @@
             }, true);
             chatScrollAbajo();
 
-            // Insertar el mensaje en Supabase
             const { error } = await _sb.from('mensajes').insert({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
@@ -644,12 +634,16 @@
 
         /* ═══════════════════════════════════════════════════════
            ESCUCHAR MENSAJES EN TIEMPO REAL (Supabase Realtime)
-           Se suscribe a INSERT en la tabla mensajes.
-           Si el mensaje es de la conv activa → renderiza directamente.
-           Si es de otra conv → muestra toast y recarga el sidebar.
+           
+           - Mensaje de la conv activa → renderizar + marcar leído
+             (chatMarcarLeidos llama a chatActualizarBadge, que
+              le avisa al Navbar para bajar la campana)
+           
+           - Mensaje de otra conv → toast + recargar sidebar
+             (el Navbar.js ya lo detecta por su propio canal RT
+              y sube la campana automáticamente)
         ═══════════════════════════════════════════════════════ */
         function chatEscucharRT() {
-            // Remover canal anterior si existe (evita duplicados)
             if (rtChannel) _sb.removeChannel(rtChannel);
 
             rtChannel = _sb.channel('motricare_chat_rt')
@@ -662,16 +656,16 @@
                         if (m.id_emisor === FISIO_ID) return;
 
                         if (convActiva && m.id_conv === convActiva.id_conv) {
-                            // Mensaje de la conversación activa: renderizar y marcar leído
+                            // Mensaje de la conv activa: mostrar y marcar leído de inmediato
+                            // (el badge de la campana NO sube porque se lee al instante)
                             chatAgregarBubble(m, true);
                             chatScrollAbajo();
                             chatMarcarLeidos(convActiva.id_conv);
                         } else {
-                            // Mensaje de otra conversación: notificar y actualizar sidebar
+                            // Mensaje de otra conv: solo notificar y actualizar el sidebar
+                            // El Navbar.js se encarga de subir la campana vía su canal RT
                             mostrarToastChat('💬 Nuevo mensaje de un paciente');
                             cargarConvs();
-                            // Incrementar el badge de notificaciones en el navbar
-                            actualizarBadgeCampana(1);
                         }
                     }
                 )
@@ -680,64 +674,28 @@
 
 
         /* ═══════════════════════════════════════════════════════
-           BADGE DE CAMPANA EN EL NAVBAR
-           Incrementa el contador de notificaciones visibles.
-        ═══════════════════════════════════════════════════════ */
-        function actualizarBadgeCampana(incremento = 1) {
-            const badge = document.getElementById('bell-badge');
-            if (!badge) return;
-            const actual = parseInt(badge.textContent) || 0;
-            const nuevo  = actual + incremento;
-            badge.textContent    = nuevo > 99 ? '99+' : nuevo;
-            badge.style.display  = 'flex';
-        }
-
-
-        /* ═══════════════════════════════════════════════════════
            MARCAR MENSAJES COMO LEÍDOS
-           Actualiza msg_leido=true en todos los mensajes recibidos
-           de la conversación activa, y recalcula el badge global.
+           
+           Actualiza msg_leido=true en Supabase y luego le avisa
+           al Navbar para que recalcule y baje la campana.
+           
+           El Navbar.js escucha UPDATE en mensajes vía RT, pero
+           chatActualizarBadge() lo llama de forma directa para
+           que la bajada sea inmediata (sin esperar el evento RT).
         ═══════════════════════════════════════════════════════ */
         async function chatMarcarLeidos(convId) {
             await _sb.from('mensajes')
                 .update({ msg_leido: true })
                 .eq('id_conv', convId)
-                .neq('id_emisor', FISIO_ID); // solo los que no son del fisio
-
-            // Después de marcar, recalcular el total para la campana
-            recalcularBadgeTotal();
-        }
-
-
-        /* ═══════════════════════════════════════════════════════
-           RECALCULAR BADGE TOTAL DE NO LEÍDOS
-           Cuenta todos los mensajes no leídos en todas las convs
-           y actualiza el ícono de campana en el navbar.
-        ═══════════════════════════════════════════════════════ */
-        async function recalcularBadgeTotal() {
-            if (!FISIO_ID) return;
-
-            const { count } = await _sb
-                .from('mensajes')
-                .select('*', { count: 'exact', head: true })
-                .eq('msg_leido', false)
                 .neq('id_emisor', FISIO_ID);
 
-            const badge = document.getElementById('bell-badge');
-            if (!badge) return;
-
-            if (count > 0) {
-                badge.textContent   = count > 99 ? '99+' : count;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
+            // Avisar al Navbar para bajar la campana
+            chatActualizarBadge();
         }
 
 
         /* ═══════════════════════════════════════════════════════
            FILTRAR CONVERSACIONES POR NOMBRE
-           Se activa con cada tecla en el buscador del sidebar.
         ═══════════════════════════════════════════════════════ */
         function filtrarConvs() {
             const q = document.getElementById('chatSearch').value.toLowerCase();
@@ -747,8 +705,6 @@
 
         /* ═══════════════════════════════════════════════════════
            VOLVER AL SIDEBAR (móvil)
-           En pantallas pequeñas, oculta el panel de mensajes
-           y muestra el sidebar de conversaciones.
         ═══════════════════════════════════════════════════════ */
         function volverSidebarChat() {
             document.getElementById('chatSidebar').classList.add('show');
@@ -757,26 +713,18 @@
 
 
         /* ═══════════════════════════════════════════════════════
-           UTILIDADES DE FORMATO Y HELPERS
+           UTILIDADES
         ═══════════════════════════════════════════════════════ */
 
         /**
-         * chatFormatFechaSep
-         * Devuelve la etiqueta del separador de fecha estilo WhatsApp:
-         *   - "Hoy"           → si el mensaje es de hoy
-         *   - "Ayer"          → si el mensaje es de ayer
-         *   - "lunes"/"martes"→ si es de esta semana (menos de 7 días)
-         *   - "08 de abril de 2026" → si es más antiguo
-         *
-         * Se compara usando toLocaleDateString para evitar problemas
-         * de zona horaria (UTC vs. Mexico_City).
+         * chatFormatFechaSep — Separador de fecha estilo WhatsApp
+         * "Hoy" / "Ayer" / nombre del día (< 7 días) / fecha completa
          */
         function chatFormatFechaSep(fecha) {
             if (!fecha) return '';
             const TZ = 'America/Mexico_City';
             const d  = new Date(fecha);
 
-            // Fechas de referencia en zona local
             const hoy  = new Date();
             const ayer = new Date();
             ayer.setDate(hoy.getDate() - 1);
@@ -790,27 +738,25 @@
             if (dStr === ayerStr) return 'Ayer';
 
             // Si es de los últimos 7 días, mostrar nombre del día
-            const diffMs   = hoy - d;
-            const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffDias = Math.floor((hoy - d) / (1000 * 60 * 60 * 24));
             if (diffDias < 7) {
                 return d.toLocaleDateString('es-MX', { weekday: 'long', timeZone: TZ });
             }
 
-            // Para mensajes más antiguos, fecha completa: "08 de abril de 2026"
+            // Más antiguo: "08 de abril de 2026"
             return d.toLocaleDateString('es-MX', {
                 day: '2-digit', month: 'long', year: 'numeric', timeZone: TZ
             });
         }
 
         /**
-         * chatFormatHora
-         * Para el SIDEBAR: muestra HH:MM si es hoy, o DD/MM si es anterior.
-         * Es distinto de chatFormatFechaSep que es para los separadores.
+         * chatFormatHora — Para el sidebar
+         * HH:MM si es hoy, DD/MM si es anterior
          */
         function chatFormatHora(fecha) {
             if (!fecha) return '';
-            const TZ   = 'America/Mexico_City';
-            const d    = new Date(fecha);
+            const TZ     = 'America/Mexico_City';
+            const d      = new Date(fecha);
             const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
             const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
 
@@ -820,31 +766,19 @@
             return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', timeZone: TZ });
         }
 
-        /**
-         * chatScrollAbajo
-         * Hace scroll al fondo del área de mensajes con requestAnimationFrame
-         * para garantizar que el DOM ya actualizó antes de medir scrollHeight.
-         */
+        /** Scroll al fondo del área de mensajes */
         function chatScrollAbajo() {
             const area = document.getElementById('chatMessagesArea');
             requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
         }
 
-        /**
-         * chatAutoResize
-         * Ajusta la altura del textarea automáticamente al escribir,
-         * con un máximo de 110px para no tapar el área de mensajes.
-         */
+        /** Ajusta altura del textarea al escribir (máx 110px) */
         function chatAutoResize(el) {
             el.style.height = 'auto';
             el.style.height = Math.min(el.scrollHeight, 110) + 'px';
         }
 
-        /**
-         * chatHandleKey
-         * Envía el mensaje con Enter (sin Shift).
-         * Shift+Enter inserta salto de línea normal.
-         */
+        /** Enter envía, Shift+Enter salta de línea */
         function chatHandleKey(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -852,11 +786,7 @@
             }
         }
 
-        /**
-         * chatColorAvatar
-         * Genera un color determinista a partir de las iniciales del paciente.
-         * Mismo input → mismo color siempre (para consistencia visual).
-         */
+        /** Color determinista para avatares basado en iniciales */
         function chatColorAvatar(ini) {
             const cols = ['#9b1b6e', '#7a1254', '#b5357f', '#c4629a', '#6d1249', '#d4539e', '#531040'];
             let s = 0;
@@ -864,11 +794,7 @@
             return cols[s % cols.length];
         }
 
-        /**
-         * chatEscHTML
-         * Escapa caracteres especiales de HTML para evitar XSS
-         * al insertar texto del usuario en el DOM.
-         */
+        /** Escapa HTML para evitar XSS al insertar texto en el DOM */
         function chatEscHTML(str) {
             return String(str || '')
                 .replace(/&/g,  '&amp;')
@@ -878,11 +804,7 @@
                 .replace(/\n/g, '<br>');
         }
 
-        /**
-         * mostrarToastChat
-         * Muestra un mensaje flotante temporal en la parte superior del chat.
-         * Se oculta automáticamente después de 3 segundos.
-         */
+        /** Toast temporal en la parte superior del chat */
         function mostrarToastChat(msg) {
             const el = document.getElementById('chatToast');
             el.textContent = msg;
@@ -890,13 +812,9 @@
             setTimeout(() => el.classList.remove('show'), 3000);
         }
 
-        // Exponer toast globalmente para que el Navbar pueda usarlo si lo necesita
         window.toast = mostrarToastChat;
 
-
-        /* ═══════════════════════════════════════════════════════
-           PUNTO DE ENTRADA: iniciar el chat al cargar la página
-        ═══════════════════════════════════════════════════════ */
+        /* ── PUNTO DE ENTRADA ── */
         chatInit();
     </script>
 

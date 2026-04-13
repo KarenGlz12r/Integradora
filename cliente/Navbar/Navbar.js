@@ -1,13 +1,16 @@
-// TIENE COMO FUNCIONALIDAD HACER FUNCIONAR AL NAVBAR
-// <!-- PROTEGER LA RUTA -->
+// ══════════════════════════════════════════════════════════════
+// Navbar.js — Funcionalidad del navbar de Motricare (fisioterapeuta)
+// ══════════════════════════════════════════════════════════════
 
+// ── PROTEGER LA RUTA ──
 import { protegerRuta } from "../../proteger.js";
 await protegerRuta("fisioterapeuta");
 
 import supabase from "../../auth.js";
 
-const menu = document.getElementById('menu');
-const sidebar = document.getElementById('sidebar');
+// ── MENÚ HAMBURGUESA / SIDEBAR ──
+const menu        = document.getElementById('menu');
+const sidebar     = document.getElementById('sidebar');
 const mainContent = document.querySelector('.main-content');
 
 menu.addEventListener('click', () => {
@@ -17,12 +20,13 @@ menu.addEventListener('click', () => {
 });
 
 
-// FUNCION DEL DROPDOWN
+// ── DROPDOWN DEL USUARIO ──
+
 function toggleDropdown() {
     document.getElementById("dropdown").classList.toggle("active");
 }
 
-// CERRAR AL HACER CLICK AFUERA
+// Cerrar dropdown al hacer clic fuera de él
 document.addEventListener("click", (e) => {
     const userMenu = document.querySelector(".user-menu");
     if (userMenu && !userMenu.contains(e.target)) {
@@ -30,12 +34,13 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// FOTO DE PERFIL
+
+// ── FOTO DE PERFIL ──
+
 function abrirSelectorFoto() {
     document.getElementById("input-foto").click();
 }
 
-// SUBIR FOTO
 async function subirFoto(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -43,7 +48,7 @@ async function subirFoto(event) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const extension = archivo.name.split(".").pop();
+    const extension    = archivo.name.split(".").pop();
     const nombreArchivo = `${user.id}.${extension}`;
 
     const { error } = await supabase.storage
@@ -67,7 +72,6 @@ async function subirFoto(event) {
     if (fotoDashboard) fotoDashboard.src = urlConTimestamp;
 }
 
-// CARGAR FOTO
 async function cargarFotoPerfil() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -91,10 +95,12 @@ async function cargarFotoPerfil() {
 
 cargarFotoPerfil();
 
-// MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
+
+// ── ENLACE ACTIVO EN EL SIDEBAR ──
+
 function marcarEnlaceActivo() {
     const urlActual = window.location.pathname;
-    const enlaces = document.querySelectorAll(".sidebar nav ul li a");
+    const enlaces   = document.querySelectorAll(".sidebar nav ul li a");
 
     enlaces.forEach(enlace => {
         enlace.classList.remove("selected");
@@ -112,7 +118,9 @@ function marcarEnlaceActivo() {
 
 marcarEnlaceActivo();
 
+
 // ── MODAL CERRAR SESIÓN ──
+
 function abrirModalCerrarSesion() {
     document.getElementById("dropdown")?.classList.remove("active");
     document.getElementById("modal-logout").classList.add("active");
@@ -137,31 +145,42 @@ async function cerrarSesion() {
     window.location.href = "/index.html";
 }
 
-window.toggleDropdown         = toggleDropdown;
-window.abrirSelectorFoto      = abrirSelectorFoto;
-window.subirFoto              = subirFoto;
-window.abrirModalCerrarSesion = abrirModalCerrarSesion;
-window.cerrarModal            = cerrarModal;
-window.cerrarSesion           = cerrarSesion;
 
-
-// ── CAMPANA: MENSAJES NO LEÍDOS EN TIEMPO REAL CON SUPABASE ──
+// ══════════════════════════════════════════════════════════════
+// CAMPANA — BADGE DE MENSAJES NO LEÍDOS
+//
+// DISEÑO:
+//   • El Navbar es la ÚNICA fuente de verdad del badge.
+//   • cargarMensajesNoLeidos() hace la query real a Supabase.
+//   • recalcularBadgeGlobal() se expone en window para que
+//     chat.js la llame después de marcar mensajes como leídos,
+//     sin duplicar lógica ni tener dos sistemas paralelos.
+//   • El canal RT escucha INSERT y UPDATE en mensajes:
+//       - INSERT de un paciente → sube el contador
+//       - UPDATE (msg_leido=true) → baja el contador
+// ══════════════════════════════════════════════════════════════
 
 let _badgeChannel = null;
+let _badgeUserId  = null; // Se guarda para que recalcularBadgeGlobal pueda usarlo
 
+/** Actualiza visualmente el badge de la campana */
 function actualizarBadge(count) {
     const badge = document.getElementById("bell-badge");
     if (!badge) return;
     if (count > 0) {
-        badge.textContent = count > 99 ? "99+" : count;
+        badge.textContent   = count > 99 ? "99+" : count;
         badge.style.display = "flex";
     } else {
         badge.style.display = "none";
     }
 }
 
+/**
+ * Consulta Supabase y actualiza el badge.
+ * Cuenta todos los mensajes no leídos que NO son del fisio.
+ * Se llama al inicio y cada vez que llega un evento RT.
+ */
 async function cargarMensajesNoLeidos(userId) {
-    // Cuenta todos los mensajes no leídos que NO son del fisio (= mensajes de pacientes)
     const { count } = await supabase
         .from('mensajes')
         .select('*', { count: 'exact', head: true })
@@ -171,14 +190,32 @@ async function cargarMensajesNoLeidos(userId) {
     actualizarBadge(count || 0);
 }
 
+/**
+ * recalcularBadgeGlobal — FUNCIÓN PÚBLICA
+ *
+ * Expuesta en window para que chat.js la invoque después de
+ * marcar mensajes como leídos. Así el badge baja de forma inmediata
+ * sin que el chat necesite su propio sistema paralelo.
+ *
+ * Uso desde chat.js:
+ *   if (window.recalcularBadgeGlobal) window.recalcularBadgeGlobal();
+ */
+window.recalcularBadgeGlobal = async function () {
+    if (_badgeUserId) await cargarMensajesNoLeidos(_badgeUserId);
+};
+
+/** Inicializa la campana: carga inicial + suscripción RT */
 async function iniciarCampana() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Carga inicial
+    // Guardar el userId para que recalcularBadgeGlobal pueda usarlo
+    _badgeUserId = user.id;
+
+    // Carga inicial del badge al abrir la página
     await cargarMensajesNoLeidos(user.id);
 
-    // Escucha en tiempo real: cada INSERT en mensajes recalcula el badge
+    // Evitar canales duplicados si la función se llama más de una vez
     if (_badgeChannel) supabase.removeChannel(_badgeChannel);
 
     _badgeChannel = supabase
@@ -187,9 +224,8 @@ async function iniciarCampana() {
             'postgres_changes',
             { event: 'INSERT', schema: 'public', table: 'mensajes' },
             async (payload) => {
-                const m = payload.new;
-                // Solo contar mensajes de otros (pacientes), no los del propio fisio
-                if (m.id_emisor !== user.id) {
+                // Solo contar mensajes de pacientes, no los del propio fisio
+                if (payload.new.id_emisor !== user.id) {
                     await cargarMensajesNoLeidos(user.id);
                 }
             }
@@ -198,7 +234,7 @@ async function iniciarCampana() {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'mensajes' },
             async () => {
-                // Cuando se marcan como leídos, actualizar el badge
+                // Cuando chat.js marca mensajes como leídos, el badge baja
                 await cargarMensajesNoLeidos(user.id);
             }
         )
@@ -206,3 +242,12 @@ async function iniciarCampana() {
 }
 
 iniciarCampana();
+
+
+// ── EXPONER FUNCIONES GLOBALES ──
+window.toggleDropdown          = toggleDropdown;
+window.abrirSelectorFoto       = abrirSelectorFoto;
+window.subirFoto               = subirFoto;
+window.abrirModalCerrarSesion  = abrirModalCerrarSesion;
+window.cerrarModal             = cerrarModal;
+window.cerrarSesion            = cerrarSesion;
