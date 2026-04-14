@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes — Motricare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../Navbar/Navbar.css">
+    <link rel="stylesheet" href="./reportes.css">
+</head>
+<body>
+
+    <div id="navbar"></div>
+
+    <main class="main-content" id="mainContent">
+
+        <!-- ── Header ── -->
+        <div class="page-header">
+            <div class="header-left">
+                <div class="header-icon"><i class="bi bi-bar-chart-line-fill"></i></div>
+                <div>
+                    <div class="page-title">Reportes</div>
+                    <div class="page-subtitle">Resumen clínico y de actividad de tus pacientes</div>
+                </div>
+            </div>
+            <div class="header-filtros">
+                <button class="btn-filtro active" data-periodo="mes">Este mes</button>
+                <button class="btn-filtro" data-periodo="trimestre">Trimestre</button>
+                <button class="btn-filtro" data-periodo="año">Este año</button>
+                <button class="btn-filtro" data-periodo="todo">Todo</button>
+            </div>
+        </div>
+
+        <!-- ── KPIs ── -->
+        <div class="kpis-grid" id="kpisGrid">
+            <div class="kpi-card kpi-principal">
+                <div class="kpi-icon" style="background:#f3e8fd;color:#9b1b6e;"><i class="bi bi-people-fill"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-pacientes">—</span>
+                    <span class="kpi-label">Pacientes atendidos</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#e8f5e9;color:#2e7d32;"><i class="bi bi-calendar-check-fill"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-citas">—</span>
+                    <span class="kpi-label">Citas completadas</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#fff3e0;color:#e65100;"><i class="bi bi-journal-medical"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-notas">—</span>
+                    <span class="kpi-label">Notas de evolución</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#e3f2fd;color:#1565c0;"><i class="bi bi-graph-down-arrow"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-dolor">—</span>
+                    <span class="kpi-label">Reducción dolor prom.</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#fce4ec;color:#880e4f;"><i class="bi bi-person-check-fill"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-alta">—</span>
+                    <span class="kpi-label">Pacientes con alta</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:#ede7f6;color:#4527a0;"><i class="bi bi-clock-history"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-valor" id="kpi-duracion">—</span>
+                    <span class="kpi-label">Duración prom. sesión</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Fila 1: Citas por semana + Estado pacientes ── -->
+        <div class="seccion-dos">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-bar-chart-fill"></i> Citas por semana</span>
+                </div>
+                <div class="grafica-wrap" id="graficaCitas">
+                    <div class="sin-datos">Cargando…</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-pie-chart-fill"></i> Estado de pacientes</span>
+                </div>
+                <div id="estadosWrap" style="padding:1.2rem 1.4rem;">
+                    <div class="sin-datos">Cargando…</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Fila 2: Reducción de dolor + Rutinas ── -->
+        <div class="seccion-dos" style="margin-top:1rem;">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-activity"></i> Evolución del dolor por paciente</span>
+                </div>
+                <div id="dolorWrap" style="padding:1rem 1.4rem; overflow-x:auto;">
+                    <div class="sin-datos">Cargando…</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-titulo"><i class="bi bi-list-check"></i> Rutinas asignadas</span>
+                </div>
+                <div id="rutinasWrap" style="padding:1rem 1.4rem;">
+                    <div class="sin-datos">Cargando…</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Tabla pacientes ── -->
+        <div class="panel panel-tabla" style="margin-top:1rem;">
+            <div class="panel-header">
+                <span class="panel-titulo"><i class="bi bi-table"></i> Detalle por paciente</span>
+                <span class="badge-count" id="badge-pacientes-tabla">0</span>
+            </div>
+            <div class="tabla-wrap">
+                <table class="tabla-reportes">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Citas</th>
+                            <th>Última sesión</th>
+                            <th>Dolor inicial</th>
+                            <th>Dolor final</th>
+                            <th>Reducción</th>
+                            <th>Estado</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPacientes">
+                        <tr><td colspan="8" class="sin-datos">Cargando…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        fetch('../../Navbar/Navbar.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const s = document.createElement('script');
+                s.type = 'module';
+                s.src  = '../../Navbar/Navbar.js';
+                document.body.appendChild(s);
+            });
+    </script>
+
+    <script src="./reportes.js" type="module"></script>
+
+</body>
+</html>
