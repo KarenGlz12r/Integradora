@@ -13,7 +13,7 @@ import { supabase } from "../../../auth.js";
    ⚠️ CAMBIA 'avatares' por el nombre real de tu bucket en Supabase.
 ══════════════════════════════════════════════════════════════ */
 const SUPABASE_PROJECT_URL = 'https://qhrennyqjhngysortocu.supabase.co';
-const STORAGE_BUCKET       = 'avatares'; // ← nombre real de tu bucket
+const STORAGE_BUCKET       = 'perfil_pacientes'; 
 
 /**
  * Construye la URL pública de una foto desde Supabase Storage.
