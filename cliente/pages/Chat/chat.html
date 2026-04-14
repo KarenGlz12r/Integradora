@@ -20,11 +20,7 @@
     <main class="main-content">
         <div class="chat-toast" id="chatToast"></div>
 
-        <!-- ══════════════════════════════════════════════════════
-             SIDEBAR: lista de conversaciones con pacientes
-        ══════════════════════════════════════════════════════ -->
         <aside class="chat-sidebar" id="chatSidebar">
-
             <div class="chat-sb-header">
                 <div class="chat-sb-icon">
                     <i class="fa-solid fa-comments"></i>
@@ -34,23 +30,17 @@
                     <div class="chat-sb-sub">Fisioterapeuta</div>
                 </div>
             </div>
-
             <div class="chat-sb-search">
                 <input type="text" placeholder="Buscar paciente..." id="chatSearch" oninput="filtrarConvs()">
             </div>
-
             <div class="chat-conv-list" id="chatConvList">
                 <div id="chatConvLoading"
                     style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">
                     Cargando conversaciones...
                 </div>
             </div>
-
         </aside>
 
-        <!-- ══════════════════════════════════════════════════════
-             PANEL PRINCIPAL
-        ══════════════════════════════════════════════════════ -->
         <main class="chat-main" id="chatMain">
             <div class="chat-bg-pattern"></div>
 
@@ -63,7 +53,6 @@
             </div>
 
             <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
-
                 <div class="chat-panel-header">
                     <button class="chat-icon-btn" id="chatBackBtn" style="display:none;" onclick="volverSidebarChat()">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -94,12 +83,10 @@
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
-
             </div>
         </main>
     </main>
 
-    <!-- Navbar dinámico -->
     <script>
         fetch('../../Navbar/Navbar.html')
             .then(res => res.text())
@@ -112,30 +99,30 @@
             });
     </script>
 
-    <!-- ══════════════════════════════════════════════════════
-         LÓGICA PRINCIPAL DEL CHAT
-    ══════════════════════════════════════════════════════ -->
     <script>
-        /* ─────────────────────────────────────────────────────
-           CONFIGURACIÓN DE SUPABASE
-        ───────────────────────────────────────────────────── */
         const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
         const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         /* ─────────────────────────────────────────────────────
-           VARIABLES GLOBALES
+           ⚠️ AJUSTA este nombre si tu bucket se llama diferente.
+           Es el bucket de Supabase Storage donde se guardan
+           las fotos de los pacientes (y del fisio si aplica).
            
-           FISIO_ID      = auth.users.id  → usado en mensajes.id_emisor
-           FISIO_REAL_ID = fisioterapeutas.id → usado en conversaciones.id_fisio
-           
-           Del paciente:
-           El sessionStorage puede traer el id_us (usuario.id_us)
-           o el auth.users.id según desde qué pantalla se llega.
-           chatInit() detecta cuál es y siempre trabaja con id_us
-           para conversaciones, y con el auth.users.id solo para
-           mensajes.id_emisor.
+           La URL pública queda así:
+           https://<project>.supabase.co/storage/v1/object/public/<BUCKET>/<filename>
         ───────────────────────────────────────────────────── */
+        const STORAGE_BUCKET = 'perfil_pacientes'; // ← CAMBIA al nombre real de tu bucket
+
+        /* Construye la URL pública de Supabase Storage.
+           Si el valor YA es una URL completa (http/https), la devuelve tal cual.
+           Si es solo un nombre de archivo, construye la URL pública. */
+        function chatBuildFotoUrl(valor) {
+            if (!valor) return null;
+            if (valor.startsWith('http://') || valor.startsWith('https://')) return valor;
+            return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${valor}`;
+        }
+
         let FISIO_ID      = null;
         let FISIO_REAL_ID = null;
         let FISIO_FOTO    = null;
@@ -168,23 +155,18 @@
                 return;
             }
             FISIO_ID = user.id;
-            console.log('[chatInit] FISIO_ID (auth.users.id):', FISIO_ID);
 
-            // Obtener el id interno del fisioterapeuta (fisioterapeutas.id)
-            const { data: fisioRow, error: fisioErr } = await _sb
+            const { data: fisioRow } = await _sb
                 .from('fisioterapeutas')
                 .select('id')
                 .eq('user_id', user.id)
                 .single();
-
-            console.log('[chatInit] fisioRow:', fisioRow, '| error:', fisioErr);
 
             if (!fisioRow) {
                 mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado');
                 return;
             }
             FISIO_REAL_ID = fisioRow.id;
-            console.log('[chatInit] FISIO_REAL_ID (fisioterapeutas.id):', FISIO_REAL_ID);
 
             // Foto del fisioterapeuta
             const { data: perfil } = await _sb
@@ -192,19 +174,14 @@
                 .select('foto_url')
                 .eq('id', user.id)
                 .single();
-            if (perfil?.foto_url) FISIO_FOTO = perfil.foto_url;
+            if (perfil?.foto_url) FISIO_FOTO = chatBuildFotoUrl(perfil.foto_url);
+            console.log('[chatInit] FISIO_FOTO:', FISIO_FOTO);
 
             await cargarConvs();
             chatEscucharRT();
 
-            // ── Apertura directa desde pantalla de Pacientes ──────────────────
-            // sessionStorage puede traer el id_us directamente (preferido)
-            // o el auth.users.id como fallback.
             const pacienteIdPendiente     = sessionStorage.getItem('chatPacienteId');
             const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
-
-            console.log('[chatInit] sessionStorage chatPacienteId:', pacienteIdPendiente);
-            console.log('[chatInit] sessionStorage chatPacienteNombre:', pacienteNombrePendiente);
 
             if (pacienteIdPendiente) {
                 sessionStorage.removeItem('chatPacienteId');
@@ -216,21 +193,10 @@
 
         /* ═══════════════════════════════════════════════════════
            RESOLVER DATOS DEL PACIENTE
-           
-           Dado cualquier identificador del paciente (puede llegar
-           como id_us o como auth.users.id / user_id), devuelve
-           siempre { id_us, us_nom, url_foto } o null.
-           
-           Orden de intento:
-           1. usuario.id_us  (lo más probable cuando viene de la
-              pantalla de pacientes que ya tiene el row de usuario)
-           2. usuario.user_id (FK a auth.users, por si viene el
-              auth UUID en su lugar)
         ═══════════════════════════════════════════════════════ */
         async function _resolverPaciente(idRecibido) {
             if (!idRecibido) return null;
 
-            // Intento 1: el id recibido ES el id_us de la tabla usuario
             const { data: u1 } = await _sb
                 .from('usuario')
                 .select('id_us, us_nom, url_foto')
@@ -242,7 +208,6 @@
                 return u1;
             }
 
-            // Intento 2: el id recibido es el auth.users.id (user_id FK)
             const { data: u2 } = await _sb
                 .from('usuario')
                 .select('id_us, us_nom, url_foto')
@@ -261,66 +226,38 @@
 
         /* ═══════════════════════════════════════════════════════
            ABRIR O CREAR CONVERSACIÓN CON UN PACIENTE
-           
-           FIX PRINCIPAL:
-           - Siempre resuelve usuario.id_us antes de tocar
-             la tabla conversaciones.
-           - NUNCA pasa el campo "id" al INSERT de conversaciones.
-             Postgres lo genera automáticamente (gen_random_uuid()).
-           - Recupera el UUID generado con .select('id').single()
-             y ESE es el que se usa en mensajes.id_conv.
         ═══════════════════════════════════════════════════════ */
         async function abrirOCrearConvPaciente(idRecibido, pacienteNombre) {
-            console.log('[abrirOCrearConv] idRecibido:', idRecibido, '| nombre:', pacienteNombre);
-            console.log('[abrirOCrearConv] FISIO_REAL_ID:', FISIO_REAL_ID, '| FISIO_ID:', FISIO_ID);
-
-            // Guardia básica
-            if (!idRecibido) {
-                console.error('[abrirOCrearConv] ❌ idRecibido es null/undefined');
+            if (!idRecibido || !FISIO_REAL_ID) {
                 mostrarToastChat('⚠️ No se pudo identificar al paciente');
                 return;
             }
-            if (!FISIO_REAL_ID) {
-                console.error('[abrirOCrearConv] ❌ FISIO_REAL_ID no disponible aún');
-                mostrarToastChat('⚠️ Sesión del fisioterapeuta no lista');
-                return;
-            }
 
-            // ── Paso 0: resolver siempre el id_us real del paciente ───────────
             const pacienteData = await _resolverPaciente(idRecibido);
             if (!pacienteData) {
                 mostrarToastChat('⚠️ Paciente no encontrado en el sistema');
                 return;
             }
+
             const pacienteIdUs = pacienteData.id_us;
             const nombre       = pacienteData.us_nom || pacienteNombre || 'Paciente';
-            const fotoUrl      = pacienteData.url_foto || null;
+            // ✅ Construir URL completa desde el valor almacenado
+            const fotoUrl      = chatBuildFotoUrl(pacienteData.url_foto);
             const iniciales    = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
-            console.log('[abrirOCrearConv] ✅ pacienteIdUs:', pacienteIdUs, '| nombre:', nombre);
+            console.log('[abrirOCrearConv] fotoUrl resuelta:', fotoUrl);
 
-            // ── Paso 1: ¿ya existe la conversación? ───────────────────────────
-            console.log('[abrirOCrearConv] Paso 1 → buscando conv existente...');
-            const { data: convExistente, error: e1 } = await _sb
+            const { data: convExistente } = await _sb
                 .from('conversaciones')
                 .select('id')
                 .eq('id_fisio',    FISIO_REAL_ID)
                 .eq('id_paciente', pacienteIdUs)
                 .maybeSingle();
 
-            console.log('[abrirOCrearConv] Paso 1 resultado:', convExistente, '| error:', e1);
-
             if (convExistente?.id) {
-                console.log('[abrirOCrearConv] ✅ Conv existente:', convExistente.id);
                 return _montarYAbrirConv(convExistente.id, pacienteIdUs, nombre, iniciales, fotoUrl);
             }
 
-            // ── Paso 2: ¿hay mensajes huérfanos de este paciente? ─────────────
-            // (El paciente inició el chat desde la app y hay mensajes pero
-            //  no existe el row en conversaciones para este fisio)
-            console.log('[abrirOCrearConv] Paso 2 → buscando mensajes huérfanos...');
-
-            // Buscamos por id_us primero, luego por user_id como fallback
             let convIdHuerfana = null;
 
             const { data: mh1 } = await _sb
@@ -330,12 +267,9 @@
                 .not('id_conv', 'is', null)
                 .limit(1)
                 .maybeSingle();
-
-            console.log('[abrirOCrearConv] Paso 2a (por id_us):', mh1);
             convIdHuerfana = mh1?.id_conv || null;
 
             if (!convIdHuerfana) {
-                // Si el paciente envió con su auth.users.id como emisor
                 const { data: mh2 } = await _sb
                     .from('mensajes')
                     .select('id_conv')
@@ -343,71 +277,39 @@
                     .not('id_conv', 'is', null)
                     .limit(1)
                     .maybeSingle();
-
-                console.log('[abrirOCrearConv] Paso 2b (por idRecibido):', mh2);
                 convIdHuerfana = mh2?.id_conv || null;
             }
 
             if (convIdHuerfana) {
-                console.log('[abrirOCrearConv] Conv huérfana detectada:', convIdHuerfana, '→ registrando...');
-                // Registrar con upsert usando el id ya existente de los mensajes
-                const { error: upsertErr } = await _sb.from('conversaciones').upsert(
-                    {
-                        id:          convIdHuerfana,   // id que YA existe en mensajes.id_conv
-                        id_fisio:    FISIO_REAL_ID,
-                        id_paciente: pacienteIdUs
-                    },
+                await _sb.from('conversaciones').upsert(
+                    { id: convIdHuerfana, id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs },
                     { onConflict: 'id' }
                 );
-                if (upsertErr) console.error('[abrirOCrearConv] Error upsert huérfana:', upsertErr);
-                else console.log('[abrirOCrearConv] ✅ Conv huérfana registrada');
-
                 return _montarYAbrirConv(convIdHuerfana, pacienteIdUs, nombre, iniciales, fotoUrl);
             }
 
-            // ── Paso 3: crear conversación nueva ──────────────────────────────
-            // ✅ CRÍTICO: NO se pasa el campo "id".
-            //    Postgres lo genera con gen_random_uuid().
-            //    Se recupera con .select('id').single() para usarlo
-            //    en todos los mensajes.id_conv posteriores.
-            console.log('[abrirOCrearConv] Paso 3 → creando conv nueva (sin id manual):', {
-                id_fisio:    FISIO_REAL_ID,
-                id_paciente: pacienteIdUs
-            });
-
             const { data: nueva, error: errConv } = await _sb
                 .from('conversaciones')
-                .insert({
-                    // ✅ SIN "id" — Postgres genera el UUID automáticamente
-                    id_fisio:    FISIO_REAL_ID,
-                    id_paciente: pacienteIdUs
-                })
+                .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs })
                 .select('id')
                 .single();
 
-            console.log('[abrirOCrearConv] Resultado INSERT nueva conv:', nueva, '| error:', errConv);
-
             if (errConv || !nueva?.id) {
-                console.error('[abrirOCrearConv] ❌ Error creando conv:', errConv);
                 mostrarToastChat('Error al abrir chat');
                 return;
             }
 
-            console.log('[abrirOCrearConv] ✅ Conv nueva creada. UUID generado por Postgres:', nueva.id);
             return _montarYAbrirConv(nueva.id, pacienteIdUs, nombre, iniciales, fotoUrl);
         }
 
 
         /* ═══════════════════════════════════════════════════════
-           HELPER: construir objeto conv y llamar abrirConv()
-           Centraliza la lógica para los 3 pasos anteriores.
+           HELPER: construir objeto conv y abrir
         ═══════════════════════════════════════════════════════ */
         function _montarYAbrirConv(convId, pacienteIdUs, nombre, iniciales, fotoUrl) {
-            console.log('[_montarYAbrirConv] convId:', convId);
-
             const conv = {
-                id_conv:     convId,       // ← UUID real generado por Postgres
-                paciente_id: pacienteIdUs, // ← usuario.id_us
+                id_conv:     convId,
+                paciente_id: pacienteIdUs,
                 nombre,
                 iniciales,
                 fotoUrl,
@@ -425,8 +327,6 @@
            CARGAR TODAS LAS CONVERSACIONES DEL SIDEBAR
         ═══════════════════════════════════════════════════════ */
         async function cargarConvs() {
-            console.log('[cargarConvs] FISIO_REAL_ID:', FISIO_REAL_ID);
-
             const { data: convRows, error } = await _sb
                 .from('conversaciones')
                 .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
@@ -434,59 +334,56 @@
                 .order('ultimo_mensaje_fecha', { ascending: false, nullsFirst: false });
 
             if (error) { console.error('[cargarConvs] Error:', error); return; }
-            console.log('[cargarConvs] Rows encontradas:', convRows?.length, convRows);
 
             const convs = [];
 
             for (const row of (convRows || [])) {
                 const pacienteIdUs = row.id_paciente;
 
-                // Saltar filas con id_paciente inválido (las del bug anterior)
-                if (!pacienteIdUs || pacienteIdUs === '00000000-0000-0000-0000-000000000000') {
-                    console.warn('[cargarConvs] ⚠️ id_paciente inválido en conv', row.id, '— omitiendo');
-                    continue;
-                }
+                if (!pacienteIdUs || pacienteIdUs === '00000000-0000-0000-0000-000000000000') continue;
 
                 const { count } = await _sb
                     .from('mensajes')
                     .select('*', { count: 'exact', head: true })
-                    .eq('id_conv',   row.id)
-                    .eq('msg_leido', false)
+                    .eq('id_conv',    row.id)
+                    .eq('msg_leido',  false)
                     .neq('id_emisor', FISIO_ID);
 
-                // Buscar nombre y foto del paciente por id_us
-                const { data: u, error: uErr } = await _sb
+                const { data: u } = await _sb
                     .from('usuario')
                     .select('us_nom, url_foto')
                     .eq('id_us', pacienteIdUs)
                     .single();
 
-                if (uErr) console.warn('[cargarConvs] Sin usuario para id_us:', pacienteIdUs, uErr);
-
                 const nombre    = u?.us_nom || 'Paciente';
                 const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                // ✅ Construir URL completa
+                const fotoUrl   = chatBuildFotoUrl(u?.url_foto);
+
+                console.log('[cargarConvs] paciente:', nombre, '| fotoUrl:', fotoUrl);
 
                 convs.push({
                     id_conv:     row.id,
                     paciente_id: pacienteIdUs,
                     nombre,
                     iniciales,
-                    fotoUrl:  u?.url_foto || null,
-                    sinLeer:  count || 0,
+                    fotoUrl,
+                    sinLeer: count || 0,
                     ultimo: row.ultimo_mensaje
                         ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
                         : null
                 });
             }
 
-            console.log('[cargarConvs] ✅ Total convs válidas:', convs.length);
             todasConvs = convs;
             renderConvs(convs);
         }
 
 
         /* ═══════════════════════════════════════════════════════
-           RENDERIZAR LA LISTA DE CONVERSACIONES EN EL SIDEBAR
+           RENDERIZAR LISTA DE CONVERSACIONES
+           ✅ FIX: todo con appendChild — el avDiv con <img>
+              nunca se destruye por un innerHTML posterior.
         ═══════════════════════════════════════════════════════ */
         function renderConvs(lista) {
             const el      = document.getElementById('chatConvList');
@@ -504,18 +401,14 @@
                 item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
                 item.dataset.convId = c.id_conv;
 
-                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
-                const preview = c.ultimo
-                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
-                    : '';
-
+                // ── Avatar ──────────────────────────────────────
                 const avDiv = document.createElement('div');
                 avDiv.className = 'chat-c-avatar md';
                 if (c.fotoUrl) {
-                    const img = document.createElement('img');
-                    img.src   = c.fotoUrl;
-                    img.alt   = c.nombre;
-                    img.onerror = () => {
+                    const img    = document.createElement('img');
+                    img.src      = c.fotoUrl;
+                    img.alt      = c.nombre;
+                    img.onerror  = () => {
                         avDiv.innerHTML        = '';
                         avDiv.textContent      = c.iniciales;
                         avDiv.style.background = chatColorAvatar(c.iniciales);
@@ -526,17 +419,28 @@
                     avDiv.style.background = chatColorAvatar(c.iniciales);
                 }
 
-                item.innerHTML = `
-                    <div class="chat-conv-info">
-                        <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
-                        <div class="chat-conv-last">${chatEscHTML(preview)}</div>
-                    </div>
-                    <div class="chat-conv-meta">
-                        <span class="chat-conv-time">${hora}</span>
-                        ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
-                    </div>
+                // ── Info ────────────────────────────────────────
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'chat-conv-info';
+                const preview = c.ultimo
+                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
+                    : '';
+                infoDiv.innerHTML = `
+                    <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
+                    <div class="chat-conv-last">${chatEscHTML(preview)}</div>
                 `;
-                item.prepend(avDiv);
+
+                // ── Meta ────────────────────────────────────────
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'chat-conv-meta';
+                metaDiv.innerHTML = `
+                    <span class="chat-conv-time">${chatFormatHora(c.ultimo?.msg_fecha)}</span>
+                    ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
+                `;
+
+                item.appendChild(avDiv);
+                item.appendChild(infoDiv);
+                item.appendChild(metaDiv);
                 item.addEventListener('click', () => abrirConv(c));
                 el.appendChild(item);
             });
@@ -556,12 +460,13 @@
             document.getElementById('chatActivePanel').style.display = 'flex';
             document.getElementById('chatHeaderName').textContent    = conv.nombre;
 
+            // ── Header avatar ───────────────────────────────────
             const headerAv = document.getElementById('chatHeaderAvatar');
             headerAv.innerHTML = '';
             if (conv.fotoUrl) {
-                const img = document.createElement('img');
-                img.src   = conv.fotoUrl;
-                img.alt   = conv.nombre;
+                const img         = document.createElement('img');
+                img.src           = conv.fotoUrl;
+                img.alt           = conv.nombre;
                 img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
                 img.onerror = () => {
                     headerAv.innerHTML        = '';
@@ -633,78 +538,67 @@
         /* ═══════════════════════════════════════════════════════
            RENDERIZAR UNA BURBUJA DE MENSAJE
         ═══════════════════════════════════════════════════════ */
-function renderConvs(lista) {
-            const el      = document.getElementById('chatConvList');
-            const loading = document.getElementById('chatConvLoading');
-            if (loading) loading.style.display = 'none';
-            el.innerHTML = '';
- 
-            if (!lista.length) {
-                el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">Sin conversaciones aún</div>';
-                return;
+        function chatAgregarBubble(m, animar = true) {
+            const area    = document.getElementById('chatMessagesArea');
+            const esFisio = m.id_emisor === FISIO_ID;
+
+            const row = document.createElement('div');
+            row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
+            if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
+
+            const hora = m.msg_fecha
+                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
+                    hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
+                  })
+                : '';
+
+            const checkIcon = m.msg_leido
+                ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
+                : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+            // ── Mini avatar en burbuja ──────────────────────────
+            const avDiv     = document.createElement('div');
+            avDiv.className = 'chat-msg-av';
+
+            // ✅ Para el fisio: FISIO_FOTO (ya es URL completa desde chatInit)
+            // ✅ Para el paciente: convActiva.fotoUrl (ya es URL completa desde cargarConvs)
+            const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
+            const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
+            const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
+
+            if (fotoUrl) {
+                const img   = document.createElement('img');
+                img.src     = fotoUrl;
+                img.alt     = ini;
+                img.onerror = () => {
+                    avDiv.innerHTML        = '';
+                    avDiv.textContent      = ini;
+                    avDiv.style.background = bgColor;
+                };
+                avDiv.appendChild(img);
+            } else {
+                avDiv.textContent      = ini;
+                avDiv.style.background = bgColor;
             }
- 
-            lista.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
-                item.dataset.convId = c.id_conv;
- 
-                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
-                const preview = c.ultimo
-                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
-                    : '';
- 
-                // ── Avatar ──────────────────────────────────────────────────
-                const avDiv = document.createElement('div');
-                avDiv.className = 'chat-c-avatar md';
-                if (c.fotoUrl) {
-                    const img = document.createElement('img');
-                    img.src   = c.fotoUrl;
-                    img.alt   = c.nombre;
-                    img.onerror = () => {
-                        avDiv.innerHTML        = '';
-                        avDiv.textContent      = c.iniciales;
-                        avDiv.style.background = chatColorAvatar(c.iniciales);
-                    };
-                    avDiv.appendChild(img);
-                } else {
-                    avDiv.textContent      = c.iniciales;
-                    avDiv.style.background = chatColorAvatar(c.iniciales);
-                }
- 
-                // ── Info ────────────────────────────────────────────────────
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'chat-conv-info';
-                infoDiv.innerHTML = `
-                    <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
-                    <div class="chat-conv-last">${chatEscHTML(preview)}</div>
-                `;
- 
-                // ── Meta ────────────────────────────────────────────────────
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'chat-conv-meta';
-                metaDiv.innerHTML = `
-                    <span class="chat-conv-time">${hora}</span>
-                    ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
-                `;
- 
-                // ✅ FIX: se construye todo con appendChild, nunca innerHTML
-                //    así el avDiv con su <img> no se destruye
-                item.appendChild(avDiv);
-                item.appendChild(infoDiv);
-                item.appendChild(metaDiv);
- 
-                item.addEventListener('click', () => abrirConv(c));
-                el.appendChild(item);
-            });
+
+            const bubble     = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.innerHTML = `
+                ${chatEscHTML(m.msg_texto)}
+                <div class="chat-bubble-meta">
+                    <span class="chat-bubble-time">${hora}</span>
+                    ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
+                </div>
+            `;
+
+            row.appendChild(avDiv);
+            row.appendChild(bubble);
+            area.appendChild(row);
         }
- 
+
 
         /* ═══════════════════════════════════════════════════════
            ENVIAR UN MENSAJE
-           
-           convActiva.id_conv es siempre el UUID real de Postgres
-           (nunca 0000...) porque viene de _montarYAbrirConv().
         ═══════════════════════════════════════════════════════ */
         async function chatEnviarMensaje() {
             if (!FISIO_ID || !convActiva) {
@@ -716,9 +610,7 @@ function renderConvs(lista) {
             const texto = input.value.trim();
             if (!texto) return;
 
-            // Guardia extra: el id_conv nunca debe ser el UUID cero
             if (!convActiva.id_conv || convActiva.id_conv === '00000000-0000-0000-0000-000000000000') {
-                console.error('[chatEnviarMensaje] ❌ id_conv inválido:', convActiva.id_conv);
                 mostrarToastChat('⚠️ Error de conversación, recarga la página');
                 return;
             }
@@ -728,7 +620,6 @@ function renderConvs(lista) {
 
             const ahora = new Date().toISOString();
 
-            // Burbuja optimista
             chatAgregarBubble({
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
@@ -742,7 +633,7 @@ function renderConvs(lista) {
                 id_emisor: FISIO_ID,
                 msg_texto: texto,
                 msg_leido: false,
-                id_conv:   convActiva.id_conv   // ← UUID real, nunca 0000...
+                id_conv:   convActiva.id_conv
             });
 
             if (error) {
@@ -759,7 +650,7 @@ function renderConvs(lista) {
 
 
         /* ═══════════════════════════════════════════════════════
-           ESCUCHAR MENSAJES EN TIEMPO REAL
+           TIEMPO REAL
         ═══════════════════════════════════════════════════════ */
         function chatEscucharRT() {
             if (rtChannel) _sb.removeChannel(rtChannel);
@@ -786,7 +677,7 @@ function renderConvs(lista) {
 
 
         /* ═══════════════════════════════════════════════════════
-           MARCAR MENSAJES COMO LEÍDOS
+           MARCAR LEÍDOS
         ═══════════════════════════════════════════════════════ */
         async function chatMarcarLeidos(convId) {
             await _sb.from('mensajes')
@@ -799,7 +690,7 @@ function renderConvs(lista) {
 
 
         /* ═══════════════════════════════════════════════════════
-           FILTRAR CONVERSACIONES
+           FILTRAR
         ═══════════════════════════════════════════════════════ */
         function filtrarConvs() {
             const q = document.getElementById('chatSearch').value.toLowerCase();
@@ -827,10 +718,9 @@ function renderConvs(lista) {
             const ayer = new Date();
             ayer.setDate(hoy.getDate() - 1);
 
-            const opts    = { timeZone: TZ };
-            const dStr    = d.toLocaleDateString('es-MX', opts);
-            const hoyStr  = hoy.toLocaleDateString('es-MX', opts);
-            const ayerStr = ayer.toLocaleDateString('es-MX', opts);
+            const dStr    = d.toLocaleDateString('es-MX', { timeZone: TZ });
+            const hoyStr  = hoy.toLocaleDateString('es-MX', { timeZone: TZ });
+            const ayerStr = ayer.toLocaleDateString('es-MX', { timeZone: TZ });
 
             if (dStr === hoyStr)  return 'Hoy';
             if (dStr === ayerStr) return 'Ayer';
@@ -896,7 +786,6 @@ function renderConvs(lista) {
 
         window.toast = mostrarToastChat;
 
-        /* ── PUNTO DE ENTRADA ── */
         chatInit();
     </script>
 
