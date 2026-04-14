@@ -100,693 +100,642 @@
     </script>
 
     <script>
-        const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
-        const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+       const SUPABASE_URL = 'https://qhrennyqjhngysortocu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AQ7Wi7CXWGjC5w1qeK1qMg_rk5A8dsq';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        /* ─────────────────────────────────────────────────────
-           ⚠️ AJUSTA este nombre si tu bucket se llama diferente.
-           Es el bucket de Supabase Storage donde se guardan
-           las fotos de los pacientes (y del fisio si aplica).
-           
-           La URL pública queda así:
-           https://<project>.supabase.co/storage/v1/object/public/<BUCKET>/<filename>
-        ───────────────────────────────────────────────────── */
-        const STORAGE_BUCKET = 'perfil_pacientes'; // ← CAMBIA al nombre real de tu bucket
+const STORAGE_BUCKET = 'perfil_pacientes';
 
-        /* Construye la URL pública de Supabase Storage.
-           Si el valor YA es una URL completa (http/https), la devuelve tal cual.
-           Si es solo un nombre de archivo, construye la URL pública. */
-        function chatBuildFotoUrl(valor) {
-            if (!valor) return null;
-            if (valor.startsWith('http://') || valor.startsWith('https://')) return valor;
-            return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${valor}`;
-        }
+function chatBuildFotoUrl(valor) {
+    if (!valor) return null;
+    if (valor.startsWith('http://') || valor.startsWith('https://')) return valor;
+    return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${valor}`;
+}
 
-        let FISIO_ID      = null;
-        let FISIO_REAL_ID = null;
-        let FISIO_FOTO    = null;
+let FISIO_ID      = null;
+let FISIO_REAL_ID = null;
+let FISIO_FOTO    = null;
+let convActiva    = null;
+let todasConvs    = [];
+let rtChannel     = null;
 
-        let convActiva = null;
-        let todasConvs = [];
-        let rtChannel  = null;
+function chatActualizarBadge() {
+    setTimeout(() => { if (window.recalcularBadgeGlobal) window.recalcularBadgeGlobal(); }, 300);
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           BADGE HELPER
-        ═══════════════════════════════════════════════════════ */
-        function chatActualizarBadge() {
-            setTimeout(() => {
-                if (window.recalcularBadgeGlobal) window.recalcularBadgeGlobal();
-            }, 300);
-        }
+/* ═══════════════════════════════════════════════════════
+   INICIALIZACIÓN
+═══════════════════════════════════════════════════════ */
+async function chatInit() {
+    const { data: { user }, error } = await _sb.auth.getUser();
+    if (error || !user) {
+        mostrarToastChat('⚠️ Sin sesión activa');
+        return;
+    }
+    FISIO_ID = user.id;
+
+    const { data: fisioRow, error: errFisio } = await _sb
+        .from('fisioterapeutas')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (errFisio || !fisioRow) {
+        mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado');
+        console.error('[chatInit] fisioRow error:', errFisio);
+        return;
+    }
+    FISIO_REAL_ID = fisioRow.id;
+
+    const { data: perfil } = await _sb
+        .from('perfiles')
+        .select('foto_url')
+        .eq('id', user.id)
+        .single();
+    if (perfil?.foto_url) FISIO_FOTO = chatBuildFotoUrl(perfil.foto_url);
+
+    await cargarConvs();
+    chatEscucharRT();
+
+    // Abrir conversación si viene desde lista de pacientes
+    const pacienteIdPendiente     = sessionStorage.getItem('chatPacienteId');
+    const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
+
+    if (pacienteIdPendiente) {
+        sessionStorage.removeItem('chatPacienteId');
+        sessionStorage.removeItem('chatPacienteNombre');
+        await abrirOCrearConvPaciente(pacienteIdPendiente, pacienteNombrePendiente);
+    }
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           INICIALIZACIÓN
-        ═══════════════════════════════════════════════════════ */
-        async function chatInit() {
-            console.log('[chatInit] Iniciando...');
+/* ═══════════════════════════════════════════════════════
+   RESOLVER PACIENTE (por id_us o por user_id)
+═══════════════════════════════════════════════════════ */
+async function _resolverPaciente(idRecibido) {
+    if (!idRecibido) return null;
 
-            const { data: { user }, error } = await _sb.auth.getUser();
-            if (error || !user) {
-                console.error('[chatInit] Sin sesión:', error);
-                mostrarToastChat('⚠️ Sin sesión activa');
-                return;
-            }
-            FISIO_ID = user.id;
+    const { data: u1 } = await _sb
+        .from('usuario')
+        .select('id_us, us_nom, url_foto')
+        .eq('id_us', idRecibido)
+        .maybeSingle();
+    if (u1?.id_us) return u1;
 
-            const { data: fisioRow } = await _sb
-                .from('fisioterapeutas')
-                .select('id')
-                .eq('user_id', user.id)
-                .single();
+    const { data: u2 } = await _sb
+        .from('usuario')
+        .select('id_us, us_nom, url_foto')
+        .eq('user_id', idRecibido)
+        .maybeSingle();
+    if (u2?.id_us) return u2;
 
-            if (!fisioRow) {
-                mostrarToastChat('⚠️ Perfil de fisioterapeuta no encontrado');
-                return;
-            }
-            FISIO_REAL_ID = fisioRow.id;
-
-            // Foto del fisioterapeuta
-            const { data: perfil } = await _sb
-                .from('perfiles')
-                .select('foto_url')
-                .eq('id', user.id)
-                .single();
-            if (perfil?.foto_url) FISIO_FOTO = chatBuildFotoUrl(perfil.foto_url);
-            console.log('[chatInit] FISIO_FOTO:', FISIO_FOTO);
-
-            await cargarConvs();
-            chatEscucharRT();
-
-            const pacienteIdPendiente     = sessionStorage.getItem('chatPacienteId');
-            const pacienteNombrePendiente = sessionStorage.getItem('chatPacienteNombre');
-
-            if (pacienteIdPendiente) {
-                sessionStorage.removeItem('chatPacienteId');
-                sessionStorage.removeItem('chatPacienteNombre');
-                await abrirOCrearConvPaciente(pacienteIdPendiente, pacienteNombrePendiente);
-            }
-        }
+    console.error('[_resolverPaciente] No encontrado para:', idRecibido);
+    return null;
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           RESOLVER DATOS DEL PACIENTE
-        ═══════════════════════════════════════════════════════ */
-        async function _resolverPaciente(idRecibido) {
-            if (!idRecibido) return null;
+/* ═══════════════════════════════════════════════════════
+   ABRIR O CREAR CONVERSACIÓN
+═══════════════════════════════════════════════════════ */
+async function abrirOCrearConvPaciente(idRecibido, pacienteNombre) {
+    if (!idRecibido || !FISIO_REAL_ID) {
+        mostrarToastChat('⚠️ No se pudo identificar al paciente');
+        return;
+    }
 
-            const { data: u1 } = await _sb
-                .from('usuario')
-                .select('id_us, us_nom, url_foto')
-                .eq('id_us', idRecibido)
-                .maybeSingle();
+    const pacienteData = await _resolverPaciente(idRecibido);
+    if (!pacienteData) {
+        mostrarToastChat('⚠️ Paciente no encontrado en el sistema');
+        return;
+    }
 
-            if (u1?.id_us) {
-                console.log('[_resolverPaciente] Resuelto por id_us:', u1);
-                return u1;
-            }
+    const pacienteIdUs = pacienteData.id_us;
+    const nombre       = pacienteData.us_nom || pacienteNombre || 'Paciente';
+    const fotoUrl      = chatBuildFotoUrl(pacienteData.url_foto);
+    const iniciales    = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
-            const { data: u2 } = await _sb
-                .from('usuario')
-                .select('id_us, us_nom, url_foto')
-                .eq('user_id', idRecibido)
-                .maybeSingle();
+    // Buscar conversación existente
+    const { data: convExistente } = await _sb
+        .from('conversaciones')
+        .select('id')
+        .eq('id_fisio',    FISIO_REAL_ID)
+        .eq('id_paciente', pacienteIdUs)
+        .maybeSingle();
 
-            if (u2?.id_us) {
-                console.log('[_resolverPaciente] Resuelto por user_id:', u2);
-                return u2;
-            }
+    if (convExistente?.id) {
+        return _montarYAbrirConv(convExistente.id, pacienteIdUs, nombre, iniciales, fotoUrl);
+    }
 
-            console.error('[_resolverPaciente] ❌ No se encontró usuario para:', idRecibido);
-            return null;
-        }
+    // Crear nueva conversación
+    const { data: nueva, error: errConv } = await _sb
+        .from('conversaciones')
+        .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs })
+        .select('id')
+        .single();
 
+    if (errConv || !nueva?.id) {
+        console.error('[abrirOCrearConv] Error:', errConv);
+        mostrarToastChat('Error al abrir chat: ' + (errConv?.message || 'desconocido'));
+        return;
+    }
 
-        /* ═══════════════════════════════════════════════════════
-           ABRIR O CREAR CONVERSACIÓN CON UN PACIENTE
-        ═══════════════════════════════════════════════════════ */
-        async function abrirOCrearConvPaciente(idRecibido, pacienteNombre) {
-            if (!idRecibido || !FISIO_REAL_ID) {
-                mostrarToastChat('⚠️ No se pudo identificar al paciente');
-                return;
-            }
-
-            const pacienteData = await _resolverPaciente(idRecibido);
-            if (!pacienteData) {
-                mostrarToastChat('⚠️ Paciente no encontrado en el sistema');
-                return;
-            }
-
-            const pacienteIdUs = pacienteData.id_us;
-            const nombre       = pacienteData.us_nom || pacienteNombre || 'Paciente';
-            // ✅ Construir URL completa desde el valor almacenado
-            const fotoUrl      = chatBuildFotoUrl(pacienteData.url_foto);
-            const iniciales    = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-
-            console.log('[abrirOCrearConv] fotoUrl resuelta:', fotoUrl);
-
-            const { data: convExistente } = await _sb
-                .from('conversaciones')
-                .select('id')
-                .eq('id_fisio',    FISIO_REAL_ID)
-                .eq('id_paciente', pacienteIdUs)
-                .maybeSingle();
-
-            if (convExistente?.id) {
-                return _montarYAbrirConv(convExistente.id, pacienteIdUs, nombre, iniciales, fotoUrl);
-            }
-
-            let convIdHuerfana = null;
-
-            const { data: mh1 } = await _sb
-                .from('mensajes')
-                .select('id_conv')
-                .eq('id_emisor', pacienteIdUs)
-                .not('id_conv', 'is', null)
-                .limit(1)
-                .maybeSingle();
-            convIdHuerfana = mh1?.id_conv || null;
-
-            if (!convIdHuerfana) {
-                const { data: mh2 } = await _sb
-                    .from('mensajes')
-                    .select('id_conv')
-                    .eq('id_emisor', idRecibido)
-                    .not('id_conv', 'is', null)
-                    .limit(1)
-                    .maybeSingle();
-                convIdHuerfana = mh2?.id_conv || null;
-            }
-
-            if (convIdHuerfana) {
-                await _sb.from('conversaciones').upsert(
-                    { id: convIdHuerfana, id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs },
-                    { onConflict: 'id' }
-                );
-                return _montarYAbrirConv(convIdHuerfana, pacienteIdUs, nombre, iniciales, fotoUrl);
-            }
-
-            const { data: nueva, error: errConv } = await _sb
-                .from('conversaciones')
-                .insert({ id_fisio: FISIO_REAL_ID, id_paciente: pacienteIdUs })
-                .select('id')
-                .single();
-
-            if (errConv || !nueva?.id) {
-                mostrarToastChat('Error al abrir chat');
-                return;
-            }
-
-            return _montarYAbrirConv(nueva.id, pacienteIdUs, nombre, iniciales, fotoUrl);
-        }
+    return _montarYAbrirConv(nueva.id, pacienteIdUs, nombre, iniciales, fotoUrl);
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           HELPER: construir objeto conv y abrir
-        ═══════════════════════════════════════════════════════ */
-        function _montarYAbrirConv(convId, pacienteIdUs, nombre, iniciales, fotoUrl) {
-            const conv = {
-                id_conv:     convId,
-                paciente_id: pacienteIdUs,
-                nombre,
-                iniciales,
-                fotoUrl,
-                sinLeer: 0,
-                ultimo:  null
+/* ═══════════════════════════════════════════════════════
+   HELPER: montar objeto conv y abrir
+═══════════════════════════════════════════════════════ */
+function _montarYAbrirConv(convId, pacienteIdUs, nombre, iniciales, fotoUrl) {
+    const conv = {
+        id_conv:     convId,
+        paciente_id: pacienteIdUs,
+        nombre,
+        iniciales,
+        fotoUrl,
+        sinLeer: 0,
+        ultimo:  null
+    };
+    const yaEsta = todasConvs.find(c => c.id_conv === convId);
+    if (!yaEsta) todasConvs.unshift(conv);
+    abrirConv(yaEsta || conv);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   CARGAR CONVERSACIONES DEL SIDEBAR
+═══════════════════════════════════════════════════════ */
+async function cargarConvs() {
+    const { data: convRows, error } = await _sb
+        .from('conversaciones')
+        .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
+        .eq('id_fisio', FISIO_REAL_ID)
+        .not('id_paciente', 'is', null)
+        .order('ultimo_mensaje_fecha', { ascending: false, nullsFirst: false });
+
+    if (error) {
+        console.error('[cargarConvs]', error);
+        return;
+    }
+
+    const convs = [];
+
+    for (const row of (convRows || [])) {
+        const pacienteIdUs = row.id_paciente;
+        if (!pacienteIdUs) continue;
+
+        const { count } = await _sb
+            .from('mensajes')
+            .select('*', { count: 'exact', head: true })
+            .eq('id_conv',    row.id)
+            .eq('msg_leido',  false)
+            .neq('id_emisor', FISIO_ID);
+
+        const { data: u } = await _sb
+            .from('usuario')
+            .select('us_nom, url_foto')
+            .eq('id_us', pacienteIdUs)
+            .single();
+
+        const nombre    = u?.us_nom || 'Paciente';
+        const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        const fotoUrl   = chatBuildFotoUrl(u?.url_foto);
+
+        convs.push({
+            id_conv:     row.id,
+            paciente_id: pacienteIdUs,
+            nombre,
+            iniciales,
+            fotoUrl,
+            sinLeer: count || 0,
+            ultimo: row.ultimo_mensaje
+                ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
+                : null
+        });
+    }
+
+    todasConvs = convs;
+    renderConvs(convs);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   RENDERIZAR LISTA DE CONVERSACIONES
+═══════════════════════════════════════════════════════ */
+function renderConvs(lista) {
+    const el      = document.getElementById('chatConvList');
+    const loading = document.getElementById('chatConvLoading');
+    if (loading) loading.style.display = 'none';
+    el.innerHTML = '';
+
+    if (!lista.length) {
+        el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">Sin conversaciones aún</div>';
+        return;
+    }
+
+    lista.forEach(c => {
+        const item = document.createElement('div');
+        item.className  = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
+        item.dataset.convId = c.id_conv;
+
+        // Avatar
+        const avDiv = document.createElement('div');
+        avDiv.className = 'chat-c-avatar md';
+        if (c.fotoUrl) {
+            const img   = document.createElement('img');
+            img.src     = c.fotoUrl;
+            img.alt     = c.nombre;
+            img.onerror = () => {
+                avDiv.innerHTML        = '';
+                avDiv.textContent      = c.iniciales;
+                avDiv.style.background = chatColorAvatar(c.iniciales);
             };
-
-            const yaEsta = todasConvs.find(c => c.id_conv === convId);
-            if (!yaEsta) todasConvs.unshift(conv);
-            abrirConv(yaEsta || conv);
+            avDiv.appendChild(img);
+        } else {
+            avDiv.textContent      = c.iniciales;
+            avDiv.style.background = chatColorAvatar(c.iniciales);
         }
 
+        // Info
+        const infoDiv     = document.createElement('div');
+        infoDiv.className = 'chat-conv-info';
+        const preview     = c.ultimo
+            ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
+            : '';
+        infoDiv.innerHTML = `
+            <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
+            <div class="chat-conv-last">${chatEscHTML(preview)}</div>
+        `;
 
-        /* ═══════════════════════════════════════════════════════
-           CARGAR TODAS LAS CONVERSACIONES DEL SIDEBAR
-        ═══════════════════════════════════════════════════════ */
-        async function cargarConvs() {
-            const { data: convRows, error } = await _sb
-                .from('conversaciones')
-                .select('id, id_paciente, ultimo_mensaje, ultimo_mensaje_fecha')
-                .eq('id_fisio', FISIO_REAL_ID)
-                .order('ultimo_mensaje_fecha', { ascending: false, nullsFirst: false });
+        // Meta
+        const metaDiv     = document.createElement('div');
+        metaDiv.className = 'chat-conv-meta';
+        metaDiv.innerHTML = `
+            <span class="chat-conv-time">${chatFormatHora(c.ultimo?.msg_fecha)}</span>
+            ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
+        `;
 
-            if (error) { console.error('[cargarConvs] Error:', error); return; }
+        item.appendChild(avDiv);
+        item.appendChild(infoDiv);
+        item.appendChild(metaDiv);
+        item.addEventListener('click', () => abrirConv(c));
+        el.appendChild(item);
+    });
+}
 
-            const convs = [];
 
-            for (const row of (convRows || [])) {
-                const pacienteIdUs = row.id_paciente;
+/* ═══════════════════════════════════════════════════════
+   ABRIR UNA CONVERSACIÓN
+═══════════════════════════════════════════════════════ */
+async function abrirConv(conv) {
+    convActiva = conv;
 
-                if (!pacienteIdUs || pacienteIdUs === '00000000-0000-0000-0000-000000000000') continue;
+    document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
 
-                const { count } = await _sb
-                    .from('mensajes')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('id_conv',    row.id)
-                    .eq('msg_leido',  false)
-                    .neq('id_emisor', FISIO_ID);
+    document.getElementById('chatEmptyState').style.display  = 'none';
+    document.getElementById('chatActivePanel').style.display = 'flex';
+    document.getElementById('chatHeaderName').textContent    = conv.nombre;
 
-                const { data: u } = await _sb
-                    .from('usuario')
-                    .select('us_nom, url_foto')
-                    .eq('id_us', pacienteIdUs)
-                    .single();
+    // Header avatar
+    const headerAv    = document.getElementById('chatHeaderAvatar');
+    headerAv.innerHTML = '';
+    if (conv.fotoUrl) {
+        const img         = document.createElement('img');
+        img.src           = conv.fotoUrl;
+        img.alt           = conv.nombre;
+        img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+        img.onerror = () => {
+            headerAv.innerHTML        = '';
+            headerAv.textContent      = conv.iniciales;
+            headerAv.style.background = chatColorAvatar(conv.iniciales);
+        };
+        headerAv.appendChild(img);
+        headerAv.style.background = 'transparent';
+    } else {
+        headerAv.textContent      = conv.iniciales;
+        headerAv.style.background = chatColorAvatar(conv.iniciales);
+    }
 
-                const nombre    = u?.us_nom || 'Paciente';
-                const iniciales = nombre.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                // ✅ Construir URL completa
-                const fotoUrl   = chatBuildFotoUrl(u?.url_foto);
+    document.getElementById('chatHeaderStatus').textContent = 'en línea';
+    document.getElementById('chatMain').classList.remove('hide');
+    document.getElementById('chatSidebar').classList.remove('show');
 
-                console.log('[cargarConvs] paciente:', nombre, '| fotoUrl:', fotoUrl);
+    await cargarMsgs(conv.id_conv);
+    chatMarcarLeidos(conv.id_conv);
 
-                convs.push({
-                    id_conv:     row.id,
-                    paciente_id: pacienteIdUs,
-                    nombre,
-                    iniciales,
-                    fotoUrl,
-                    sinLeer: count || 0,
-                    ultimo: row.ultimo_mensaje
-                        ? { msg_texto: row.ultimo_mensaje, msg_fecha: row.ultimo_mensaje_fecha }
-                        : null
-                });
-            }
+    const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
+    if (badge) badge.remove();
+}
 
-            todasConvs = convs;
-            renderConvs(convs);
+
+/* ═══════════════════════════════════════════════════════
+   CARGAR MENSAJES
+═══════════════════════════════════════════════════════ */
+async function cargarMsgs(convId) {
+    const area = document.getElementById('chatMessagesArea');
+
+    area.innerHTML = `
+        <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:4px 0;"></div>
+        <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:4px 0;"></div>
+    `;
+
+    const { data, error } = await _sb
+        .from('mensajes')
+        .select('*')
+        .eq('id_conv', convId)
+        .order('msg_fecha', { ascending: true });
+
+    area.innerHTML = '';
+
+    if (error) {
+        console.error('[cargarMsgs]', error);
+        return;
+    }
+
+    if (!data.length) {
+        area.innerHTML = '<div style="text-align:center;color:var(--chat-text-hint);font-size:13px;margin-top:40px;">Inicia la conversación 👋</div>';
+        return;
+    }
+
+    let ultimaFechaSep = null;
+    data.forEach(m => {
+        const etiquetaFecha = chatFormatFechaSep(m.msg_fecha);
+        if (etiquetaFecha !== ultimaFechaSep) {
+            const sep       = document.createElement('div');
+            sep.className   = 'chat-date-sep';
+            sep.innerHTML   = `<span>${etiquetaFecha}</span>`;
+            area.appendChild(sep);
+            ultimaFechaSep  = etiquetaFecha;
         }
+        chatAgregarBubble(m, false);
+    });
+
+    chatScrollAbajo();
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           RENDERIZAR LISTA DE CONVERSACIONES
-           ✅ FIX: todo con appendChild — el avDiv con <img>
-              nunca se destruye por un innerHTML posterior.
-        ═══════════════════════════════════════════════════════ */
-        function renderConvs(lista) {
-            const el      = document.getElementById('chatConvList');
-            const loading = document.getElementById('chatConvLoading');
-            if (loading) loading.style.display = 'none';
-            el.innerHTML = '';
+/* ═══════════════════════════════════════════════════════
+   RENDERIZAR BURBUJA DE MENSAJE
+═══════════════════════════════════════════════════════ */
+function chatAgregarBubble(m, animar = true) {
+    const area    = document.getElementById('chatMessagesArea');
+    const esFisio = m.id_emisor === FISIO_ID;
 
-            if (!lista.length) {
-                el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">Sin conversaciones aún</div>';
-                return;
-            }
+    const row       = document.createElement('div');
+    row.className   = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
+    if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
-            lista.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
-                item.dataset.convId = c.id_conv;
+    const hora = m.msg_fecha
+        ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
+            hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
+          })
+        : '';
 
-                // ── Avatar ──────────────────────────────────────
-                const avDiv = document.createElement('div');
-                avDiv.className = 'chat-c-avatar md';
-                if (c.fotoUrl) {
-                    const img    = document.createElement('img');
-                    img.src      = c.fotoUrl;
-                    img.alt      = c.nombre;
-                    img.onerror  = () => {
-                        avDiv.innerHTML        = '';
-                        avDiv.textContent      = c.iniciales;
-                        avDiv.style.background = chatColorAvatar(c.iniciales);
-                    };
-                    avDiv.appendChild(img);
+    const checkIcon = m.msg_leido
+        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
+        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+    // Mini avatar
+    const avDiv     = document.createElement('div');
+    avDiv.className = 'chat-msg-av';
+
+    const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
+    const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
+    const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
+
+    if (fotoUrl) {
+        const img   = document.createElement('img');
+        img.src     = fotoUrl;
+        img.alt     = ini;
+        img.onerror = () => {
+            avDiv.innerHTML        = '';
+            avDiv.textContent      = ini;
+            avDiv.style.background = bgColor;
+        };
+        avDiv.appendChild(img);
+    } else {
+        avDiv.textContent      = ini;
+        avDiv.style.background = bgColor;
+    }
+
+    const bubble     = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = `
+        ${chatEscHTML(m.msg_texto)}
+        <div class="chat-bubble-meta">
+            <span class="chat-bubble-time">${hora}</span>
+            ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
+        </div>
+    `;
+
+    row.appendChild(avDiv);
+    row.appendChild(bubble);
+    area.appendChild(row);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   ENVIAR MENSAJE
+═══════════════════════════════════════════════════════ */
+async function chatEnviarMensaje() {
+    if (!FISIO_ID || !convActiva) {
+        mostrarToastChat('Selecciona una conversación');
+        return;
+    }
+
+    const input = document.getElementById('chatMsgInput');
+    const texto = input.value.trim();
+    if (!texto) return;
+
+    if (!convActiva.id_conv) {
+        mostrarToastChat('⚠️ Error de conversación, recarga la página');
+        return;
+    }
+
+    input.value        = '';
+    input.style.height = 'auto';
+
+    const ahora = new Date().toISOString();
+
+    // Mostrar burbuja optimista inmediatamente
+    chatAgregarBubble({
+        id_emisor: FISIO_ID,
+        msg_texto: texto,
+        msg_fecha: ahora,
+        msg_leido: false,
+        id_conv:   convActiva.id_conv
+    }, true);
+    chatScrollAbajo();
+
+    // Guardar en Supabase
+    const { error } = await _sb.from('mensajes').insert({
+        id_emisor: FISIO_ID,
+        msg_texto: texto,
+        msg_leido: false,
+        id_conv:   convActiva.id_conv
+    });
+
+    if (error) {
+        console.error('[chatEnviarMensaje]', error);
+        mostrarToastChat('Error al enviar: ' + error.message);
+        return;
+    }
+
+    // Actualizar último mensaje en conversación
+    await _sb.from('conversaciones').update({
+        ultimo_mensaje:       texto,
+        ultimo_mensaje_fecha: ahora
+    }).eq('id', convActiva.id_conv);
+
+    // Actualizar preview en sidebar
+    const convEnLista = todasConvs.find(c => c.id_conv === convActiva.id_conv);
+    if (convEnLista) {
+        convEnLista.ultimo = { msg_texto: texto, msg_fecha: ahora };
+        renderConvs(todasConvs);
+    }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   TIEMPO REAL
+═══════════════════════════════════════════════════════ */
+function chatEscucharRT() {
+    if (rtChannel) _sb.removeChannel(rtChannel);
+
+    rtChannel = _sb.channel('motricare_chat_rt')
+        .on('postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'mensajes' },
+            payload => {
+                const m = payload.new;
+                if (m.id_emisor === FISIO_ID) return; // ignorar los propios
+
+                if (convActiva && m.id_conv === convActiva.id_conv) {
+                    chatAgregarBubble(m, true);
+                    chatScrollAbajo();
+                    chatMarcarLeidos(convActiva.id_conv);
                 } else {
-                    avDiv.textContent      = c.iniciales;
-                    avDiv.style.background = chatColorAvatar(c.iniciales);
+                    mostrarToastChat('💬 Nuevo mensaje de un paciente');
+                    cargarConvs(); // refrescar sidebar
                 }
-
-                // ── Info ────────────────────────────────────────
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'chat-conv-info';
-                const preview = c.ultimo
-                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
-                    : '';
-                infoDiv.innerHTML = `
-                    <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
-                    <div class="chat-conv-last">${chatEscHTML(preview)}</div>
-                `;
-
-                // ── Meta ────────────────────────────────────────
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'chat-conv-meta';
-                metaDiv.innerHTML = `
-                    <span class="chat-conv-time">${chatFormatHora(c.ultimo?.msg_fecha)}</span>
-                    ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
-                `;
-
-                item.appendChild(avDiv);
-                item.appendChild(infoDiv);
-                item.appendChild(metaDiv);
-                item.addEventListener('click', () => abrirConv(c));
-                el.appendChild(item);
-            });
-        }
-
-
-        /* ═══════════════════════════════════════════════════════
-           ABRIR UNA CONVERSACIÓN
-        ═══════════════════════════════════════════════════════ */
-        async function abrirConv(conv) {
-            convActiva = conv;
-
-            document.querySelectorAll('.chat-conv-item').forEach(el => el.classList.remove('active'));
-            document.querySelector(`[data-conv-id="${conv.id_conv}"]`)?.classList.add('active');
-
-            document.getElementById('chatEmptyState').style.display  = 'none';
-            document.getElementById('chatActivePanel').style.display = 'flex';
-            document.getElementById('chatHeaderName').textContent    = conv.nombre;
-
-            // ── Header avatar ───────────────────────────────────
-            const headerAv = document.getElementById('chatHeaderAvatar');
-            headerAv.innerHTML = '';
-            if (conv.fotoUrl) {
-                const img         = document.createElement('img');
-                img.src           = conv.fotoUrl;
-                img.alt           = conv.nombre;
-                img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
-                img.onerror = () => {
-                    headerAv.innerHTML        = '';
-                    headerAv.textContent      = conv.iniciales;
-                    headerAv.style.background = chatColorAvatar(conv.iniciales);
-                };
-                headerAv.appendChild(img);
-                headerAv.style.background = 'transparent';
-            } else {
-                headerAv.textContent      = conv.iniciales;
-                headerAv.style.background = chatColorAvatar(conv.iniciales);
             }
-
-            document.getElementById('chatHeaderStatus').textContent = 'en línea';
-            document.getElementById('chatMain').classList.remove('hide');
-            document.getElementById('chatSidebar').classList.remove('show');
-
-            await cargarMsgs(conv.id_conv);
-            chatMarcarLeidos(conv.id_conv);
-
-            const badge = document.querySelector(`[data-conv-id="${conv.id_conv}"] .chat-badge`);
-            if (badge) badge.remove();
-        }
+        )
+        .subscribe();
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           CARGAR MENSAJES DE UNA CONVERSACIÓN
-        ═══════════════════════════════════════════════════════ */
-        async function cargarMsgs(convId) {
-            const area = document.getElementById('chatMessagesArea');
+/* ═══════════════════════════════════════════════════════
+   MARCAR LEÍDOS
+═══════════════════════════════════════════════════════ */
+async function chatMarcarLeidos(convId) {
+    await _sb.from('mensajes')
+        .update({ msg_leido: true })
+        .eq('id_conv',  convId)
+        .neq('id_emisor', FISIO_ID);
 
-            area.innerHTML = `
-                <div class="chat-skeleton" style="width:52%;align-self:flex-end;height:38px;margin:4px 0;"></div>
-                <div class="chat-skeleton" style="width:44%;align-self:flex-start;height:38px;margin:4px 0;"></div>
-            `;
-
-            const { data, error } = await _sb
-                .from('mensajes')
-                .select('*')
-                .eq('id_conv', convId)
-                .order('msg_fecha', { ascending: true });
-
-            area.innerHTML = '';
-
-            if (error) { console.error(error); return; }
-
-            if (!data.length) {
-                area.innerHTML = '<div style="text-align:center;color:var(--chat-text-hint);font-size:13px;margin-top:40px;">Inicia la conversación 👋</div>';
-                return;
-            }
-
-            let ultimaFechaSep = null;
-            data.forEach(m => {
-                const etiquetaFecha = chatFormatFechaSep(m.msg_fecha);
-                if (etiquetaFecha !== ultimaFechaSep) {
-                    const sep = document.createElement('div');
-                    sep.className = 'chat-date-sep';
-                    sep.innerHTML = `<span>${etiquetaFecha}</span>`;
-                    area.appendChild(sep);
-                    ultimaFechaSep = etiquetaFecha;
-                }
-                chatAgregarBubble(m, false);
-            });
-
-            chatScrollAbajo();
-        }
+    chatActualizarBadge();
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           RENDERIZAR UNA BURBUJA DE MENSAJE
-        ═══════════════════════════════════════════════════════ */
-        function chatAgregarBubble(m, animar = true) {
-            const area    = document.getElementById('chatMessagesArea');
-            const esFisio = m.id_emisor === FISIO_ID;
-
-            const row = document.createElement('div');
-            row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
-            if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
-
-            const hora = m.msg_fecha
-                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
-                    hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
-                  })
-                : '';
-
-            const checkIcon = m.msg_leido
-                ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
-                : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-
-            // ── Mini avatar en burbuja ──────────────────────────
-            const avDiv     = document.createElement('div');
-            avDiv.className = 'chat-msg-av';
-
-            // ✅ Para el fisio: FISIO_FOTO (ya es URL completa desde chatInit)
-            // ✅ Para el paciente: convActiva.fotoUrl (ya es URL completa desde cargarConvs)
-            const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
-            const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
-            const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
-
-            if (fotoUrl) {
-                const img   = document.createElement('img');
-                img.src     = fotoUrl;
-                img.alt     = ini;
-                img.onerror = () => {
-                    avDiv.innerHTML        = '';
-                    avDiv.textContent      = ini;
-                    avDiv.style.background = bgColor;
-                };
-                avDiv.appendChild(img);
-            } else {
-                avDiv.textContent      = ini;
-                avDiv.style.background = bgColor;
-            }
-
-            const bubble     = document.createElement('div');
-            bubble.className = 'chat-bubble';
-            bubble.innerHTML = `
-                ${chatEscHTML(m.msg_texto)}
-                <div class="chat-bubble-meta">
-                    <span class="chat-bubble-time">${hora}</span>
-                    ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
-                </div>
-            `;
-
-            row.appendChild(avDiv);
-            row.appendChild(bubble);
-            area.appendChild(row);
-        }
+/* ═══════════════════════════════════════════════════════
+   FILTRAR CONVERSACIONES
+═══════════════════════════════════════════════════════ */
+function filtrarConvs() {
+    const q = document.getElementById('chatSearch').value.toLowerCase();
+    renderConvs(todasConvs.filter(c => c.nombre.toLowerCase().includes(q)));
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           ENVIAR UN MENSAJE
-        ═══════════════════════════════════════════════════════ */
-        async function chatEnviarMensaje() {
-            if (!FISIO_ID || !convActiva) {
-                mostrarToastChat('Selecciona una conversación');
-                return;
-            }
-
-            const input = document.getElementById('chatMsgInput');
-            const texto = input.value.trim();
-            if (!texto) return;
-
-            if (!convActiva.id_conv || convActiva.id_conv === '00000000-0000-0000-0000-000000000000') {
-                mostrarToastChat('⚠️ Error de conversación, recarga la página');
-                return;
-            }
-
-            input.value        = '';
-            input.style.height = 'auto';
-
-            const ahora = new Date().toISOString();
-
-            chatAgregarBubble({
-                id_emisor: FISIO_ID,
-                msg_texto: texto,
-                msg_fecha: ahora,
-                msg_leido: false,
-                id_conv:   convActiva.id_conv
-            }, true);
-            chatScrollAbajo();
-
-            const { error } = await _sb.from('mensajes').insert({
-                id_emisor: FISIO_ID,
-                msg_texto: texto,
-                msg_leido: false,
-                id_conv:   convActiva.id_conv
-            });
-
-            if (error) {
-                console.error('[chatEnviarMensaje] Error:', error);
-                mostrarToastChat('Error al enviar');
-                return;
-            }
-
-            await _sb.from('conversaciones').update({
-                ultimo_mensaje:       texto,
-                ultimo_mensaje_fecha: ahora
-            }).eq('id', convActiva.id_conv);
-        }
+/* ═══════════════════════════════════════════════════════
+   VOLVER AL SIDEBAR (móvil)
+═══════════════════════════════════════════════════════ */
+function volverSidebarChat() {
+    document.getElementById('chatSidebar').classList.add('show');
+    document.getElementById('chatMain').classList.add('hide');
+}
 
 
-        /* ═══════════════════════════════════════════════════════
-           TIEMPO REAL
-        ═══════════════════════════════════════════════════════ */
-        function chatEscucharRT() {
-            if (rtChannel) _sb.removeChannel(rtChannel);
+/* ═══════════════════════════════════════════════════════
+   UTILIDADES
+═══════════════════════════════════════════════════════ */
+function chatFormatFechaSep(fecha) {
+    if (!fecha) return '';
+    const TZ   = 'America/Mexico_City';
+    const d    = new Date(fecha);
+    const hoy  = new Date();
+    const ayer = new Date();
+    ayer.setDate(hoy.getDate() - 1);
 
-            rtChannel = _sb.channel('motricare_chat_rt')
-                .on('postgres_changes',
-                    { event: 'INSERT', schema: 'public', table: 'mensajes' },
-                    payload => {
-                        const m = payload.new;
-                        if (m.id_emisor === FISIO_ID) return;
+    const dStr    = d.toLocaleDateString('es-MX', { timeZone: TZ });
+    const hoyStr  = hoy.toLocaleDateString('es-MX', { timeZone: TZ });
+    const ayerStr = ayer.toLocaleDateString('es-MX', { timeZone: TZ });
 
-                        if (convActiva && m.id_conv === convActiva.id_conv) {
-                            chatAgregarBubble(m, true);
-                            chatScrollAbajo();
-                            chatMarcarLeidos(convActiva.id_conv);
-                        } else {
-                            mostrarToastChat('💬 Nuevo mensaje de un paciente');
-                            cargarConvs();
-                        }
-                    }
-                )
-                .subscribe();
-        }
+    if (dStr === hoyStr)  return 'Hoy';
+    if (dStr === ayerStr) return 'Ayer';
 
+    const diffDias = Math.floor((hoy - d) / (1000 * 60 * 60 * 24));
+    if (diffDias < 7) return d.toLocaleDateString('es-MX', { weekday: 'long', timeZone: TZ });
 
-        /* ═══════════════════════════════════════════════════════
-           MARCAR LEÍDOS
-        ═══════════════════════════════════════════════════════ */
-        async function chatMarcarLeidos(convId) {
-            await _sb.from('mensajes')
-                .update({ msg_leido: true })
-                .eq('id_conv', convId)
-                .neq('id_emisor', FISIO_ID);
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', timeZone: TZ });
+}
 
-            chatActualizarBadge();
-        }
+function chatFormatHora(fecha) {
+    if (!fecha) return '';
+    const TZ     = 'America/Mexico_City';
+    const d      = new Date(fecha);
+    const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
+    const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
 
+    if (dStr === hoyStr) {
+        return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
+    }
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', timeZone: TZ });
+}
 
-        /* ═══════════════════════════════════════════════════════
-           FILTRAR
-        ═══════════════════════════════════════════════════════ */
-        function filtrarConvs() {
-            const q = document.getElementById('chatSearch').value.toLowerCase();
-            renderConvs(todasConvs.filter(c => c.nombre.toLowerCase().includes(q)));
-        }
+function chatScrollAbajo() {
+    const area = document.getElementById('chatMessagesArea');
+    requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
+}
 
+function chatAutoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+}
 
-        /* ═══════════════════════════════════════════════════════
-           VOLVER AL SIDEBAR (móvil)
-        ═══════════════════════════════════════════════════════ */
-        function volverSidebarChat() {
-            document.getElementById('chatSidebar').classList.add('show');
-            document.getElementById('chatMain').classList.add('hide');
-        }
+function chatHandleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatEnviarMensaje();
+    }
+}
 
+function chatColorAvatar(ini) {
+    const cols = ['#9b1b6e','#7a1254','#b5357f','#c4629a','#6d1249','#d4539e','#531040'];
+    let s = 0;
+    for (const c of (ini || 'P')) s += c.charCodeAt(0);
+    return cols[s % cols.length];
+}
 
-        /* ═══════════════════════════════════════════════════════
-           UTILIDADES
-        ═══════════════════════════════════════════════════════ */
-        function chatFormatFechaSep(fecha) {
-            if (!fecha) return '';
-            const TZ   = 'America/Mexico_City';
-            const d    = new Date(fecha);
-            const hoy  = new Date();
-            const ayer = new Date();
-            ayer.setDate(hoy.getDate() - 1);
+function chatEscHTML(str) {
+    return String(str || '')
+        .replace(/&/g,  '&amp;')
+        .replace(/</g,  '&lt;')
+        .replace(/>/g,  '&gt;')
+        .replace(/"/g,  '&quot;')
+        .replace(/\n/g, '<br>');
+}
 
-            const dStr    = d.toLocaleDateString('es-MX', { timeZone: TZ });
-            const hoyStr  = hoy.toLocaleDateString('es-MX', { timeZone: TZ });
-            const ayerStr = ayer.toLocaleDateString('es-MX', { timeZone: TZ });
+function mostrarToastChat(msg) {
+    const el = document.getElementById('chatToast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+}
 
-            if (dStr === hoyStr)  return 'Hoy';
-            if (dStr === ayerStr) return 'Ayer';
+window.toast = mostrarToastChat;
 
-            const diffDias = Math.floor((hoy - d) / (1000 * 60 * 60 * 24));
-            if (diffDias < 7) return d.toLocaleDateString('es-MX', { weekday: 'long', timeZone: TZ });
-
-            return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', timeZone: TZ });
-        }
-
-        function chatFormatHora(fecha) {
-            if (!fecha) return '';
-            const TZ     = 'America/Mexico_City';
-            const d      = new Date(fecha);
-            const hoyStr = new Date().toLocaleDateString('es-MX', { timeZone: TZ });
-            const dStr   = d.toLocaleDateString('es-MX', { timeZone: TZ });
-
-            if (dStr === hoyStr) {
-                return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
-            }
-            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', timeZone: TZ });
-        }
-
-        function chatScrollAbajo() {
-            const area = document.getElementById('chatMessagesArea');
-            requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
-        }
-
-        function chatAutoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-        }
-
-        function chatHandleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                chatEnviarMensaje();
-            }
-        }
-
-        function chatColorAvatar(ini) {
-            const cols = ['#9b1b6e', '#7a1254', '#b5357f', '#c4629a', '#6d1249', '#d4539e', '#531040'];
-            let s = 0;
-            for (const c of (ini || 'P')) s += c.charCodeAt(0);
-            return cols[s % cols.length];
-        }
-
-        function chatEscHTML(str) {
-            return String(str || '')
-                .replace(/&/g,  '&amp;')
-                .replace(/</g,  '&lt;')
-                .replace(/>/g,  '&gt;')
-                .replace(/"/g,  '&quot;')
-                .replace(/\n/g, '<br>');
-        }
-
-        function mostrarToastChat(msg) {
-            const el = document.getElementById('chatToast');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        window.toast = mostrarToastChat;
-
-        chatInit();
+chatInit();
     </script>
 
 </body>
