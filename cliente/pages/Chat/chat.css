@@ -668,9 +668,6 @@ body {
         padding: 8px 12px;
         padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
-    .main-content{
-        margin-left: 4rem;
-    }
 }
 
 /* ══════════════════════════════════════════
@@ -696,9 +693,6 @@ body {
     .chat-input-area {
         padding: 11px 16px;
         padding-bottom: max(11px, env(safe-area-inset-bottom));
-    }
-    .main-content{
-        margin-left: 4rem;
     }
 }
 
@@ -735,9 +729,6 @@ body {
     .chat-input-wrap textarea {
         font-size: 14px; /* en desktop no hay riesgo de zoom iOS */
     }
-    .main-content{
-        margin-left: 4rem;
-    }
 }
 
 /* ══════════════════════════════════════════
@@ -756,9 +747,6 @@ body {
 
     .chat-messages-area {
         max-width: 1100px;
-    }
-    .main-content{
-        margin-left: 4rem;
     }
 }
 
