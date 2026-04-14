@@ -633,61 +633,72 @@
         /* ═══════════════════════════════════════════════════════
            RENDERIZAR UNA BURBUJA DE MENSAJE
         ═══════════════════════════════════════════════════════ */
-        function chatAgregarBubble(m, animar = true) {
-            const area    = document.getElementById('chatMessagesArea');
-            const esFisio = m.id_emisor === FISIO_ID;
-
-            const row = document.createElement('div');
-            row.className = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
-            if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
-
-            const hora = m.msg_fecha
-                ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
-                    hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
-                  })
-                : '';
-
-            const checkIcon = m.msg_leido
-                ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
-                : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-
-            const avDiv   = document.createElement('div');
-            avDiv.className = 'chat-msg-av';
-
-            const fotoUrl = esFisio ? FISIO_FOTO : (convActiva?.fotoUrl || null);
-            const ini     = esFisio ? 'Yo' : (convActiva?.iniciales || 'P');
-            const bgColor = esFisio ? 'var(--color-primary)' : chatColorAvatar(convActiva?.iniciales || 'P');
-
-            if (fotoUrl) {
-                const img = document.createElement('img');
-                img.src   = fotoUrl;
-                img.alt   = ini;
-                img.onerror = () => {
-                    avDiv.innerHTML        = '';
-                    avDiv.textContent      = ini;
-                    avDiv.style.background = bgColor;
-                };
-                avDiv.appendChild(img);
-            } else {
-                avDiv.textContent      = ini;
-                avDiv.style.background = bgColor;
+function renderConvs(lista) {
+            const el      = document.getElementById('chatConvList');
+            const loading = document.getElementById('chatConvLoading');
+            if (loading) loading.style.display = 'none';
+            el.innerHTML = '';
+ 
+            if (!lista.length) {
+                el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--chat-text-hint);font-size:13px;">Sin conversaciones aún</div>';
+                return;
             }
-
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble';
-            bubble.innerHTML = `
-                ${chatEscHTML(m.msg_texto)}
-                <div class="chat-bubble-meta">
-                    <span class="chat-bubble-time">${hora}</span>
-                    ${esFisio ? `<span class="chat-check">${checkIcon}</span>` : ''}
-                </div>
-            `;
-
-            row.appendChild(avDiv);
-            row.appendChild(bubble);
-            area.appendChild(row);
+ 
+            lista.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'chat-conv-item' + (convActiva?.id_conv === c.id_conv ? ' active' : '');
+                item.dataset.convId = c.id_conv;
+ 
+                const hora    = chatFormatHora(c.ultimo?.msg_fecha);
+                const preview = c.ultimo
+                    ? c.ultimo.msg_texto.substring(0, 40) + (c.ultimo.msg_texto.length > 40 ? '…' : '')
+                    : '';
+ 
+                // ── Avatar ──────────────────────────────────────────────────
+                const avDiv = document.createElement('div');
+                avDiv.className = 'chat-c-avatar md';
+                if (c.fotoUrl) {
+                    const img = document.createElement('img');
+                    img.src   = c.fotoUrl;
+                    img.alt   = c.nombre;
+                    img.onerror = () => {
+                        avDiv.innerHTML        = '';
+                        avDiv.textContent      = c.iniciales;
+                        avDiv.style.background = chatColorAvatar(c.iniciales);
+                    };
+                    avDiv.appendChild(img);
+                } else {
+                    avDiv.textContent      = c.iniciales;
+                    avDiv.style.background = chatColorAvatar(c.iniciales);
+                }
+ 
+                // ── Info ────────────────────────────────────────────────────
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'chat-conv-info';
+                infoDiv.innerHTML = `
+                    <div class="chat-conv-name">${chatEscHTML(c.nombre)}</div>
+                    <div class="chat-conv-last">${chatEscHTML(preview)}</div>
+                `;
+ 
+                // ── Meta ────────────────────────────────────────────────────
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'chat-conv-meta';
+                metaDiv.innerHTML = `
+                    <span class="chat-conv-time">${hora}</span>
+                    ${c.sinLeer > 0 ? `<span class="chat-badge">${c.sinLeer}</span>` : ''}
+                `;
+ 
+                // ✅ FIX: se construye todo con appendChild, nunca innerHTML
+                //    así el avDiv con su <img> no se destruye
+                item.appendChild(avDiv);
+                item.appendChild(infoDiv);
+                item.appendChild(metaDiv);
+ 
+                item.addEventListener('click', () => abrirConv(c));
+                el.appendChild(item);
+            });
         }
-
+ 
 
         /* ═══════════════════════════════════════════════════════
            ENVIAR UN MENSAJE
