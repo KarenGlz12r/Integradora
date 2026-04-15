@@ -13,7 +13,7 @@ import { supabase } from "../../../auth.js";
    ⚠️ CAMBIA 'avatares' por el nombre real de tu bucket en Supabase.
 ══════════════════════════════════════════════════════════════ */
 const SUPABASE_PROJECT_URL = 'https://qhrennyqjhngysortocu.supabase.co';
-const STORAGE_BUCKET       = 'perfil_pacientes'; 
+const STORAGE_BUCKET = 'perfil_pacientes';
 
 /**
  * Construye la URL pública de una foto desde Supabase Storage.
@@ -62,11 +62,11 @@ function buildAvatarHTML(fotoUrl, nombre, cssClass = '') {
    Se inicializan en null y se van llenando conforme el usuario
    navega por la pantalla.
 ══════════════════════════════════════════════════════════════ */
-let _fisioId           = null;  // ID interno del fisio (tabla fisioterapeutas)
-let _fisioUserId       = null;  // ID de auth.users del fisio
-let _pacienteActual    = null;  // Objeto completo del paciente seleccionado
-let _citaIdNota        = null;  // ID de la cita de la nota en edición/creación
-let _notaEditandoId    = null;  // ID de la nota en edición (null = nueva nota)
+let _fisioId = null;  // ID interno del fisio (tabla fisioterapeutas)
+let _fisioUserId = null;  // ID de auth.users del fisio
+let _pacienteActual = null;  // Objeto completo del paciente seleccionado
+let _citaIdNota = null;  // ID de la cita de la nota en edición/creación
+let _notaEditandoId = null;  // ID de la nota en edición (null = nueva nota)
 let _todosLosPacientes = [];    // Cache de pacientes para el buscador
 
 
@@ -92,7 +92,7 @@ async function getFisioData() {
     if (!fisio) return null;
 
     // Guardar ambos IDs globalmente para uso en el resto del módulo
-    _fisioId     = fisio.id;
+    _fisioId = fisio.id;
     _fisioUserId = user.id;
     return fisio.id;
 }
@@ -153,8 +153,8 @@ function toast(msg, tipo = 'success') {
     const icons = {
         success: 'check-circle-fill',
         warning: 'exclamation-triangle-fill',
-        danger:  'x-circle-fill',
-        info:    'info-circle-fill'
+        danger: 'x-circle-fill',
+        info: 'info-circle-fill'
     };
     const el = document.createElement('div');
     el.className = `toast-msg toast-${tipo}`;
@@ -190,10 +190,10 @@ async function cargarEstadisticas(fisioId) {
     const card1 = document.getElementById('card-pacientes-confirmados');
     const unicos = new Set(citasConf?.map(c => c.usuario_id));
     card1.querySelector('.card-stat-numero').textContent = unicos.size;
-    card1.querySelector('.card-stat-label').textContent  = 'Pacientes confirmados';
+    card1.querySelector('.card-stat-label').textContent = 'Pacientes confirmados';
 
     // ── 2. Pacientes nuevos este mes ──────────────────────────────────────
-    const ahora     = new Date();
+    const ahora = new Date();
     const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-01`;
     const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
         .toISOString().split('T')[0];
@@ -262,7 +262,7 @@ async function cargarEstadisticas(fisioId) {
             `${c.fecha < hoy ? 'Última' : 'Próxima'} · ${c.hora_inicio} · ${c.motivo}`;
     } else {
         cardP.querySelector('.card-stat-numero').textContent = '—';
-        cardP.querySelector('.card-stat-label').textContent  = 'Sin citas registradas';
+        cardP.querySelector('.card-stat-label').textContent = 'Sin citas registradas';
     }
 }
 
@@ -341,16 +341,16 @@ function renderListaPacientes(lista) {
     }
 
     container.innerHTML = lista.map(c => {
-        const nom       = c.usuario?.us_nom || 'Sin nombre';
+        const nom = c.usuario?.us_nom || 'Sin nombre';
         const iniciales = getIniciales(nom);
 
         // ✅ Construir URL completa de la foto antes de renderizar
-        const fotoUrl   = buildFotoUrl(c.usuario?.url_foto);
+        const fotoUrl = buildFotoUrl(c.usuario?.url_foto);
 
         // Badge de estado de la cita más reciente
         const badgeClass = c.estado === 'confirmada' ? 'badge-confirmada'
-                         : c.estado === 'cancelada'  ? 'badge-cancelada'
-                         : 'badge-pendiente';
+            : c.estado === 'cancelada' ? 'badge-cancelada'
+                : 'badge-pendiente';
         const badgeTxt = c.estado?.replace('_', ' ') || '—';
 
         return `
@@ -359,7 +359,7 @@ function renderListaPacientes(lista) {
             <!-- Avatar: foto si existe, iniciales si no -->
             <div class="paciente-avatar">
                 ${fotoUrl
-                    ? `<img 
+                ? `<img 
                             src="${fotoUrl}" 
                             alt="${nom}"
                             onerror="
@@ -367,8 +367,8 @@ function renderListaPacientes(lista) {
                                 this.parentElement.removeAttribute('style');
                             "
                        >`
-                    : iniciales
-                }
+                : iniciales
+            }
             </div>
 
             <!-- Nombre y fecha de última cita -->
@@ -420,7 +420,7 @@ document.getElementById('buscarPaciente').addEventListener('input', e => {
 
     // Filtrar por nombre o correo
     const filtrados = _todosLosPacientes.filter(c =>
-        (c.usuario?.us_nom    || '').toLowerCase().includes(q) ||
+        (c.usuario?.us_nom || '').toLowerCase().includes(q) ||
         (c.usuario?.us_correo || '').toLowerCase().includes(q)
     );
     renderListaPacientes(filtrados);
@@ -453,34 +453,34 @@ async function abrirDetallePaciente(cita) {
     document.getElementById('panelDetalle').classList.add('show');
 
     // ── Header: avatar, nombre, contacto ──────────────────────────────────
-    const nom       = cita.usuario.us_nom || 'Sin nombre';
+    const nom = cita.usuario.us_nom || 'Sin nombre';
     const iniciales = getIniciales(nom);
 
     // ✅ Construir URL completa de la foto del paciente
-    const fotoUrl   = buildFotoUrl(cita.usuario.url_foto);
+    const fotoUrl = buildFotoUrl(cita.usuario.url_foto);
 
-    const avatarEl  = document.getElementById('detailAvatar');
+    const avatarEl = document.getElementById('detailAvatar');
     avatarEl.innerHTML = '';
 
     if (fotoUrl) {
         // Foto disponible: insertar <img> con fallback a iniciales en onerror
-        const img     = document.createElement('img');
-        img.src       = fotoUrl;
-        img.alt       = nom;
+        const img = document.createElement('img');
+        img.src = fotoUrl;
+        img.alt = nom;
         img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
-        img.onerror   = () => {
+        img.onerror = () => {
             // Si la imagen falla (URL rota, CORS, etc.), mostrar iniciales
-            avatarEl.innerHTML        = iniciales;
+            avatarEl.innerHTML = iniciales;
             avatarEl.style.background = 'var(--color-primary-lt)';
-            avatarEl.style.color      = 'var(--color-primary)';
+            avatarEl.style.color = 'var(--color-primary)';
         };
         avatarEl.appendChild(img);
         avatarEl.style.background = 'transparent';
     } else {
         // Sin foto: mostrar iniciales
-        avatarEl.textContent      = iniciales;
+        avatarEl.textContent = iniciales;
         avatarEl.style.background = 'var(--color-primary-lt)';
-        avatarEl.style.color      = 'var(--color-primary)';
+        avatarEl.style.color = 'var(--color-primary)';
     }
 
     document.getElementById('detailNombre').textContent = nom;
@@ -593,9 +593,9 @@ async function cargarCitasPaciente(pacienteUserId) {
 
     container.innerHTML = citas.map(c => {
         const { dia, mes } = formatFechaCorta(c.fecha);
-        const tieneNota    = citasConNota.has(c.id);
-        const estadoClass  = `estado-${c.estado || 'pendiente'}`;
-        const estadoTxt    = (c.estado || 'pendiente').replace('_', ' ');
+        const tieneNota = citasConNota.has(c.id);
+        const estadoClass = `estado-${c.estado || 'pendiente'}`;
+        const estadoTxt = (c.estado || 'pendiente').replace('_', ' ');
 
         return `
         <div class="cita-card">
@@ -632,7 +632,7 @@ async function cargarCitasPaciente(pacienteUserId) {
     // Eventos de los botones de nota en cada tarjeta de cita
     container.querySelectorAll('.cita-nota-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const citaId    = btn.dataset.citaId;
+            const citaId = btn.dataset.citaId;
             const tieneNota = btn.dataset.tieneNota === 'true';
             abrirModalNota(citaId, tieneNota);
         });
@@ -670,7 +670,7 @@ async function cargarHistorialClinico(pacienteUserId) {
     const val = (v) => {
         if (v === null || v === undefined || v === '')
             return `<span class="hc-value empty">No especificado</span>`;
-        if (v === true  || v === 'true')
+        if (v === true || v === 'true')
             return `<span class="hc-value bool-si">Sí</span>`;
         if (v === false || v === 'false')
             return `<span class="hc-value bool-no">No</span>`;
@@ -701,8 +701,8 @@ async function cargarHistorialClinico(pacienteUserId) {
                 <div class="hc-row">
                     <span class="hc-label">Nivel de dolor inicial</span>
                     ${val(hc.nivel_dolor_inicial !== null
-                        ? hc.nivel_dolor_inicial + ' / 10'
-                        : null)}
+        ? hc.nivel_dolor_inicial + ' / 10'
+        : null)}
                 </div>
             </div>
         </div>
@@ -769,14 +769,14 @@ async function cargarHistorialClinico(pacienteUserId) {
                 <div class="hc-row">
                     <span class="hc-label">Creado</span>
                     ${val(hc.creado_en
-                        ? new Date(hc.creado_en).toLocaleDateString('es-MX')
-                        : null)}
+            ? new Date(hc.creado_en).toLocaleDateString('es-MX')
+            : null)}
                 </div>
                 <div class="hc-row">
                     <span class="hc-label">Actualizado</span>
                     ${val(hc.actualizado_en
-                        ? new Date(hc.actualizado_en).toLocaleDateString('es-MX')
-                        : null)}
+                ? new Date(hc.actualizado_en).toLocaleDateString('es-MX')
+                : null)}
                 </div>
             </div>
         </div>
@@ -831,8 +831,8 @@ async function cargarNotasEvolucion(pacienteUserId) {
                 <span class="nota-card-fecha">
                     <i class="bi bi-calendar3"></i>
                     ${n.cita?.fecha
-                        ? formatFecha(n.cita.fecha)
-                        : formatFecha(n.creado_en?.split('T')[0])}
+            ? formatFecha(n.cita.fecha)
+            : formatFecha(n.creado_en?.split('T')[0])}
                     ${n.cita?.hora_inicio ? '· ' + n.cita.hora_inicio : ''}
                 </span>
                 <span class="nota-card-motivo">
@@ -885,8 +885,8 @@ async function cargarNotasEvolucion(pacienteUserId) {
                         <span class="nota-field-label">Duración</span>
                         <span class="nota-field-value">
                             ${n.duracion_minutos
-                                ? n.duracion_minutos + ' min'
-                                : '<span class="nota-field-value empty">No registrado</span>'}
+            ? n.duracion_minutos + ' min'
+            : '<span class="nota-field-value empty">No registrado</span>'}
                         </span>
                     </div>
 
@@ -948,7 +948,7 @@ async function cargarNotasEvolucion(pacienteUserId) {
 
 // ── Sliders de dolor — actualizar el número mostrado al mover ──────────
 const sliderInicio = document.getElementById('nf-dolor-inicio');
-const sliderFin    = document.getElementById('nf-dolor-fin');
+const sliderFin = document.getElementById('nf-dolor-fin');
 
 sliderInicio.addEventListener('input', () => {
     document.getElementById('nf-dolor-inicio-val').textContent = sliderInicio.value;
@@ -965,14 +965,14 @@ sliderFin.addEventListener('input', () => {
  * @param {string|null} notaId    - ID de la nota a editar (solo en modo edición)
  */
 async function abrirModalNota(citaId, tieneNota = false, notaId = null) {
-    _citaIdNota     = citaId;
+    _citaIdNota = citaId;
     _notaEditandoId = null;
 
     // Limpiar el formulario antes de llenar
     limpiarFormNota();
 
-    const overlay   = document.getElementById('modalNotaOverlay');
-    const titulo    = document.getElementById('modalNotaTitulo');
+    const overlay = document.getElementById('modalNotaOverlay');
+    const titulo = document.getElementById('modalNotaTitulo');
     const subtitulo = document.getElementById('modalNotaSubtitulo');
 
     if (tieneNota) {
@@ -993,7 +993,7 @@ async function abrirModalNota(citaId, tieneNota = false, notaId = null) {
         if (nota) {
             // Guardar el ID de la nota para el UPDATE posterior
             _notaEditandoId = nota.id;
-            _citaIdNota     = nota.cita_id;
+            _citaIdNota = nota.cita_id;
             llenarFormNota(nota);
             titulo.textContent = 'Editar nota de evolución';
         } else {
@@ -1047,9 +1047,9 @@ function limpiarFormNota() {
 
     // Resetear sliders de dolor a 0
     sliderInicio.value = 0;
-    sliderFin.value    = 0;
+    sliderFin.value = 0;
     document.getElementById('nf-dolor-inicio-val').textContent = '0';
-    document.getElementById('nf-dolor-fin-val').textContent    = '0';
+    document.getElementById('nf-dolor-fin-val').textContent = '0';
 }
 
 /**
@@ -1064,27 +1064,27 @@ function llenarFormNota(n) {
         if (el && val != null) el.value = val;
     };
 
-    set('nf-motivo',          n.motivo_sesion);
+    set('nf-motivo', n.motivo_sesion);
     set('nf-estado-paciente', n.estado_paciente);
-    set('nf-reporte',         n.reporte_paciente);
-    set('nf-postura',         n.postura);
-    set('nf-rango',           n.rango_movimiento);
-    set('nf-fuerza',          n.fuerza_muscular);
-    set('nf-pruebas',         n.pruebas_especiales);
+    set('nf-reporte', n.reporte_paciente);
+    set('nf-postura', n.postura);
+    set('nf-rango', n.rango_movimiento);
+    set('nf-fuerza', n.fuerza_muscular);
+    set('nf-pruebas', n.pruebas_especiales);
     // signos_vitales puede ser objeto JSON: convertir a string para el textarea
-    set('nf-signos',          typeof n.signos_vitales === 'object'
+    set('nf-signos', typeof n.signos_vitales === 'object'
         ? JSON.stringify(n.signos_vitales)
         : n.signos_vitales);
-    set('nf-diagnostico',     n.diagnostico_fisio);
-    set('nf-objetivos',       n.objetivos_sesion);
-    set('nf-tecnicas',        n.tecnicas_utilizadas);
-    set('nf-ejercicios',      n.ejercicios_realizados);
-    set('nf-equipo',          n.equipo_utilizado);
-    set('nf-duracion',        n.duracion_minutos);
-    set('nf-respuesta',       n.respuesta_tratamiento);
-    set('nf-observaciones',   n.observaciones);
-    set('nf-plan',            n.plan_siguiente_sesion);
-    set('nf-frecuencia',      n.frecuencia_recomendada);
+    set('nf-diagnostico', n.diagnostico_fisio);
+    set('nf-objetivos', n.objetivos_sesion);
+    set('nf-tecnicas', n.tecnicas_utilizadas);
+    set('nf-ejercicios', n.ejercicios_realizados);
+    set('nf-equipo', n.equipo_utilizado);
+    set('nf-duracion', n.duracion_minutos);
+    set('nf-respuesta', n.respuesta_tratamiento);
+    set('nf-observaciones', n.observaciones);
+    set('nf-plan', n.plan_siguiente_sesion);
+    set('nf-frecuencia', n.frecuencia_recomendada);
     set('nf-ejercicios-casa', n.ejercicios_en_casa);
 
     // Sliders de dolor: actualizar valor y etiqueta visible
@@ -1101,7 +1101,7 @@ function llenarFormNota(n) {
 /** Cierra el modal de nota y limpia las variables de estado. */
 function cerrarModalNota() {
     document.getElementById('modalNotaOverlay').classList.remove('active');
-    _citaIdNota     = null;
+    _citaIdNota = null;
     _notaEditandoId = null;
 }
 
@@ -1124,7 +1124,7 @@ document.getElementById('btnGuardarNota').addEventListener('click', async () => 
 
     // Estado de carga en el botón
     const btn = document.getElementById('btnGuardarNota');
-    btn.disabled  = true;
+    btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando…';
 
     // Helper: obtener valor de un campo o null si está vacío
@@ -1132,30 +1132,30 @@ document.getElementById('btnGuardarNota').addEventListener('click', async () => 
 
     // Construir el payload con todos los campos del formulario
     const payload = {
-        paciente_id:           _pacienteActual.id_us,
-        fisioterapeuta_id:     _fisioId,
-        cita_id:               _citaIdNota || null,
-        motivo_sesion:         g('nf-motivo'),
-        estado_paciente:       g('nf-estado-paciente'),
-        dolor_inicio:          parseInt(sliderInicio.value),
-        dolor_fin:             parseInt(sliderFin.value),
-        reporte_paciente:      g('nf-reporte'),
-        postura:               g('nf-postura'),
-        rango_movimiento:      g('nf-rango'),
-        fuerza_muscular:       g('nf-fuerza'),
-        pruebas_especiales:    g('nf-pruebas'),
-        signos_vitales:        g('nf-signos'),
-        diagnostico_fisio:     g('nf-diagnostico'),
-        objetivos_sesion:      g('nf-objetivos'),
-        tecnicas_utilizadas:   g('nf-tecnicas'),
+        paciente_id: _pacienteActual.id_us,
+        fisioterapeuta_id: _fisioId,
+        cita_id: _citaIdNota || null,
+        motivo_sesion: g('nf-motivo'),
+        estado_paciente: g('nf-estado-paciente'),
+        dolor_inicio: parseInt(sliderInicio.value),
+        dolor_fin: parseInt(sliderFin.value),
+        reporte_paciente: g('nf-reporte'),
+        postura: g('nf-postura'),
+        rango_movimiento: g('nf-rango'),
+        fuerza_muscular: g('nf-fuerza'),
+        pruebas_especiales: g('nf-pruebas'),
+        signos_vitales: g('nf-signos'),
+        diagnostico_fisio: g('nf-diagnostico'),
+        objetivos_sesion: g('nf-objetivos'),
+        tecnicas_utilizadas: g('nf-tecnicas'),
         ejercicios_realizados: g('nf-ejercicios'),
-        equipo_utilizado:      g('nf-equipo'),
-        duracion_minutos:      g('nf-duracion') ? parseInt(g('nf-duracion')) : null,
+        equipo_utilizado: g('nf-equipo'),
+        duracion_minutos: g('nf-duracion') ? parseInt(g('nf-duracion')) : null,
         respuesta_tratamiento: g('nf-respuesta'),
-        observaciones:         g('nf-observaciones'),
+        observaciones: g('nf-observaciones'),
         plan_siguiente_sesion: g('nf-plan'),
-        frecuencia_recomendada:g('nf-frecuencia'),
-        ejercicios_en_casa:    g('nf-ejercicios-casa'),
+        frecuencia_recomendada: g('nf-frecuencia'),
+        ejercicios_en_casa: g('nf-ejercicios-casa'),
     };
 
     let error;
@@ -1174,7 +1174,7 @@ document.getElementById('btnGuardarNota').addEventListener('click', async () => 
     }
 
     // Restaurar botón
-    btn.disabled  = false;
+    btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-check-lg"></i> Guardar nota';
 
     if (error) {
@@ -1210,7 +1210,7 @@ document.getElementById('btnGuardarNota').addEventListener('click', async () => 
    2. Seleccionar rutina en el <select>
    3. Confirmar → UPDATE en tabla rutina (usuario_id = pacienteId)
 ══════════════════════════════════════════════════════════════ */
-let _pacienteIdAsignar     = null;
+let _pacienteIdAsignar = null;
 let _pacienteNombreAsignar = null;
 
 /**
@@ -1220,15 +1220,15 @@ let _pacienteNombreAsignar = null;
  * @param {string} pacienteNombre  - Nombre del paciente (para el UI)
  */
 async function abrirModalAsignarRutina(pacienteUserId, pacienteNombre) {
-    _pacienteIdAsignar     = pacienteUserId;
+    _pacienteIdAsignar = pacienteUserId;
     _pacienteNombreAsignar = pacienteNombre;
 
     document.getElementById('modalAsignarNombrePaciente').textContent = pacienteNombre;
 
     const select = document.getElementById('selectRutinaAsignar');
     select.innerHTML = '<option value="">Cargando rutinas…</option>';
-    select.disabled  = true;
-    document.getElementById('avisoSinRutinas').style.display     = 'none';
+    select.disabled = true;
+    document.getElementById('avisoSinRutinas').style.display = 'none';
     document.getElementById('btnConfirmarAsignarRutina').disabled = true;
 
     const modal = new bootstrap.Modal(document.getElementById('modalAsignarRutina'));
@@ -1273,7 +1273,7 @@ async function cargarRutinasConEjercicios(select) {
 
     if (!validas.length) {
         select.innerHTML = '<option value="">Sin rutinas con ejercicios</option>';
-        document.getElementById('avisoSinRutinas').style.display     = 'block';
+        document.getElementById('avisoSinRutinas').style.display = 'block';
         document.getElementById('btnConfirmarAsignarRutina').disabled = true;
         return;
     }
@@ -1281,8 +1281,8 @@ async function cargarRutinasConEjercicios(select) {
     // Poblar el select con las rutinas válidas
     select.innerHTML = '<option value="">Selecciona una rutina…</option>';
     validas.forEach(r => {
-        const opt       = document.createElement('option');
-        opt.value       = r.id_rut;
+        const opt = document.createElement('option');
+        opt.value = r.id_rut;
         opt.textContent = r.rut_nom;
         select.appendChild(opt);
     });
@@ -1304,7 +1304,7 @@ document.getElementById('btnConfirmarAsignarRutina').addEventListener('click', a
     }
 
     const btn = document.getElementById('btnConfirmarAsignarRutina');
-    btn.disabled    = true;
+    btn.disabled = true;
     btn.textContent = 'Asignando…';
 
     // Actualizar el campo usuario_id de la rutina con el paciente seleccionado
@@ -1313,7 +1313,7 @@ document.getElementById('btnConfirmarAsignarRutina').addEventListener('click', a
         .update({ usuario_id: _pacienteIdAsignar })
         .eq('id_rut', rutinaId);
 
-    btn.disabled  = false;
+    btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-person-check"></i> Asignar';
 
     if (error) {
@@ -1324,8 +1324,8 @@ document.getElementById('btnConfirmarAsignarRutina').addEventListener('click', a
 
     bootstrap.Modal.getInstance(document.getElementById('modalAsignarRutina')).hide();
 
-    const nombrePaciente   = _pacienteNombreAsignar;
-    _pacienteIdAsignar     = null;
+    const nombrePaciente = _pacienteNombreAsignar;
+    _pacienteIdAsignar = null;
     _pacienteNombreAsignar = null;
 
     toast(`Rutina asignada a ${nombrePaciente} exitosamente.`, 'success');
