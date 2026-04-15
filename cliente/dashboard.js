@@ -220,7 +220,8 @@ async function cargarAlertas(fisioId) {
         .order("fecha", { ascending: false })
         .limit(3);
 
-        console.log(data);
+        console.log("Los que no asistieron", noAsistieron);
+        console.log("Pagos pendientes", pendientes);
 
     const alertas = [];
 
