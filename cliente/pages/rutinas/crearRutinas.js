@@ -201,7 +201,7 @@ document.getElementById("rut_img_file").addEventListener("change", function () {
         // Mostrar nombre del archivo seleccionado
         nombre.textContent = archivo.name;
         feedback.style.display = "block";
-        label.textContent = "Cambiar archivo";
+        // label.textContent = "Cambiar archivo";
     } else {
         // Restaurar estado inicial si no hay archivo
         feedback.style.display = "none";
