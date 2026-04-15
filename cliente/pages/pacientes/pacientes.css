@@ -556,7 +556,7 @@
 @media (max-width: 768px){
     /* ── Quitar el margen del sidebar izquierdo ── */
     .main-content {
-        margin-left: 2rem !important;
+        margin-left: 3.4rem !important;
         width: 100% !important;      
         overflow-x: hidden;          
     }
