@@ -174,6 +174,7 @@ async function RegistrarRutinas() {
     }
 
     // ── Limpiar formulario ─────────────────────────────
+    console.log("🧹 Limpiando formulario...");
     document.getElementById("rut_nom").value = "";
     document.getElementById("rut_desc").value = "";
     document.getElementById("rut_zona").value = "";
@@ -181,8 +182,8 @@ async function RegistrarRutinas() {
     document.getElementById("rut_zona_custom").style.display = "none";
     document.getElementById("rut_objetivo").value = "";
     document.getElementById("es_publica").value = "";
-    document.getElementById("rut_img").value = "";
-    document.getElementById("rut_img_file").value = "";
+    // document.getElementById("rut_img").value = "";
+    // document.getElementById("rut_img_file").value = "";
     document.getElementById("usuario_id").value = "";
     resetFileInput(); //PARA LIMPIAR EL DEL ARCHIVO SELECCIONADO.
     mostrarAlerta("Rutina registrada exitosamente", "success");
