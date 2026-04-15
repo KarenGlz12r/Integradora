@@ -493,7 +493,7 @@ header {
 ══════════════════════════════════════════ */
 @media (max-width: 568px) {
     /* Sidebar abierto a casi todo el ancho */
-    .sidebar.menu-toggle { width: 100%; }
+    .sidebar.menu-toggle { width: 80%; }
  
     /* Nombre de usuario más compacto */
     .user-name h2 { font-size: 12px; }
