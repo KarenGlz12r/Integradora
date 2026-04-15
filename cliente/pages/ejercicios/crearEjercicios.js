@@ -182,7 +182,7 @@ async function RegistrarVideo() {
     const nombreEje = document.getElementById("eje_nom").value.trim();
     const descEje = document.getElementById("eje_desc").value.trim();
     const rutAsignar = document.getElementById("id_rut").value;
-    const urlVideo = document.getElementById("eje_video").value.trim();
+    // const urlVideo = document.getElementById("eje_video").value.trim();
     const videoInput = document.getElementById("rut_video_file");
     const video = videoInput ? videoInput.files[0] : null;
     const repeticiones = parseInt(document.getElementById("eje_repeticiones").value) || null;
@@ -354,7 +354,7 @@ async function RegistrarVideo() {
     document.getElementById("eje_nom").value = "";
     document.getElementById("eje_desc").value = "";
     document.getElementById("id_rut").value = "";
-    document.getElementById("eje_video").value = "";
+    // document.getElementById("eje_video").value = "";
     document.getElementById("rut_video_file").value = "";
     document.getElementById("eje_repeticiones").value = "";
     document.getElementById("eje_duracion").value = "";
