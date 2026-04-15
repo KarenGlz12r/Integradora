@@ -551,6 +551,11 @@
 @media (max-width: 1100px) {
     .cards-info { grid-template-columns: repeat(2, 1fr); }
     .pacientes-sidebar { width: 260px; }
+       /* ── Quitar el margen del sidebar izquierdo ── */
+    .main-content {     
+        overflow-x: hidden;   
+        overflow-y: hidden;       
+    }
 }
 
 @media (max-width: 768px){
@@ -558,7 +563,8 @@
     .main-content {
         margin-left: 3.4rem !important;
         width: 100% !important;      
-        overflow-x: hidden;          
+        overflow-x: hidden;   
+        overflow-y: hidden;       
     }
 
     .cards-info {
@@ -577,7 +583,7 @@
     /* ── Sidebar ocupa toda la pantalla en móvil ── */
     .pacientes-sidebar {
         width: 100%;
-        min-width: unset;            /
+        min-width: unset;            
         position: absolute;
         inset: 0;
         z-index: 2;
