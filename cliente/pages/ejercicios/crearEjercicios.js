@@ -200,31 +200,32 @@ async function RegistrarVideo() {
     // ══════════════════════════════════════════
     // CASO 1: URL DE VIDEO (YouTube o Drive)
     // ══════════════════════════════════════════
-    if (urlVideo) {
+    // if (urlVideo) {
 
-        // Verificar que la URL tenga formato válido
-        try {
-            new URL(urlVideo);
-        } catch {
-            mostrarAlerta("URL no tiene un formato válido", "warning");
-            return;
-        }
+    //     // Verificar que la URL tenga formato válido
+    //     try {
+    //         new URL(urlVideo);
+    //     } catch {
+    //         mostrarAlerta("URL no tiene un formato válido", "warning");
+    //         return;
+    //     }
 
-        // Solo se permiten URLs de YouTube o Google Drive
-        const esYoutube = urlVideo.includes("youtube.com") || urlVideo.includes("youtu.be");
-        const esDrive = urlVideo.includes("drive.google.com");
+    //     // Solo se permiten URLs de YouTube o Google Drive
+    //     const esYoutube = urlVideo.includes("youtube.com") || urlVideo.includes("youtu.be");
+    //     const esDrive = urlVideo.includes("drive.google.com");
 
-        if (!esYoutube && !esDrive) {
-            mostrarAlerta("Solo se permiten URLs de YouTube o Google Drive", "warning");
-            return;
-        }
+    //     if (!esYoutube && !esDrive) {
+    //         mostrarAlerta("Solo se permiten URLs de YouTube o Google Drive", "warning");
+    //         return;
+    //     }
 
-        videoFinal = urlVideo;
+    //     videoFinal = urlVideo;
 
-    // ══════════════════════════════════════════
-    // CASO 2: ARCHIVO DE VIDEO SUBIDO
-    // ══════════════════════════════════════════
-    } else if (video) {
+    // // ══════════════════════════════════════════
+    // // CASO 2: ARCHIVO DE VIDEO SUBIDO
+    // // ══════════════════════════════════════════
+    // } else 
+        if (video) {
 
         // Verificar que sea un archivo de video
         if (!video.type.startsWith("video/")) {
