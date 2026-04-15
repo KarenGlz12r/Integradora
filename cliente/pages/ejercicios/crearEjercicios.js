@@ -187,6 +187,17 @@ async function RegistrarVideo() {
     const video = videoInput ? videoInput.files[0] : null;
     const repeticiones = parseInt(document.getElementById("eje_repeticiones").value) || null;
     const duracion = parseInt(document.getElementById("eje_duracion").value) || null;
+
+
+    // VALIDAR QUE NO PERMITA NÚMEROS NEGATIVOS
+    if(repeticiones !== null && repeticiones < 1){
+        mostrarAlerta("Las repeticiones deben ser minímo 1.", "warning");
+        return;
+    }
+    if(duracion !== null && duracion <10){
+        mostrarAlerta("La duración debe ser de al menos 10s.", "warning");
+        return;
+    }
     const articulacionSeleccionada=document.getElementById("eje_articulacion").value;
     // ── Validar campos obligatorios ────────
     if (!nombreEje || !descEje || !rutAsignar || !articulacionSeleccionada) {
