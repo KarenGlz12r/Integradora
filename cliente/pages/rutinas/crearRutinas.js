@@ -189,6 +189,27 @@ async function RegistrarRutinas() {
 }
 
 // ══════════════════════════════════════════
+// FEEDBACK AL SELECCIONAR ARCHIVO DE VIDEO
+// ══════════════════════════════════════════
+document.getElementById("rut_img_file").addEventListener("change", function () {
+    const archivo = this.files[0];
+    const feedback = document.getElementById("video_file_feedback");
+    const nombre = document.getElementById("video_file_name");
+    const label = document.getElementById("video_file_label");
+
+    if (archivo) {
+        // Mostrar nombre del archivo seleccionado
+        nombre.textContent = archivo.name;
+        feedback.style.display = "block";
+        label.textContent = "Cambiar archivo";
+    } else {
+        // Restaurar estado inicial si no hay archivo
+        feedback.style.display = "none";
+        label.textContent = "Arrastra o haz clic para subir";
+    }
+});
+
+// ══════════════════════════════════════════
 // ALERTA BOOTSTRAP
 // ══════════════════════════════════════════
 function mostrarAlerta(mensaje, tipo = "warning") {
