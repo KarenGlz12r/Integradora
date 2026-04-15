@@ -405,54 +405,239 @@ header {
             background: #9b1b6e;
             color: #fff;
         }
-/* ── RESPONSIVE ── */
-@media (max-width: 500px) {
-    .sidebar {
-        width: 0;
-    }
+//* ══════════════════════════════════════════
+   RESPONSIVE — NAVBAR / SIDEBAR
+   Breakpoints:
+     xs  ≤ 360px   Móviles muy pequeños
+     sm  ≤ 480px   Móviles compactos  (ya existía como 500px, ajustado)
+     md  ≤ 768px   Phablets / tablets portrait  (ya existía)
+     lg  ≤ 1024px  Tablets landscape
+     xl  ≤ 1280px  Laptops pequeñas
+   Sin modo oscuro · Sin impresión
+══════════════════════════════════════════ */
 
-    .menu.menu-toggle div:first-child {
-        width: 100%;
-        transform: rotate(-50deg) translate(-0.3rem, 0.4rem);
-    }
+/* ══════════════════════════════════════════
+   XL — Laptops pequeñas ≤ 1280px
+══════════════════════════════════════════ */
+@media (max-width: 1280px) {
+    .sidebar.menu-toggle { width: 16rem; }
 
-    .menu.menu-toggle div:nth-child(2) {
-        opacity: 0;
-    }
-
-    .menu.menu-toggle div:last-child {
-        width: 100%;
-        transform: rotate(50deg) translate(-0.3rem, -0.4rem);
-    }
-
-    .right {
-        width: auto;         
-        gap: 0.5rem;
-        margin-left: 0;       
-    }
-
-    .user-name {
-        display: none;
-    }
-
-    #navbar .user-avatar {
-        width: 2rem !important;
-        height: 2rem !important;
-        min-width: 2rem !important;
-        min-height: 2rem !important;
-    }
+    .brand { font-size: 18px; }
 }
 
+/* ══════════════════════════════════════════
+   LG — Tablets landscape ≤ 1024px
+══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    /* El sidebar se colapsa por defecto */
+    .sidebar {
+        width: 4rem;
+    }
+    .sidebar.menu-toggle { width: 15rem; }
+
+    /* Textos del header ligeramente más pequeños */
+    .brand        { font-size: 17px; }
+    .user-name h2 { font-size: 14px; }
+
+    /* Dropdown se posiciona bien en tablets */
+    .dropdown { width: 190px; }
+}
+
+/* ══════════════════════════════════════════
+   MD — Phablets / Tablets portrait ≤ 768px
+   (Complementa el bloque ya existente)
+══════════════════════════════════════════ */
 @media (max-width: 768px) {
-    #navbar header {
-        padding: 0 1rem 0 0.75rem;
-    }
+    /* Ya definido en el CSS original:
+       header padding, user-name font-size, sidebar.menu-toggle width.
+       Aquí se agregan los ajustes faltantes: */
 
-    .user-name h2 {
-        font-size: 13px;
-    }
+    .brand { font-size: 16px; letter-spacing: 0.5px; }
 
+    /* El sidebar expandido ocupa todo el ancho de pantalla en portrait */
     .sidebar.menu-toggle {
-        width: 14rem;
+        width: 100%;
+        z-index: 150;
+    }
+
+    /* Overlay semitransparente detrás del sidebar abierto */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(61, 0, 48, 0.4);
+        z-index: 140;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    /* Dropdown se abre hacia la izquierda para no salirse de pantalla */
+    .dropdown {
+        right: 0;
+        left: auto;
+        width: 180px;
+    }
+
+    /* Badge de campana ligeramente más pequeño */
+    .bell-btn { width: 2rem; height: 2rem; }
+    .bell-btn i { font-size: 15px; }
+
+    /* Gap del right más compacto */
+    #navbar .right { gap: 0.75rem !important; }
+
+    /* Modal de cierre de sesión ocupa más ancho */
+    .modal-card { padding: 1.5rem; max-width: 320px; }
+}
+
+/* ══════════════════════════════════════════
+   SM — Móviles ≤ 480px
+   (Reemplaza / extiende el bloque original de 500px)
+══════════════════════════════════════════ */
+@media (max-width: 480px) {
+    /* Sidebar oculto por defecto en móvil */
+    .sidebar { width: 0; overflow: hidden; }
+
+    /* Sidebar abierto: ocupa todo el ancho */
+    .sidebar.menu-toggle {
+        width: 100%;
+        padding-top: 0.75rem;
+    }
+
+    /* Animación hamburguesa → X */
+    .menu.menu-toggle div:first-child {
+        width: 100%;
+        transform: rotate(-45deg) translate(-0.3rem, 0.4rem);
+    }
+    .menu.menu-toggle div:nth-child(2) { opacity: 0; }
+    .menu.menu-toggle div:last-child {
+        width: 100%;
+        transform: rotate(45deg) translate(-0.3rem, -0.4rem);
+    }
+
+    /* Nombre de usuario oculto */
+    .user-name { display: none; }
+
+    /* Avatar más pequeño */
+    #navbar .user-avatar {
+        width: 2.2rem  !important;
+        height: 2.2rem !important;
+        min-width:  2.2rem !important;
+        min-height: 2.2rem !important;
+        max-width:  2.2rem !important;
+        max-height: 2.2rem !important;
+    }
+
+    /* Header más compacto */
+    #navbar header {
+        padding: 0 0.9rem 0 0.75rem !important;
+    }
+
+    /* Gap del right */
+    .right         { gap: 0.5rem; }
+    #navbar .right { gap: 0.5rem !important; }
+
+    /* Brand */
+    .brand { font-size: 15px; }
+
+    /* Dropdown ocupa casi todo el ancho */
+    .dropdown {
+        width: calc(100vw - 1.8rem);
+        right: -0.5rem;
+    }
+
+    /* Campana */
+    .bell-btn { width: 1.9rem; height: 1.9rem; }
+    .bell-btn i { font-size: 14px; }
+    .bell-badge { font-size: 9px; min-width: 15px; height: 15px; }
+
+    /* Modal de cierre de sesión */
+    .modal-card {
+        padding: 1.25rem;
+        max-width: 90%;
+        border-radius: 12px;
+    }
+    .modal-card h3 { font-size: 1.05rem; }
+    .modal-card p  { font-size: 0.88rem; margin-bottom: 1.25rem; }
+    .modal-buttons button { padding: 0.55rem 1.2rem; font-size: 0.85rem; }
+}
+
+/* ══════════════════════════════════════════
+   XS — Móviles muy pequeños ≤ 360px
+══════════════════════════════════════════ */
+@media (max-width: 360px) {
+    /* Header aún más compacto */
+    #navbar header {
+        padding: 0 0.6rem 0 0.5rem !important;
+        height: 3rem !important;
+    }
+
+    /* Ajustar el main-content si usa margin-top:3.5rem */
+    /* (solo aplica si la clase está disponible globalmente) */
+    .main-content { margin-top: 3rem; height: calc(100dvh - 3rem); }
+
+    .brand { font-size: 13px; letter-spacing: 0; }
+
+    /* Gap mínimo */
+    .right         { gap: 0.35rem; }
+    #navbar .right { gap: 0.35rem !important; }
+
+    /* Avatar */
+    #navbar .user-avatar {
+        width: 2rem  !important;
+        height: 2rem !important;
+        min-width:  2rem !important;
+        min-height: 2rem !important;
+        max-width:  2rem !important;
+        max-height: 2rem !important;
+    }
+
+    /* Campana */
+    .bell-btn { width: 1.7rem; height: 1.7rem; }
+    .bell-btn i { font-size: 13px; }
+
+    /* Sidebar abierto en pantallas muy pequeñas */
+    .sidebar.menu-toggle { width: 100%; }
+
+    /* Links del sidebar más compactos */
+    .sidebar a { padding: 0.75rem 0.6rem; gap: 1rem; font-size: 14px; }
+    .fa-solid   { font-size: 18px; }
+
+    /* Modal */
+    .modal-card { padding: 1rem; }
+    .modal-card .modal-icon { font-size: 2rem; }
+    .modal-buttons { gap: 0.5rem; }
+    .modal-buttons button { padding: 0.5rem 1rem; font-size: 0.82rem; }
+}
+
+/* ══════════════════════════════════════════
+   TÁCTIL — targets mínimos 44px (WCAG 2.5.5)
+══════════════════════════════════════════ */
+@media (hover: none) and (pointer: coarse) {
+    .sidebar a          { min-height: 44px; }
+    .dropdown ul li     { min-height: 44px; }
+    .bell-btn           { min-width: 44px; min-height: 44px; }
+    .menu-container     { min-width: 44px; min-height: 44px; justify-content: center; }
+    .modal-buttons button { min-height: 44px; }
+
+    /* Quitar efectos hover que no aplican en touch */
+    .sidebar a:hover            { background-color: transparent; color: var(--text-color); }
+    .sidebar a:hover .fa-solid  { color: #ffffff; }
+    .sidebar a.selected         { background-color: var(--background-selected); color: var(--text-select-color); }
+    .dropdown ul li:hover       { background-color: transparent; color: #ffffff; }
+    .dropdown ul li:hover img   { filter: brightness(0) invert(1); }
+    .bell-btn:hover             { background: rgba(255,255,255,0.12); }
+}
+
+/* ══════════════════════════════════════════
+   MOVIMIENTO REDUCIDO
+══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .menu div,
+    .sidebar a,
+    .dropdown,
+    .bell-btn,
+    .modal-card {
+        transition: none !important;
+        animation: none !important;
     }
 }
