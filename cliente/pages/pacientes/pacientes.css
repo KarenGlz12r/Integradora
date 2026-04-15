@@ -861,55 +861,6 @@
 }
 
 /* ══════════════════════════════════════════
-   MODO OSCURO — prefers-color-scheme: dark
-══════════════════════════════════════════ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-bg:         #1a0614;
-        --color-white:      #1f0a19;
-        --color-border:     #5a2248;
-        --color-primary-lt: #3d0030;
-        --color-hover:      #4d0040;
-        --color-text-dark:  #f8d7ef;
-        --color-gray:       #a08095;
-        --color-gray-lt:    #2a1022;
-        --shadow-sm:        0 1px 3px rgba(0,0,0,0.3);
-        --shadow-md:        0 4px 16px rgba(0,0,0,0.4);
-    }
-
-    .page-header,
-    .cards-info,
-    .pacientes-sidebar,
-    .detail-header,
-    .detail-tabs,
-    .cita-card,
-    .hc-section,
-    .nota-card,
-    .modal-nota,
-    .btn-nota-edit { background: #1f0a19; }
-
-    .paciente-item-nombre,
-    .cita-card-motivo,
-    .hc-value,
-    .nota-field-value { color: #f0d4e8; }
-
-    .pacientes-search input { background: #2a1022; color: #f0d4e8; }
-    .nota-form-group input,
-    .nota-form-group select,
-    .nota-form-group textarea { background: #2a1022; color: #f0d4e8; }
-
-    .modal-nota-footer { background: #150510; }
-
-    .btn-cancel { background: #2a1022; color: #a08095; border-color: var(--color-border); }
-    .btn-cancel:hover { background: #3a1532; }
-
-    .skeleton {
-        background: linear-gradient(90deg, #3d0030 25%, #4d1040 50%, #3d0030 75%);
-        background-size: 200% 100%;
-    }
-}
-
-/* ══════════════════════════════════════════
    MOVIMIENTO REDUCIDO
 ══════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
