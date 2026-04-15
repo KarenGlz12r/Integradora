@@ -139,7 +139,7 @@ async function guardarCambios() {
     mostrarAlerta("Rutina actualizada exitosamente", "success");
 
     // Regresar a la lista después de 2 segundos
-    setTimeout(() => window.location.href = "./rutinas.html", 2000);
+    setTimeout(() => window.location.href = "./rutinas.html", 2500);
 }
 
 // ══════════════════════════════════════════

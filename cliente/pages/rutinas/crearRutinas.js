@@ -184,7 +184,7 @@ async function RegistrarRutinas() {
     document.getElementById("rut_img").value = "";
     document.getElementById("rut_img_file").value = "";
     document.getElementById("usuario_id").value = "";
-
+    resetFileInput(); //PARA LIMPIAR EL DEL ARCHIVO SELECCIONADO.
     mostrarAlerta("Rutina registrada exitosamente", "success");
 }
 
@@ -208,7 +208,18 @@ document.getElementById("rut_img_file").addEventListener("change", function () {
         label.textContent = "Arrastra o haz clic para subir";
     }
 });
+// Función reutilizable para limpiar el input de archivo
+function resetFileInput() {
+    const feedback = document.getElementById("video_file_feedback");
+    const nombre = document.getElementById("video_file_name");
+    const inputFile = document.getElementById("rut_img_file");
+    const labelSpan = document.querySelector('label[for="rut_img_file"] span');
 
+    inputFile.value = "";               // Limpia el archivo seleccionado
+    nombre.textContent = "";            // Limpia el nombre mostrado
+    feedback.style.display = "none";    // Oculta el feedback
+    labelSpan.textContent = "Arrastra o haz clic para subir"; // Restaura label
+}
 // ══════════════════════════════════════════
 // ALERTA BOOTSTRAP
 // ══════════════════════════════════════════
@@ -220,7 +231,11 @@ function mostrarAlerta(mensaje, tipo = "warning") {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>`;
 
-    setTimeout(() => container.innerHTML = "", 5000);
+       if (tipo === "success") {
+        setTimeout(() => {
+            window.location.href = "./rutinas.html";
+        }, 2500);
+    }
 }
 
 // ══════════════════════════════════════════

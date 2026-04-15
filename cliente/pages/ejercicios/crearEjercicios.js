@@ -402,8 +402,11 @@ function mostrarAlerta(mensaje, tipo = "warning") {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>`;
 
-    // La alerta desaparece automáticamente después de 5 segundos
-    setTimeout(() => container.innerHTML = "", 5000);
+        if (tipo === "success") {
+        setTimeout(() => {
+            window.location.href = "./ejercicios.html";
+        }, 2500);
+    }
 }
 
 // ══════════════════════════════════════════
