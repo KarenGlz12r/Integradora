@@ -544,131 +544,52 @@
 #modalAsignarRutina .modal-header { background: var(--color-primary); color: #fff; border-bottom: none; }
 #modalAsignarRutina .modal-title  { font-weight: 800; font-size: 15px; }
 #modalAsignarRutina .btn-close    { filter: brightness(0) invert(1); }
-/* ══════════════════════════════════════════
-   RESPONSIVE — TODOS LOS DISPOSITIVOS
-   Breakpoints:
-     xs  < 360px   (relojes, móviles pequeños)
-     sm  < 480px   (móviles compactos)
-     md  < 768px   (móviles grandes / phablets)
-     lg  < 1024px  (tablets en portrait)
-     xl  < 1280px  (tablets landscape / laptops pequeñas)
-     2xl < 1536px  (monitores medianos)
-     →   > 1536px  base / desktop amplio
-══════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════
-   XL — Tablets landscape / Laptops ≤ 1280 px
-══════════════════════════════════════════ */
-@media (max-width: 1280px) {
-    .cards-info {
-        grid-template-columns: repeat(4, 1fr);
-        padding: 10px 20px;
-        gap: 10px;
-    }
-    .card-stat-numero { font-size: 20px; }
-    .pacientes-sidebar { width: 280px; }
-}
-
-/* ══════════════════════════════════════════
-   LG — Tablets portrait ≤ 1100 px
+   RESPONSIVE
 ══════════════════════════════════════════ */
 @media (max-width: 1100px) {
-    .cards-info {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
+    .cards-info { grid-template-columns: repeat(2, 1fr); }
     .pacientes-sidebar { width: 260px; }
-
-    .hc-grid { grid-template-columns: 1fr; }
-    .hc-section.full-width { grid-column: 1; }
 }
 
-/* ══════════════════════════════════════════
-   LG — Tablets portrait ≤ 1024 px
-══════════════════════════════════════════ */
-@media (max-width: 1024px) {
+@media (max-width: 768px){
+    /* ── Quitar el margen del sidebar izquierdo ── */
     .main-content {
         margin-left: 0 !important;
-        width: 100% !important;
-    }
-    .main-content.menu-toggle {
-        margin-left: 0 !important;
+        width: 100% !important;      
+        overflow-x: hidden;          
     }
 
-    .page-header { padding: 12px 18px 10px; }
-    .page-header-left h1 { font-size: 18px; }
-
-    .cards-info {
-        grid-template-columns: repeat(2, 1fr);
-        padding: 10px 18px;
-        gap: 10px;
-    }
-
-    .pacientes-sidebar { width: 250px; }
-
-    .detail-header { padding: 12px 16px; }
-    .detail-content { padding: 14px 16px; }
-}
-
-/* ══════════════════════════════════════════
-   MD — Móviles grandes / Phablets ≤ 768 px
-══════════════════════════════════════════ */
-@media (max-width: 768px) {
-    /* ── Layout principal ── */
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-        overflow-x: hidden;
-        margin-top: 3.5rem;          /* conserva espacio del topbar */
-    }
-    .main-content.menu-toggle {
-        margin-left: 0 !important;
-    }
-
-    /* ── Header de página ── */
-    .page-header {
-        padding: 10px 14px 8px;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .page-header-left h1 { font-size: 17px; }
-    .page-header-left i  { font-size: 19px; }
-
-    /* ── Stats ── */
     .cards-info {
         grid-template-columns: repeat(2, 1fr);
         padding: 10px 14px;
         gap: 8px;
     }
-    .card-stat { padding: 9px 11px; gap: 9px; }
-    .card-stat-icon { width: 36px; height: 36px; font-size: 15px; }
-    .card-stat-numero { font-size: 19px; }
-    .card-stat-label  { font-size: 10px; }
 
-    /* ── Split view: capas superpuestas ── */
+    /* ── Split: ambos paneles se superponen como capas ── */
     .pacientes-split {
         position: relative;
-        width: 100%;
+        width: 100%;                
         overflow: hidden;
     }
 
-    /* La sidebar ocupa toda la pantalla */
+    /* ── Sidebar ocupa toda la pantalla en móvil ── */
     .pacientes-sidebar {
         width: 100%;
-        min-width: unset;
+        min-width: unset;            /
         position: absolute;
         inset: 0;
         z-index: 2;
-        border-right: none;
     }
 
-    /* El detalle oculto por defecto */
+    /* ── Detalle oculto por defecto, aparece encima ── */
     .paciente-detail {
         position: absolute;
         inset: 0;
         z-index: 1;
         display: none;
-        width: 100%;
+        width: 100%;                
     }
     .paciente-detail.show {
         display: flex;
@@ -679,221 +600,43 @@
     .detail-header {
         flex-wrap: wrap;
         padding: 10px 14px;
-        gap: 10px;
     }
     .detail-header-actions {
         width: 100%;
         justify-content: flex-end;
     }
-    .detail-header-avatar { width: 44px; height: 44px; font-size: 16px; }
-    .detail-header-nombre { font-size: 15px; }
 
-    /* ── Tabs ── */
-    .detail-tabs { padding: 0 10px; overflow-x: auto; }
-    .detail-tab  { padding: 10px 10px; font-size: 12px; }
-
-    /* ── Contenido del detalle ── */
-    .detail-content { padding: 14px; }
-
-    /* ── Citas timeline ── */
-    .cita-card { flex-direction: row; padding: 10px 12px; gap: 10px; }
-    .cita-card-fecha { min-width: 44px; padding: 6px 8px; }
-    .cita-dia { font-size: 18px; }
+    /* ── Formularios de notas ── */
+    .nota-form-grid { grid-template-columns: 1fr; }
+    .nota-form-group.full { grid-column: 1; }
+    .nota-form-section { grid-column: 1; }
 
     /* ── Historial clínico ── */
     .hc-grid { grid-template-columns: 1fr; }
     .hc-section.full-width { grid-column: 1; }
-    .hc-label { min-width: 110px; }
 
     /* ── Notas de evolución ── */
     .nota-grid { grid-template-columns: 1fr; }
     .nota-field.full { grid-column: 1; }
 
-    /* ── Modal nota ── */
-    .modal-nota-overlay { padding: 0; align-items: flex-end; }
-    .modal-nota {
-        max-width: 100%;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        max-height: 92vh;
+    /* ── Tabs con scroll horizontal ── */
+    .detail-tabs {
+        padding: 0 10px;
     }
-    .nota-form-grid { grid-template-columns: 1fr; }
-    .nota-form-group.full { grid-column: 1; }
-    .nota-form-section   { grid-column: 1; }
+    .detail-tab {
+        padding: 10px 10px;
+        font-size: 12px;
+    }
 }
 
-/* ══════════════════════════════════════════
-   SM — Móviles compactos ≤ 480 px
-══════════════════════════════════════════ */
 @media (max-width: 480px) {
-    /* ── Stats ── */
     .cards-info {
         grid-template-columns: 1fr 1fr;
         gap: 6px;
         padding: 8px;
     }
-    .card-stat { padding: 8px 10px; gap: 8px; }
-    .card-stat-icon   { width: 32px; height: 32px; font-size: 13px; }
-    .card-stat-numero { font-size: 17px; }
-    .card-stat-label  { font-size: 10px; }
+    .card-stat-numero { font-size: 18px; }
 
-    /* ── Header de página ── */
-    .page-header-left h1 { font-size: 15px; }
-
-    /* ── Sidebar ── */
-    .pacientes-sidebar-header h2  { font-size: 10px; }
-    .paciente-item { min-height: 54px; padding: 9px 12px; }
-    .paciente-avatar { width: 36px; height: 36px; font-size: 13px; }
-    .paciente-item-nombre { font-size: 12px; }
-    .paciente-item-meta   { font-size: 10px; }
-
-    /* ── Tabs: solo icono ── */
-    .detail-tab span { display: none; }
-    .detail-tab      { padding: 10px 12px; }
-
-    /* ── Header detalle ── */
-    .detail-header-nombre { font-size: 14px; }
-    .detail-header-meta   { font-size: 11px; gap: 8px; }
-    .btn-action           { padding: 6px 11px; font-size: 11px; }
-
-    /* ── Citas ── */
-    .cita-card-motivo  { font-size: 13px; }
-    .cita-card-top     { flex-direction: column; align-items: flex-start; gap: 3px; }
-
-    /* ── Notas cards ── */
-    .nota-card-header  { flex-wrap: wrap; gap: 4px; }
-    .nota-card-motivo  { text-align: left; }
-    .nota-card-actions { flex-wrap: wrap; }
-
-    /* ── HC rows ── */
-    .hc-row   { flex-direction: column; gap: 2px; }
-    .hc-label { min-width: unset; font-size: 10px; }
-    .hc-value { font-size: 12px; }
-
-    /* ── Modal nota ── */
-    .modal-nota-header h3   { font-size: 14px; }
-    .modal-nota-header .modal-nota-subtitle { font-size: 11px; }
-    .modal-nota-body { padding: 14px; }
-    .modal-nota-footer { padding: 10px 14px; }
-    .btn-save, .btn-cancel { padding: 7px 16px; font-size: 12px; }
-}
-
-/* ══════════════════════════════════════════
-   XS — Móviles pequeños ≤ 360 px
-══════════════════════════════════════════ */
-@media (max-width: 360px) {
-    /* ── Stats: columna única ── */
-    .cards-info {
-        grid-template-columns: 1fr;
-        gap: 6px;
-        padding: 8px;
-    }
-
-    /* ── Page header ── */
-    .page-header { padding: 8px 10px 6px; }
-    .page-header-left h1 { font-size: 14px; }
-    .page-header-left i  { font-size: 16px; }
-
-    /* ── Sidebar ── */
-    .pacientes-sidebar-header { padding: 8px 10px; }
-    .paciente-item { padding: 8px 10px; gap: 9px; }
-    .paciente-avatar { width: 34px; height: 34px; font-size: 12px; }
-    .paciente-item-nombre { font-size: 12px; }
-
-    /* ── Detalle ── */
-    .detail-header { padding: 8px 10px; gap: 8px; }
-    .detail-header-avatar { width: 38px; height: 38px; font-size: 14px; }
-    .detail-header-nombre { font-size: 13px; }
-
-    .detail-tabs { padding: 0 6px; gap: 0; }
-    .detail-tab  { padding: 9px 9px; font-size: 11px; }
-    .detail-content { padding: 10px; }
-
-    /* ── Citas ── */
-    .cita-card { padding: 8px 10px; gap: 8px; }
-    .cita-dia  { font-size: 16px; }
-    .cita-mes  { font-size: 9px; }
-    .cita-card-fecha { min-width: 40px; padding: 5px 7px; }
-    .cita-card-motivo { font-size: 12px; }
-
-    /* ── Botones de acción ── */
-    .btn-action { padding: 5px 9px; font-size: 10px; }
-    .detail-header-actions { gap: 5px; }
-
-    /* ── Modal nota ── */
-    .modal-nota-header { padding: 12px 14px; }
-    .modal-nota-body   { padding: 12px; }
-    .nota-form-grid    { gap: 10px; }
-    .nota-form-group input,
-    .nota-form-group select,
-    .nota-form-group textarea {
-        font-size: 16px; /* evita zoom en iOS */
-        padding: 7px 10px;
-    }
-    .modal-nota-footer { gap: 8px; padding: 9px 12px; }
-    .btn-save, .btn-cancel { padding: 7px 13px; font-size: 11px; }
-}
-
-/* ══════════════════════════════════════════
-   AJUSTES DE ACCESIBILIDAD / TÁCTIL
-   Target mínimo recomendado por WCAG: 44px
-══════════════════════════════════════════ */
-@media (hover: none) and (pointer: coarse) {
-    .btn-action,
-    .btn-save,
-    .btn-cancel,
-    .btn-nota-edit,
-    .cita-nota-btn,
-    .detail-tab {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Aumentar área de toque del item de paciente */
-    .paciente-item { min-height: 56px; }
-
-    /* Quitar efectos hover en táctil */
-    .paciente-item:hover    { background: transparent; }
-    .paciente-item.active   { background: var(--color-hover); }
-    .card-stat:hover        { box-shadow: none; }
-    .cita-card:hover        { box-shadow: none; }
-}
-
-/* ══════════════════════════════════════════
-   MOVIMIENTO REDUCIDO
-══════════════════════════════════════════ */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-    .modal-nota-overlay,
-    .modal-nota { transition: none; }
-    .skeleton   { animation: none; background: #f5d0ea; }
-}
-
-/* ══════════════════════════════════════════
-   IMPRESIÓN
-══════════════════════════════════════════ */
-@media print {
-    .main-content { margin: 0; height: auto; overflow: visible; }
-    .pacientes-sidebar,
-    .detail-tabs,
-    .detail-header-actions,
-    .nota-card-actions,
-    .page-header,
-    .cards-info,
-    .modal-nota-overlay { display: none !important; }
-
-    .pacientes-split,
-    .paciente-detail { display: block; position: static; overflow: visible; }
-    .detail-content  { overflow: visible; padding: 0; }
-    .cita-card,
-    .nota-card,
-    .hc-section      { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
-    body             { font-size: 11pt; color: #000; }
+    /* ── Ocultar texto de tabs, solo íconos ── */
+    .detail-tab span { display: none; }   
 }
