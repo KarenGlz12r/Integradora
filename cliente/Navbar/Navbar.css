@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
 :root {
     --background-color: #9b1b6e;
@@ -22,113 +22,103 @@ body {
     height: 100vh;
 }
 
-/* ───────── HEADER ───────── */
+/* ── HEADER ── */
 header {
     width: 100%;
-    height: 3.5rem;
     display: flex;
+    height: 3.5rem;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1rem;
-    position: fixed;
-    top: 0;
-    z-index: 200;
-    background: var(--background-color);
+    padding: 0.45rem 2rem 0.45rem 1.27rem;
     border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    background-color: var(--background-color);
+    top: 0;
+    left: 0;
+    z-index: 200;
 }
 
 .left {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.4rem;
 }
 
 .brand {
     color: #fce4f3;
     font-weight: 900;
-    font-size: 16px;
+    font-size: 20px;
+    letter-spacing: 1px;
 }
 
-.right {
+/* ── MENÚ HAMBURGUESA ── */
+.menu-container {
+    height: 100%;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    cursor: pointer;
 }
 
-/* ───────── MENU ───────── */
 .menu {
     width: 1.5rem;
     height: 1.2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    cursor: pointer;
 }
 
 .menu div {
-    height: 2px;
-    background: #fff;
+    width: 100%;
+    height: 0.15rem;
+    background-color: var(--menu-color);
+    transition: all 0.3s ease;
 }
 
-/* ───────── SIDEBAR (MOBILE FIRST) ───────── */
-.sidebar {
-    position: fixed;
-    top: 3.5rem;
-    left: 0;
-    width: 0;
-    height: calc(100vh - 3.5rem);
-    background: #85155d;
-    overflow: hidden;
-    transition: 0.3s ease;
-    z-index: 150;
+.menu.menu-toggle div:first-child {
+    width: 40%;
+    transform: rotate(-40deg) translate(-30%, 175%);
 }
 
-.sidebar.menu-toggle {
-    width: 85%;
+.menu.menu-toggle div:last-child {
+    width: 40%;
+    transform: rotate(40deg) translate(-30%, -150%);
 }
 
-.sidebar ul {
-    list-style: none;
-}
-
-.sidebar a {
+/* ── RIGHT ── */
+.right {
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    color: white;
-    text-decoration: none;
+    gap: 1.6rem;
 }
 
-.sidebar a:hover {
-    background: var(--background-hover);
-    color: #3d0030;
+.user-name h2 {
+    color: #fce4f3;
+    font-size: 16px;
+    font-style: oblique;
 }
 
-.sidebar a.selected {
-    background: var(--background-selected);
-    color: var(--text-select-color);
+/* ── AVATAR Y DROPDOWN ── */
+.user-menu {
+    position: relative;
+    cursor: pointer;
+    display: flex;         /* Agregado */
+    align-items: center;   /* Agregado */
+    flex-shrink: 0;
 }
 
-/* ───────── OVERLAY ───────── */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 140;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-/* ───────── AVATAR ───────── */
 .user-avatar {
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 50%;
+    border-radius: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.5rem;
+    height: 3.3rem;
+    min-height: 3em;
+    min-width: 3rem;
     overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.35);
 }
 
 .user-avatar img {
@@ -137,72 +127,567 @@ header {
     object-fit: cover;
 }
 
-/* ───────── CAMPANA ───────── */
-.bell-btn {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 3.2rem;
+    background: #7a1254;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    z-index: 999;
+}
+
+.dropdown.active {
+    display: block;
+}
+
+.dropdown ul {
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+.dropdown ul li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.dropdown ul li:hover {
+    background-color: var(--background-hover);
+    color: #3d0030;
+}
+
+.dropdown ul li img {
+    width: 1.2rem;
+    filter: brightness(0) invert(1); /* los iconos se ven blancos */
+}
+
+.dropdown ul li:hover img {
+    filter: none; /* al hacer hover vuelven a color normal */
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+    margin-top: 3.5rem;
+    width: 4rem;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 1.1rem 0;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    background-color: #85155d;
+    transition: width 0.3s ease;
+}
+
+.sidebar.menu-toggle {
+    width: 18.75rem;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    list-style: none;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 1.3rem;
+    padding: 0.9rem 0.7rem;
+    text-decoration: none;
+    margin: 0 0.5rem;
+    border-radius: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: var(--background-hover);
+    color: #3d0030;
+}
+
+.sidebar a:hover .fa-solid {
+    color: #3d0030;
+}
+
+.sidebar a.selected {
+    background-color: var(--background-selected);
+    color: var(--text-select-color);
+}
+
+.sidebar a.selected .fa-solid {
+    color: var(--text-select-color);
+}
+
+.fa-solid {
+    font-size: 20px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+/* ── LOGO SIDEBAR ── */
+.sidebar-logo {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
 }
 
-/* ───────── TABLET ───────── */
-@media (min-width: 481px) {
+.sidebar-logo img {
+    width: 2.5rem;
+    transition: width 0.3s ease;
+}
+
+.sidebar.menu-toggle .sidebar-logo img {
+    width: 7rem;
+}
+
+/* ── FIX Bootstrap conflict ── */
+
+#navbar .user-avatar {
+    width: 3.3rem !important;
+    height: 3.3rem !important;
+    min-width: 3rem !important;
+    min-height: 3rem !important;
+    max-width: 2.8rem !important;
+    max-height: 2.8rem !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    border-radius: 45% !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+#navbar .user-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;     /* cancela Bootstrap reboot */
+    object-fit: cover !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+}
+
+#navbar header {
+    height: 3.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+#navbar .right {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    gap: 1rem !important;
+}
+.bell-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            color: #fce4f3;
+            text-decoration: none;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .bell-btn:hover {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+        }
+        .bell-btn i { font-size: 16px; }
+        .bell-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e65100;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #9b1b6e;
+            line-height: 1;
+            pointer-events: none;
+        }
+        /* ── Modal de confirmación de cierre de sesión ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .modal-card .modal-icon {
+            font-size: 2.5rem;
+            color: #9b1b6e;
+            margin-bottom: 0.75rem;
+        }
+        .modal-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3d0030;
+            margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        .modal-buttons button {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+        .modal-buttons button:hover { opacity: 0.85; }
+        .btn-cancelar {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-confirmar {
+            background: #9b1b6e;
+            color: #fff;
+        }
+//* ══════════════════════════════════════════
+   RESPONSIVE — NAVBAR / SIDEBAR
+   Breakpoints:
+     xs  ≤ 360px   Móviles muy pequeños
+     sm  ≤ 480px   Móviles compactos  (ya existía como 500px, ajustado)
+     md  ≤ 768px   Phablets / tablets portrait  (ya existía)
+     lg  ≤ 1024px  Tablets landscape
+     xl  ≤ 1280px  Laptops pequeñas
+   Sin modo oscuro · Sin impresión
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   XL — Laptops pequeñas ≤ 1280px
+══════════════════════════════════════════ */
+@media (max-width: 1280px) {
+    .sidebar.menu-toggle { width: 16rem; }
+
+    .brand { font-size: 18px; }
+}
+
+/* ══════════════════════════════════════════
+   LG — Tablets landscape ≤ 1024px
+══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    /* El sidebar se colapsa por defecto */
     .sidebar {
         width: 4rem;
     }
+    .sidebar.menu-toggle { width: 15rem; }
 
-    .sidebar.menu-toggle {
-        width: 16rem;
-    }
+    /* Textos del header ligeramente más pequeños */
+    .brand        { font-size: 17px; }
+    .user-name h2 { font-size: 14px; }
 
-    .brand {
-        font-size: 17px;
-    }
-
-    .user-avatar {
-        width: 2.6rem;
-        height: 2.6rem;
-    }
+    /* Dropdown se posiciona bien en tablets */
+    .dropdown { width: 190px; }
 }
 
-/* ───────── TABLET GRANDE ───────── */
-@media (min-width: 768px) {
+/* ══════════════════════════════════════════
+   MD — Phablets / Tablets portrait ≤ 768px
+   (Complementa el bloque ya existente)
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    /* Ya definido en el CSS original:
+       header padding, user-name font-size, sidebar.menu-toggle width.
+       Aquí se agregan los ajustes faltantes: */
+
+    .brand { font-size: 16px; letter-spacing: 0.5px; }
+
+    /* El sidebar expandido ocupa todo el ancho de pantalla en portrait */
     .sidebar.menu-toggle {
-        width: 18rem;
+        width: 100%;
+        z-index: 150;
     }
 
-    .brand {
-        font-size: 18px;
+    /* Overlay semitransparente detrás del sidebar abierto */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(61, 0, 48, 0.4);
+        z-index: 140;
     }
+    .sidebar-overlay.active { display: block; }
+
+    /* Dropdown se abre hacia la izquierda para no salirse de pantalla */
+    .dropdown {
+        right: 0;
+        left: auto;
+        width: 180px;
+    }
+
+    /* Badge de campana ligeramente más pequeño */
+    .bell-btn { width: 2rem; height: 2rem; }
+    .bell-btn i { font-size: 15px; }
+
+    /* Gap del right más compacto */
+    #navbar .right { gap: 0.75rem !important; }
+
+    /* Modal de cierre de sesión ocupa más ancho */
+    .modal-card { padding: 1.5rem; max-width: 320px; }
+}
+/* ══════════════════════════════════════════
+   SM-MD — Móviles grandes ≤ 568px
+   (iPhone SE landscape, Galaxy S*, etc.)
+══════════════════════════════════════════ */
+@media (max-width: 568px) {
+    /* Sidebar abierto a casi todo el ancho */
+    .sidebar.menu-toggle { width: 80%; }
+ 
+    /* Nombre de usuario más compacto */
+    .user-name h2 { font-size: 12px; }
+ 
+    /* Brand */
+    .brand { font-size: 15px; letter-spacing: 0.5px; }
+ 
+    /* Avatar */
+    #navbar .user-avatar {
+        width: 2.4rem  !important;
+        height: 2.4rem !important;
+        min-width:  2.4rem !important;
+        min-height: 2.4rem !important;
+        max-width:  2.4rem !important;
+        max-height: 2.4rem !important;
+    }
+ 
+    /* Header padding */
+    #navbar header {
+        padding: 0 1rem 0 0.75rem !important;
+    }
+ 
+    /* Gap del right */
+    .right         { gap: 0.6rem; }
+    #navbar .right { gap: 0.6rem !important; }
+ 
+    /* Campana */
+    .bell-btn { width: 2rem; height: 2rem; }
+    .bell-btn i { font-size: 14px; }
+ 
+    /* Dropdown ocupa más ancho */
+    .dropdown {
+        width: calc(100vw - 2rem);
+        right: -0.25rem;
+    }
+ 
+    /* Modal */
+    .modal-card {
+        padding: 1.4rem;
+        max-width: 88%;
+    }
+    .modal-buttons button { padding: 0.55rem 1.2rem; font-size: 0.87rem; }
 }
 
-/* ───────── DESKTOP ───────── */
-@media (min-width: 1024px) {
-    .sidebar {
-        width: 4rem;
-    }
+/* ══════════════════════════════════════════
+   SM — Móviles ≤ 480px
+   (Reemplaza / extiende el bloque original de 500px)
+══════════════════════════════════════════ */
+@media (max-width: 480px) {
+    /* Sidebar oculto por defecto en móvil */
+    .sidebar { width: 0; overflow: hidden; }
 
+    /* Sidebar abierto: ocupa todo el ancho */
     .sidebar.menu-toggle {
-        width: 18.75rem;
+        width: 100%;
+        padding-top: 0.75rem;
     }
 
-    .user-avatar {
-        width: 3rem;
-        height: 3rem;
+    /* Animación hamburguesa → X */
+    .menu.menu-toggle div:first-child {
+        width: 100%;
+        transform: rotate(-45deg) translate(-0.3rem, 0.4rem);
+    }
+    .menu.menu-toggle div:nth-child(2) { opacity: 0; }
+    .menu.menu-toggle div:last-child {
+        width: 100%;
+        transform: rotate(45deg) translate(-0.3rem, -0.4rem);
     }
 
-    .right {
-        gap: 1rem;
+    /* Nombre de usuario oculto */
+    .user-name { display: none; }
+
+    /* Avatar más pequeño */
+    #navbar .user-avatar {
+        width: 2.2rem  !important;
+        height: 2.2rem !important;
+        min-width:  2.2rem !important;
+        min-height: 2.2rem !important;
+        max-width:  2.2rem !important;
+        max-height: 2.2rem !important;
     }
+
+    /* Header más compacto */
+    #navbar header {
+        padding: 0 0.9rem 0 0.75rem !important;
+    }
+
+    /* Gap del right */
+    .right         { gap: 0.5rem; }
+    #navbar .right { gap: 0.5rem !important; }
+
+    /* Brand */
+    .brand { font-size: 15px; }
+
+    /* Dropdown ocupa casi todo el ancho */
+    .dropdown {
+        width: calc(100vw - 1.8rem);
+        right: -0.5rem;
+    }
+
+    /* Campana */
+    .bell-btn { width: 1.9rem; height: 1.9rem; }
+    .bell-btn i { font-size: 14px; }
+    .bell-badge { font-size: 9px; min-width: 15px; height: 15px; }
+
+    /* Modal de cierre de sesión */
+    .modal-card {
+        padding: 1.25rem;
+        max-width: 90%;
+        border-radius: 12px;
+    }
+    .modal-card h3 { font-size: 1.05rem; }
+    .modal-card p  { font-size: 0.88rem; margin-bottom: 1.25rem; }
+    .modal-buttons button { padding: 0.55rem 1.2rem; font-size: 0.85rem; }
 }
 
-/* ───────── UX TOUCH ───────── */
-@media (hover: none) {
-    .sidebar a:hover {
-        background: none;
-        color: white;
+/* ══════════════════════════════════════════
+   XS — Móviles muy pequeños ≤ 360px
+══════════════════════════════════════════ */
+@media (max-width: 360px) {
+    /* Header aún más compacto */
+    #navbar header {
+        padding: 0 0.6rem 0 0.5rem !important;
+        height: 3rem !important;
+    }
+
+    /* Ajustar el main-content si usa margin-top:3.5rem */
+    /* (solo aplica si la clase está disponible globalmente) */
+    .main-content { margin-top: 3rem; height: calc(100dvh - 3rem); }
+
+    .brand { font-size: 13px; letter-spacing: 0; }
+
+    /* Gap mínimo */
+    .right         { gap: 0.35rem; }
+    #navbar .right { gap: 0.35rem !important; }
+
+    /* Avatar */
+    #navbar .user-avatar {
+        width: 2rem  !important;
+        height: 2rem !important;
+        min-width:  2rem !important;
+        min-height: 2rem !important;
+        max-width:  2rem !important;
+        max-height: 2rem !important;
+    }
+
+    /* Campana */
+    .bell-btn { width: 1.7rem; height: 1.7rem; }
+    .bell-btn i { font-size: 13px; }
+
+    /* Sidebar abierto en pantallas muy pequeñas */
+    .sidebar.menu-toggle { width: 100%; }
+
+    /* Links del sidebar más compactos */
+    .sidebar a { padding: 0.75rem 0.6rem; gap: 1rem; font-size: 14px; }
+    .fa-solid   { font-size: 18px; }
+
+    /* Modal */
+    .modal-card { padding: 1rem; }
+    .modal-card .modal-icon { font-size: 2rem; }
+    .modal-buttons { gap: 0.5rem; }
+    .modal-buttons button { padding: 0.5rem 1rem; font-size: 0.82rem; }
+}
+
+/* ══════════════════════════════════════════
+   TÁCTIL — targets mínimos 44px (WCAG 2.5.5)
+══════════════════════════════════════════ */
+@media (hover: none) and (pointer: coarse) {
+    .sidebar a          { min-height: 44px; }
+    .dropdown ul li     { min-height: 44px; }
+    .bell-btn           { min-width: 44px; min-height: 44px; }
+    .menu-container     { min-width: 44px; min-height: 44px; justify-content: center; }
+    .modal-buttons button { min-height: 44px; }
+
+    /* Quitar efectos hover que no aplican en touch */
+    .sidebar a:hover            { background-color: transparent; color: var(--text-color); }
+    .sidebar a:hover .fa-solid  { color: #ffffff; }
+    .sidebar a.selected         { background-color: var(--background-selected); color: var(--text-select-color); }
+    .dropdown ul li:hover       { background-color: transparent; color: #ffffff; }
+    .dropdown ul li:hover img   { filter: brightness(0) invert(1); }
+    .bell-btn:hover             { background: rgba(255,255,255,0.12); }
+}
+
+/* ══════════════════════════════════════════
+   MOVIMIENTO REDUCIDO
+══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .menu div,
+    .sidebar a,
+    .dropdown,
+    .bell-btn,
+    .modal-card {
+        transition: none !important;
+        animation: none !important;
     }
 }
