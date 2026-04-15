@@ -199,7 +199,7 @@ async function cargarCitasHoy(fisioId) {
 async function cargarAlertas(fisioId) {
     const hace7Dias = new Date();
     hace7Dias.setDate(hace7Dias.getDate() - 7);
-    const fechaLimite = fechaLocalISO(hace7Dias); // ← corregido
+    const fechaLimite = fechaLocalISO(hace7Dias); 
 
     const { data: pendientes } = await supabase
         .from("citas")
@@ -219,6 +219,8 @@ async function cargarAlertas(fisioId) {
         .lte("fecha", HOY)
         .order("fecha", { ascending: false })
         .limit(3);
+
+        console.log(data);
 
     const alertas = [];
 
