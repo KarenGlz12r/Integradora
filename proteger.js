@@ -8,35 +8,40 @@ import { supabase, apiFetch, obtenerToken, limpiarSesion } from "./auth.js";
 // Llama al backend para verificar que el token sea válido y el rol correcto.
 // Si falla, redirige al login.
 export async function protegerRuta(rolRequerido = null) {
-
     const token = obtenerToken();
-
-    // Sin token → login
     if (!token) {
         window.location.href = "/index.html";
         return;
     }
 
-    // Verificar token y obtener rol desde el backend
     const data = await apiFetch("/api/auth/me");
 
-    if (!data || !data.ok) {
+    // 👇 Solo redirige si el servidor respondió activamente que no es válido
+    // Si data es null fue un error de red/timeout — NO redirigir
+    if (data === null) {
+        console.warn("Backend no disponible, usando token local como respaldo");
+        // Verificar que el token no esté caducado localmente
+        const rol = localStorage.getItem("mc_rol");
+        if (!rol) {
+            window.location.href = "/index.html";
+        }
+        return; // ← Continúa con la sesión local
+    }
+
+    if (!data.ok) {
         limpiarSesion();
         window.location.href = "/index.html";
         return;
     }
 
-    // Verificar rol específico
     if (rolRequerido && data.rol !== rolRequerido) {
         window.location.href = "/index.html";
         return;
     }
 
-    // Sincronizar sesión con el cliente Supabase local
-    // para que las queries directas a Supabase sigan funcionando
+    // Sincronizar Supabase client
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData?.session) {
-        // Restaurar sesión de Supabase con el token guardado
         const refresh = localStorage.getItem("mc_refresh");
         if (refresh) {
             await supabase.auth.setSession({

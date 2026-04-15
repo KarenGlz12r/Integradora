@@ -36,7 +36,7 @@ export function limpiarSesion() {
 export async function apiFetch(ruta, opciones = {}) {
     const token = obtenerToken();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos máximo
+    const timeoutId = setTimeout(() => controller.abort(), 18000); // 18 segundos máximo
 
     let res;
     try {
