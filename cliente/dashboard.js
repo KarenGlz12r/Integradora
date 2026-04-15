@@ -212,13 +212,14 @@ async function cargarAlertas(fisioId) {
 
 const { data: noAsistieron, error: errorNoAsistieron } = await supabase
         .from("citas")
-        .select(`id, fecha, usuario!inner(us_nom)`)
+        .select(`id, fecha, usuario(us_nom)`)
         .eq("fisioterapeuta_id", fisioId)
         .eq("estado", "no_asistio")
         .gte("fecha", fechaLimite)
         .lte("fecha", HOY)
         .order("fecha", { ascending: false })
         .limit(3);
+
         console.log("Los que no asistieron", noAsistieron);
         console.log("Pagos pendientes", pendientes);
 
