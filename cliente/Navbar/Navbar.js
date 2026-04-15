@@ -206,13 +206,24 @@ function actualizarBadge(count) {
  *           es decir, mensajes entrantes del paciente.
  */
 async function cargarMensajesNoLeidos(userId) {
-    // Paso 1: conversaciones que pertenecen a este fisio
+    // 1. Obtener el ID real del fisioterapeuta basado en el user.id de Auth
+    const { data: fisio } = await supabase
+        .from('fisioterapeutas')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+    if (!fisio) {
+        actualizarBadge(0);
+        return;
+    }
+
+    // 2. Buscar las conversaciones usando el fisio.id correcto
     const { data: convs } = await supabase
         .from('conversaciones')
         .select('id')
-        .eq('id_fisio', userId);
+        .eq('id_fisio', fisio.id);
 
-    // Si el fisio no tiene conversaciones, el badge queda en cero
     if (!convs || convs.length === 0) {
         actualizarBadge(0);
         return;
@@ -220,8 +231,6 @@ async function cargarMensajesNoLeidos(userId) {
 
     const idsConvs = convs.map(c => c.id);
 
-    // Paso 2: mensajes no leídos en esas conversaciones
-    //         que no haya mandado el propio fisio
     const { count } = await supabase
         .from('mensajes')
         .select('*', { count: 'exact', head: true })
