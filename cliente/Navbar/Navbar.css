@@ -487,6 +487,56 @@ header {
     /* Modal de cierre de sesión ocupa más ancho */
     .modal-card { padding: 1.5rem; max-width: 320px; }
 }
+/* ══════════════════════════════════════════
+   SM-MD — Móviles grandes ≤ 568px
+   (iPhone SE landscape, Galaxy S*, etc.)
+══════════════════════════════════════════ */
+@media (max-width: 568px) {
+    /* Sidebar abierto a casi todo el ancho */
+    .sidebar.menu-toggle { width: 100%; }
+ 
+    /* Nombre de usuario más compacto */
+    .user-name h2 { font-size: 12px; }
+ 
+    /* Brand */
+    .brand { font-size: 15px; letter-spacing: 0.5px; }
+ 
+    /* Avatar */
+    #navbar .user-avatar {
+        width: 2.4rem  !important;
+        height: 2.4rem !important;
+        min-width:  2.4rem !important;
+        min-height: 2.4rem !important;
+        max-width:  2.4rem !important;
+        max-height: 2.4rem !important;
+    }
+ 
+    /* Header padding */
+    #navbar header {
+        padding: 0 1rem 0 0.75rem !important;
+    }
+ 
+    /* Gap del right */
+    .right         { gap: 0.6rem; }
+    #navbar .right { gap: 0.6rem !important; }
+ 
+    /* Campana */
+    .bell-btn { width: 2rem; height: 2rem; }
+    .bell-btn i { font-size: 14px; }
+ 
+    /* Dropdown ocupa más ancho */
+    .dropdown {
+        width: calc(100vw - 2rem);
+        right: -0.25rem;
+    }
+ 
+    /* Modal */
+    .modal-card {
+        padding: 1.4rem;
+        max-width: 88%;
+    }
+    .modal-buttons button { padding: 0.55rem 1.2rem; font-size: 0.87rem; }
+}
 
 /* ══════════════════════════════════════════
    SM — Móviles ≤ 480px
