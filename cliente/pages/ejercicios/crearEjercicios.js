@@ -238,7 +238,7 @@ async function RegistrarVideo() {
             mostrarAlerta("El video pesa más de 50MB", "warning");
             return;
         }
-        mostrarAlerta("Analizando movimiento con IA","info");
+        mostrarAlerta("Analizando movimiento con IA, esto tomará unos momentos, dependiendo de la longitud del video.","info");
         angulosMeta=await analizarVideoMovenet(video, articulacionSeleccionada);
 
 
