@@ -203,7 +203,7 @@ async function cargarAlertas(fisioId) {
 
     const { data: pendientes } = await supabase
         .from("citas")
-        .select("id, fecha, hora_inicio, usuario:usuario_id(us_nom)")
+        .select("id, fecha, hora_inicio, usuario(us_nom)")
         .eq("fisioterapeuta_id", fisioId)
         .eq("estado", "pendiente_pago")
         .gte("fecha", HOY)
