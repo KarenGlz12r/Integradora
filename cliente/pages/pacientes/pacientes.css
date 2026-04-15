@@ -554,26 +554,89 @@
 }
 
 @media (max-width: 768px) {
-    .main-content { margin-left: 0 !important; }
-    .cards-info { grid-template-columns: repeat(2, 1fr); padding: 10px 14px; gap: 8px; }
+    /* ── Quitar el margen del sidebar izquierdo ── */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;      /* 👈 Fuerza ancho completo */
+        overflow-x: hidden;          /* 👈 Evita scroll horizontal */
+    }
 
-    .pacientes-split { position: relative; }
-    .pacientes-sidebar { width: 100%; position: absolute; inset: 0; z-index: 2; }
-    .paciente-detail  { position: absolute; inset: 0; z-index: 1; display: none; }
-    .paciente-detail.show { display: flex; z-index: 3; }
+    .cards-info {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 10px 14px;
+        gap: 8px;
+    }
 
+    /* ── Split: ambos paneles se superponen como capas ── */
+    .pacientes-split {
+        position: relative;
+        width: 100%;                 /* 👈 Ocupa todo el ancho */
+        overflow: hidden;
+    }
+
+    /* ── Sidebar ocupa toda la pantalla en móvil ── */
+    .pacientes-sidebar {
+        width: 100%;
+        min-width: unset;            /* 👈 Quita el min-width de 260px */
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+    }
+
+    /* ── Detalle oculto por defecto, aparece encima ── */
+    .paciente-detail {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: none;
+        width: 100%;                 /* 👈 Ocupa todo el ancho */
+    }
+    .paciente-detail.show {
+        display: flex;
+        z-index: 3;
+    }
+
+    /* ── Header del detalle ── */
+    .detail-header {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+    }
+    .detail-header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    /* ── Formularios de notas ── */
     .nota-form-grid { grid-template-columns: 1fr; }
     .nota-form-group.full { grid-column: 1; }
     .nota-form-section { grid-column: 1; }
+
+    /* ── Historial clínico ── */
     .hc-grid { grid-template-columns: 1fr; }
     .hc-section.full-width { grid-column: 1; }
+
+    /* ── Notas de evolución ── */
     .nota-grid { grid-template-columns: 1fr; }
     .nota-field.full { grid-column: 1; }
+
+    /* ── Tabs con scroll horizontal ── */
+    .detail-tabs {
+        padding: 0 10px;
+    }
+    .detail-tab {
+        padding: 10px 10px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
-    .cards-info { grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; }
+    .cards-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 8px;
+    }
     .card-stat-numero { font-size: 18px; }
-    .detail-header { flex-wrap: wrap; }
-    .detail-header-actions { width: 100%; justify-content: flex-end; }
+
+    /* ── Ocultar texto de tabs, solo íconos ── */
+    .detail-tab span { display: none; }   /* 👈 Opcional: si los tabs no caben */
 }
