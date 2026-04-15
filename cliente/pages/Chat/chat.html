@@ -487,11 +487,14 @@ function chatAgregarBubble(m, animar = true) {
     row.className   = 'chat-msg-row ' + (esFisio ? 'fisio' : 'paciente');
     if (animar) row.style.animation = 'chatFadeIn 0.2s ease';
 
-    const hora = m.msg_fecha
-        ? new Date(m.msg_fecha).toLocaleTimeString('es-MX', {
+let hora = '';
+    if (m.msg_fecha) {
+        // Aseguramos que la fecha se trate como UTC añadiendo 'Z' si no la tiene
+        let fechaUTC = m.msg_fecha.endsWith('Z') ? m.msg_fecha : m.msg_fecha + 'Z';
+        hora = new Date(fechaUTC).toLocaleTimeString('es-MX', {
             hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City'
-          })
-        : '';
+        });
+    }
 
     const checkIcon = m.msg_leido
         ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/><polyline points="14 12 9 17"/></svg>`
