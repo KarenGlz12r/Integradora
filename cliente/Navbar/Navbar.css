@@ -537,8 +537,8 @@ header {
     }
     .modal-buttons button { padding: 0.55rem 1.2rem; font-size: 0.87rem; }
         /* Links del sidebar más compactos */
-    .sidebar a { padding: 0.65rem 0.4rem; gap: 0.4rem; font-size: 14px; }
-    .fa-solid   { font-size: 13px; }
+    /* .sidebar a { padding: 0.65rem 0.4rem; gap: 0.4rem; font-size: 14px; }
+    .fa-solid   { font-size: 13px; } */
     .sidebar { width: 20%; 
      }
 }
