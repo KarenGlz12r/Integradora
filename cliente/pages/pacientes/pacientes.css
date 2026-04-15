@@ -630,6 +630,11 @@
 }
 
 @media (max-width: 480px) {
+        .main-content {
+        margin-left: 0rem !important;
+        width: 100% !important;      
+        overflow-x: hidden;          
+    }
     .cards-info {
         grid-template-columns: 1fr 1fr;
         gap: 6px;
