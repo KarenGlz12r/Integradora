@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="../../Navbar/Navbar.css">
     <link rel="stylesheet" href="./pacientes.css">
 </head>
+
 <body>
 
     <!-- Navbar dinámico -->
@@ -114,7 +116,8 @@
                 </div>
 
                 <!-- Contenido real (oculto hasta seleccionar paciente) -->
-                <div id="detailContent" style="display:none; flex-direction:column; flex:1; overflow:hidden; min-height:0;">
+                <div id="detailContent"
+                    style="display:none; flex-direction:column; flex:1; overflow:hidden; min-height:0;">
 
                     <!-- Header del paciente -->
                     <div class="detail-header">
@@ -158,21 +161,24 @@
                         <div class="tab-panel active" id="tab-citas">
                             <p class="tab-section-title"><i class="bi bi-calendar3"></i> Todas las citas</p>
                             <div class="citas-timeline" id="citasTimeline">
-                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">
+                                    Cargando…</div>
                             </div>
                         </div>
 
                         <!-- Tab: Historial clínico -->
                         <div class="tab-panel" id="tab-historial">
                             <div id="hcContent">
-                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">
+                                    Cargando…</div>
                             </div>
                         </div>
 
                         <!-- Tab: Notas de evolución -->
                         <div class="tab-panel" id="tab-notas">
                             <div class="notas-list" id="notasList">
-                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">Cargando…</div>
+                                <div style="color:var(--color-gray);font-size:13px;text-align:center;padding:20px;">
+                                    Cargando…</div>
                             </div>
                         </div>
 
@@ -193,7 +199,8 @@
 
             <div class="modal-nota-header">
                 <div>
-                    <h3><i class="bi bi-journal-plus"></i> <span id="modalNotaTitulo">Nueva nota de evolución</span></h3>
+                    <h3><i class="bi bi-journal-plus"></i> <span id="modalNotaTitulo">Nueva nota de evolución</span>
+                    </h3>
                     <div class="modal-nota-subtitle" id="modalNotaSubtitulo"></div>
                 </div>
                 <button class="modal-nota-close" id="btnCerrarModalNota" aria-label="Cerrar">
@@ -212,16 +219,16 @@
                         <input type="text" id="nf-motivo" placeholder="Ej. Dolor lumbar crónico">
                     </div>
 
-             <div class="nota-form-group">
-    <label for="nf-estado-paciente">Estado del paciente</label>
-    <select id="nf-estado-paciente">
-        <option value="">Seleccionar…</option>
-        <option value="en_tratamiento">En tratamiento</option>
-        <option value="alta_temporal">Alta temporal</option>
-        <option value="alta_definitiva">Alta definitiva</option>
-        <option value="referido">Referido</option>
-    </select>
-</div>
+                    <div class="nota-form-group">
+                        <label for="nf-estado-paciente">Estado del paciente</label>
+                        <select id="nf-estado-paciente">
+                            <option value="">Seleccionar…</option>
+                            <option value="en_tratamiento">En tratamiento</option>
+                            <option value="alta_temporal">Alta temporal</option>
+                            <option value="alta_definitiva">Alta definitiva</option>
+                            <option value="referido">Referido</option>
+                        </select>
+                    </div>
 
                     <div class="nota-form-group">
                         <label>Dolor inicial (0–10)</label>
@@ -241,7 +248,8 @@
 
                     <div class="nota-form-group full">
                         <label for="nf-reporte">Reporte del paciente</label>
-                        <textarea id="nf-reporte" placeholder="¿Qué reporta el paciente? Síntomas, cambios desde la última sesión…"></textarea>
+                        <textarea id="nf-reporte"
+                            placeholder="¿Qué reporta el paciente? Síntomas, cambios desde la última sesión…"></textarea>
                     </div>
 
                     <!-- Sección: Evaluación física -->
@@ -282,17 +290,20 @@
 
                     <div class="nota-form-group full">
                         <label for="nf-objetivos">Objetivos de la sesión</label>
-                        <textarea id="nf-objetivos" placeholder="Objetivos terapéuticos de hoy…" style="min-height:55px;"></textarea>
+                        <textarea id="nf-objetivos" placeholder="Objetivos terapéuticos de hoy…"
+                            style="min-height:55px;"></textarea>
                     </div>
 
                     <div class="nota-form-group">
                         <label for="nf-tecnicas">Técnicas utilizadas</label>
-                        <textarea id="nf-tecnicas" placeholder="Ej. Terapia manual, electroterapia…" style="min-height:55px;"></textarea>
+                        <textarea id="nf-tecnicas" placeholder="Ej. Terapia manual, electroterapia…"
+                            style="min-height:55px;"></textarea>
                     </div>
 
                     <div class="nota-form-group">
                         <label for="nf-ejercicios">Ejercicios realizados</label>
-                        <textarea id="nf-ejercicios" placeholder="Ejercicios aplicados en sesión…" style="min-height:55px;"></textarea>
+                        <textarea id="nf-ejercicios" placeholder="Ejercicios aplicados en sesión…"
+                            style="min-height:55px;"></textarea>
                     </div>
 
                     <div class="nota-form-group">
@@ -310,7 +321,8 @@
 
                     <div class="nota-form-group full">
                         <label for="nf-respuesta">Respuesta al tratamiento</label>
-                        <textarea id="nf-respuesta" placeholder="Cómo respondió el paciente durante la sesión…" style="min-height:55px;"></textarea>
+                        <textarea id="nf-respuesta" placeholder="Cómo respondió el paciente durante la sesión…"
+                            style="min-height:55px;"></textarea>
                     </div>
 
                     <div class="nota-form-group full">
@@ -320,7 +332,8 @@
 
                     <div class="nota-form-group full">
                         <label for="nf-plan">Plan para la siguiente sesión</label>
-                        <textarea id="nf-plan" placeholder="Qué se trabajará en la próxima sesión…" style="min-height:55px;"></textarea>
+                        <textarea id="nf-plan" placeholder="Qué se trabajará en la próxima sesión…"
+                            style="min-height:55px;"></textarea>
                     </div>
 
                     <div class="nota-form-group">
@@ -389,7 +402,7 @@
                 document.getElementById('navbar').innerHTML = html;
                 const s = document.createElement('script');
                 s.type = 'module';
-                s.src  = '../../Navbar/Navbar.js';
+                s.src = '../../Navbar/Navbar.js';
                 document.body.appendChild(s);
             });
     </script>
@@ -398,4 +411,5 @@
     <script src="./pacientes.js" type="module"></script>
 
 </body>
+
 </html>
