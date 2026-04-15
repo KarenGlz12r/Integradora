@@ -217,8 +217,8 @@ async function cargarAlertas(fisioId) {
         .eq("estado", "no_asistio")
         .gte("fecha", fechaLimite)
         .lte("fecha", HOY)
-        .order("fecha", { ascending: false })
-        .limit(3);
+        .order("fecha", { ascending: true })
+        .limit(5);
 
         console.log("Los que no asistieron", noAsistieron);
         console.log("Pagos pendientes", pendientes);
