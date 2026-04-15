@@ -186,7 +186,7 @@ async function RegistrarRutinas() {
     // document.getElementById("rut_img_file").value = "";
     document.getElementById("usuario_id").value = "";
     resetFileInput(); //PARA LIMPIAR EL DEL ARCHIVO SELECCIONADO.
-    mostrarAlerta("Rutina registrada exitosamente", "success");
+    mostrarAlerta("Rutina registrada exitosamente, redirigiendo al inicio...", "success");
 }
 
 // ══════════════════════════════════════════
