@@ -74,17 +74,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        fetch('./Navbar/Navbar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = './Navbar/Navbar.js';
-                document.body.appendChild(script);
-            });
-    </script>
+ <script type="module" src="./Navbar/Navbar.js"></script>
     <script type="module" src="./dashboard.js"></script>
 
 </body>
