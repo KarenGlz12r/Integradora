@@ -187,8 +187,27 @@
                 if (!result) return; 
 
                 // 5. Manejar la respuesta
+              // 5. Manejar la respuesta
                 if (result.ok) {
-                    alert("¡Fisioterapeuta registrado con éxito!");
+                    // Preparamos los datos para la plantilla de EmailJS
+                    // (Asegúrate de que las llaves coincidan con las variables {{...}} de tu plantilla en EmailJS)
+                    const templateParams = {
+                        nombre_destino: nombre,            // El nombre del fisio
+                        email_destino: emailContacto,      // A dónde le va a llegar el correo
+                        email_generado: result.emailLogin, // El correo institucional que creó el backend
+                        password_generada: result.password // La contraseña que creó el backend
+                    };
+
+                    // Reemplaza "TU_SERVICE_ID" y "TU_TEMPLATE_ID" con los tuyos
+                    emailjs.send("TU_SERVICE_ID", "TU_TEMPLATE_ID", templateParams)
+                        .then(function(response) {
+                            console.log("Correo enviado con éxito!", response.status, response.text);
+                            alert("¡Fisioterapeuta registrado y con éxito!");
+                        }, function(error) {
+                            console.error("Error al enviar el correo:", error);
+                            alert("Fisioterapeuta registrado, pero hubo un error al enviar el correo.");
+                        });
+
                     document.getElementById('form-registro').reset();
                     document.getElementById('especialidad_custom').style.display = 'none';
                 } else {
