@@ -220,7 +220,6 @@ async function cargarAlertas(fisioId) {
     //         .order("fecha", { ascending: false })
     //         .limit(3);
 
-            console.log("Los que no asistieron", inasistencias);
     //         console.log("Pagos pendientes", pendientes);
     const { data: inasistencias } = await supabase
         .from("citas")
@@ -232,6 +231,7 @@ async function cargarAlertas(fisioId) {
         .order("fecha", { ascending: false })
         .limit(6);
 
+            console.log("Los que no asistieron", inasistencias);
     const alertas = [];
 
 
