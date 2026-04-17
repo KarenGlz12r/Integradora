@@ -136,8 +136,70 @@
                 script.src = '/admin/Navbar/Navbar.js';
                 document.body.appendChild(script);
             });
+    </script><script type="module">
+        import { apiFetch } from "../../../auth.js";
+
+        // Usamos window.registrarFisioterapeuta para que el botón en el HTML (onclick) pueda encontrar la función
+        window.registrarFisioterapeuta = async function() {
+            
+            // 1. Obtener los valores del formulario HTML
+            const emailContacto = document.getElementById('email').value.trim();
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellidoPaterno = document.getElementById('apellido_paterno').value.trim();
+            const apellidoMaterno = document.getElementById('apellido_materno').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const fechaNacimiento = document.getElementById('fecha_naci').value;
+            const cedula = document.getElementById('cedula').value.trim();
+            const aniosExperiencia = parseInt(document.getElementById('anios_experiencia').value);
+            const institucionEgreso = document.getElementById('institucion_egreso').value.trim();
+            const turno = document.getElementById('turno').value;
+            const especialidad = getEspecialidad(); // Tu función auxiliar
+
+            // 2. Validación básica en el frontend
+            if (!emailContacto || !nombre || !apellidoPaterno || !cedula || !especialidad) {
+                alert("Por favor, completa todos los campos obligatorios.");
+                return;
+            }
+
+            // 3. Preparar los datos
+            const bodyData = {
+                emailContacto, 
+                nombre, 
+                apellidoPaterno, 
+                apellidoMaterno,
+                cedula, 
+                especialidad, 
+                telefono, 
+                aniosExperiencia: isNaN(aniosExperiencia) ? null : aniosExperiencia,
+                institucionEgreso, 
+                fechaNacimiento, 
+                turno
+            };
+
+            try {
+                // 4. Enviar usando tu apiFetch (¡Él solito pone el Token y la URL base!)
+                const result = await apiFetch("/api/fisioterapeutas", {
+                    method: "POST",
+                    body: JSON.stringify(bodyData)
+                });
+
+                // Si apiFetch devuelve null (por ejemplo si el token caducó), detenemos
+                if (!result) return; 
+
+                // 5. Manejar la respuesta
+                if (result.ok) {
+                    alert("¡Fisioterapeuta registrado con éxito!");
+                    document.getElementById('form-registro').reset();
+                    document.getElementById('especialidad_custom').style.display = 'none';
+                } else {
+                    alert("Error: " + (result.error || "No se pudo registrar"));
+                }
+            } catch (error) {
+                console.error("Error al registrar:", error);
+                alert("Error de conexión con el servidor.");
+            }
+        };
     </script>
-    <script type="module" src="../../../auth.js"></script>
     <script>
         function toggleEspecialidadCustom(sel) {
             const custom = document.getElementById('especialidad_custom');
