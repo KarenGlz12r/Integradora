@@ -223,7 +223,7 @@ async function cargarAlertas(fisioId) {
     //         console.log("Pagos pendientes", pendientes);
     const { data: inasistencias } = await supabase
         .from("citas")
-        .select(`id, fecha, hora_inicio, usuario!citas_usuario_id_fkey(us_nom)`)
+        .select(`id, fecha, estado,hora_inicio, usuario!citas_usuario_id_fkey(us_nom)`)
         .eq("fisioterapeuta_id", fisioId)
         .in("estado", ["no_asistio", "cancelada"])   // ambos estados
         .gte("fecha", fechaLimite)
@@ -342,18 +342,18 @@ function activarTiempoReal(fisioId) {
         })
         .subscribe();
 
-    // supabase
-    //     .channel("dashboard-pagos")
-    //     .on("postgres_changes", { 
-    //         event: "*", 
-    //         schema: "public", 
-    //         table: "pagos"
-    //         // pagos no tiene fisioterapeuta_id, así que aquí no se puede filtrar directamente
-    //     }, () => {
-    //         cargarKpiPendientes(fisioId);
-    //         cargarAlertas(fisioId);
-    //     })
-    //     .subscribe();
+    supabase
+        .channel("dashboard-pagos")
+        .on("postgres_changes", { 
+            event: "*", 
+            schema: "public", 
+            table: "pagos"
+            // pagos no tiene fisioterapeuta_id, así que aquí no se puede filtrar directamente
+        }, () => {
+            cargarKpiPendientes(fisioId);
+            cargarAlertas(fisioId);
+        })
+        .subscribe();
 }
 
 // ── INICIALIZAR ──────────────────────────────────────────────────
