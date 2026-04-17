@@ -74,7 +74,19 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- <script type="module" src="./Navbar/Navbar.js"></script>
+  <!-- ── Carga del Navbar ── -->
+    <script>
+        fetch('/admin/Navbar/Navbar.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('navbar').innerHTML = html;
+                const s = document.createElement('script');
+                s.type = 'module';
+                s.src = '/admin/Navbar/Navbar.js';
+                document.body.appendChild(s);
+            });
+    </script>
+
     <script type="module" src="./dashboard.js"></script>
 
 </body>
