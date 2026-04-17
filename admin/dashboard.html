@@ -73,19 +73,19 @@
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- ── Carga del Navbar ── -->
-    <script>
-        fetch('/admin/Navbar/Navbar.html')
-            .then(r => r.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                const s = document.createElement('script');
-                s.type = 'module';
-                s.src = '/admin/Navbar/Navbar.js';
-                document.body.appendChild(s);
-            });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ── Carga del Navbar ── -->
+<script type="module">
+    const res  = await fetch('/admin/Navbar/Navbar.html');
+    const html = await res.text();
+    document.getElementById('navbar').innerHTML = html;
+
+    const { default: initNavbar } = await import('/admin/Navbar/Navbar.js');
+    await initNavbar();
+</script>
+
+<script type="module" src="./dashboard.js"></script>
 
     <script type="module" src="./dashboard.js"></script>
 
