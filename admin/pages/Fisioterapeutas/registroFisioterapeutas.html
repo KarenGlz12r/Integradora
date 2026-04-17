@@ -3,79 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../Navbar/Navbar.css">
-    <link rel="stylesheet" href="../../admin.css">
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Registrar Fisioterapeuta</title>
+    <title>Registrar Fisioterapeuta · Motricare</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --brand:        #7C3AED;
+            --brand-light:  #A78BFA;
+            --brand-dark:   #5B21B6;
+            --surface:      #FAFAF9;
+            --card:         #FFFFFF;
+            --border:       #E8E4F0;
+            --text:         #1C1B1F;
+            --muted:        #6B7280;
+            --danger:       #DC2626;
+            --success:      #059669;
+            --radius:       14px;
+            --shadow:       0 4px 24px rgba(124,58,237,.10);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            background: var(--brand);
+            padding: 0 32px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(91,33,182,.25);
+        }
+        .topbar-logo {
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .topbar-back {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255,255,255,.85);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color .2s;
+        }
+        .topbar-back:hover { color: #fff; }
+        .topbar-back svg { width: 16px; height: 16px; }
+
+        /* ── Page layout ── */
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        .page-heading {
+            margin-bottom: 32px;
+        }
+        .page-heading h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .page-heading p {
+            color: var(--muted);
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-section {
+            padding: 28px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-section:last-of-type { border-bottom: none; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--brand);
+            margin-bottom: 20px;
+        }
+
+        /* ── Grid ── */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .grid-1 { display: grid; gap: 18px; }
+
+        @media (max-width: 560px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .card-section { padding: 22px 20px; }
+        }
+
+        /* ── Field ── */
+        .field { display: flex; flex-direction: column; gap: 6px; }
+
+        .field label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .field label .req {
+            color: var(--brand);
+            margin-left: 2px;
+        }
+
+        .field input,
+        .field select {
+            height: 42px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 0 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: #fff;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            width: 100%;
+        }
+        .field input::placeholder { color: #C4BDD6; }
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+        }
+        .field input.error,
+        .field select.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(220,38,38,.10);
+        }
+        .field .field-error {
+            font-size: 12px;
+            color: var(--danger);
+            display: none;
+        }
+        .field.has-error .field-error { display: block; }
+
+        /* custom especialidad */
+        #especialidad_custom {
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ── Alert ── */
+        #alert-container { padding: 0 32px; }
+        .alert {
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: slideIn .25s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .alert-danger  { background: #FEF2F2; color: var(--danger); border: 1px solid #FECACA; }
+        .alert-success { background: #ECFDF5; color: var(--success); border: 1px solid #A7F3D0; }
+        .alert svg { flex-shrink: 0; width: 16px; height: 16px; margin-top: 1px; }
+
+        /* ── Footer actions ── */
+        .card-footer {
+            padding: 22px 32px;
+            border-top: 1px solid var(--border);
+            background: #FAFAF9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-cancel {
+            height: 42px;
+            padding: 0 22px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: border-color .2s, color .2s;
+        }
+        .btn-cancel:hover { border-color: #C4BDD6; color: var(--text); }
+
+        .btn-submit {
+            height: 42px;
+            padding: 0 28px;
+            border-radius: 8px;
+            border: none;
+            background: var(--brand);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .2s, transform .1s, box-shadow .2s;
+            box-shadow: 0 2px 12px rgba(124,58,237,.3);
+        }
+        .btn-submit:hover:not(:disabled) {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 18px rgba(124,58,237,.4);
+        }
+        .btn-submit:active:not(:disabled) { transform: scale(.98); }
+        .btn-submit:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+        }
+
+        /* spinner */
+        .spinner {
+            width: 15px; height: 15px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            display: none;
+        }
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Credentials modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(28,27,31,.55);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 999;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%; max-width: 440px;
+            padding: 36px 32px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+            transform: translateY(12px);
+            transition: transform .25s;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-icon {
+            width: 52px; height: 52px;
+            background: #ECFDF5;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 18px;
+        }
+        .modal-icon svg { width: 26px; height: 26px; color: var(--success); }
+
+        .modal h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+        .cred-box {
+            background: #F5F3FF;
+            border: 1px solid #DDD6FE;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid #EDE9FE;
+        }
+        .cred-row:last-child { border-bottom: none; }
+        .cred-label { color: var(--muted); font-weight: 500; }
+        .cred-value {
+            font-weight: 600;
+            color: var(--brand-dark);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-copy {
+            height: 38px; padding: 0 18px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 500;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+        .btn-copy:hover { border-color: var(--brand-light); }
+        .btn-done {
+            height: 38px; padding: 0 22px;
+            border-radius: 8px; border: none;
+            background: var(--brand);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .btn-done:hover { background: var(--brand-dark); }
+    </style>
 </head>
 <body>
 
-    <div id="navbar"></div>
+<!-- Top bar -->
+<nav class="topbar">
+    <span class="topbar-logo">Motricare</span>
+    <a href="./MostrarFisioterapeutas.html" class="topbar-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Ver fisioterapeutas
+    </a>
+</nav>
 
-    <main class="container">
-        <div class="page-header">
-            <div class="text">
-                <p>Gestión de fisioterapeutas</p>
-            </div>
-            <div class="button">
-                <a href="./MostrarFisioterapeutas.html" class="btn-registrar">Ver fisioterapeutas</a>
+<main class="page">
+
+    <div class="page-heading">
+        <h1>Nuevo fisioterapeuta</h1>
+        <p>Completa los datos para crear la cuenta y enviar las credenciales.</p>
+    </div>
+
+    <div class="card">
+
+        <!-- Alert -->
+        <div id="alert-container" style="padding: 0 32px; padding-top: 20px;"></div>
+
+        <!-- Sección 1: Personal -->
+        <div class="card-section">
+            <p class="section-label">Información personal</p>
+            <div class="grid-2">
+                <div class="field" id="f-nombre">
+                    <label for="nombre">Nombre(s) <span class="req">*</span></label>
+                    <input id="nombre" type="text" placeholder="Rafael">
+                    <span class="field-error">Solo letras, sin números</span>
+                </div>
+                <div class="field" id="f-email">
+                    <label for="email">Correo de contacto <span class="req">*</span></label>
+                    <input id="email" type="email" placeholder="correo@ejemplo.com">
+                    <span class="field-error">Formato de email inválido</span>
+                </div>
+                <div class="field" id="f-apellido_paterno">
+                    <label for="apellido_paterno">Apellido paterno <span class="req">*</span></label>
+                    <input id="apellido_paterno" type="text" placeholder="Carrillo">
+                    <span class="field-error">Solo letras, sin números</span>
+                </div>
+                <div class="field">
+                    <label for="apellido_materno">Apellido materno</label>
+                    <input id="apellido_materno" type="text" placeholder="Basaldúa">
+                </div>
+                <div class="field" id="f-telefono">
+                    <label for="telefono">Teléfono</label>
+                    <input id="telefono" type="text" placeholder="10 dígitos" maxlength="10">
+                    <span class="field-error">Debe tener exactamente 10 dígitos</span>
+                </div>
+                <div class="field" id="f-fecha_naci">
+                    <label for="fecha_naci">Fecha de nacimiento</label>
+                    <input id="fecha_naci" type="date">
+                    <span class="field-error">Debe ser mayor de 18 años</span>
+                </div>
             </div>
         </div>
 
-        <form class="form" id="form-registro">
-
-            <div class="form-header">
-                <div class="form-header-icon">＋</div>
-                <div>
-                    <p class="title">Nuevo fisioterapeuta</p>
-                    <p class="message">Completa los datos para registrar</p>
-                </div>
-            </div>
-
-            <div id="alert-container"></div>
-
-            <div class="form-section-title" style="grid-column: 1/-1">Información personal</div>
-
-            <div class="form-row">
-                <div class="field-group">
-                    <label class="field-label" for="email">Correo electrónico</label>
-                    <input id="email" type="email" class="field-input" placeholder="correo@ejemplo.com" required>
-                </div>
-                <div class="field-group">
-                    <label class="field-label" for="nombre">Nombre</label>
-                    <input id="nombre" type="text" class="field-input" placeholder="Nombre(s)" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="field-group">
-                    <label class="field-label" for="apellido_paterno">Apellido paterno</label>
-                    <input id="apellido_paterno" type="text" class="field-input" placeholder="Apellido paterno" required>
-                </div>
-                <div class="field-group">
-                    <label class="field-label" for="apellido_materno">Apellido materno</label>
-                    <input id="apellido_materno" type="text" class="field-input" placeholder="Apellido materno">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="field-group">
-                    <label class="field-label" for="telefono">Teléfono</label>
-                    <input id="telefono" type="text" class="field-input" placeholder="10 dígitos">
-                </div>
-                <div class="field-group">
-                    <label class="field-label" for="fecha_naci">Fecha de nacimiento</label>
-                    <input id="fecha_naci" type="date" class="field-input">
-                </div>
-            </div>
-
-            <p class="form-section-title">Datos profesionales</p>
-
-            <div class="form-row">
-                <div class="field-group">
-                    <label class="field-label" for="especialidad">Especialidad</label>
-                    <select id="especialidad" class="field-select" onchange="toggleEspecialidadCustom(this)">
-                        <option value="">Seleccionar especialidad</option>
+        <!-- Sección 2: Profesional -->
+        <div class="card-section">
+            <p class="section-label">Datos profesionales</p>
+            <div class="grid-2">
+                <div class="field" id="f-especialidad">
+                    <label for="especialidad">Especialidad <span class="req">*</span></label>
+                    <select id="especialidad" onchange="toggleEspecialidadCustom(this)">
+                        <option value="">Seleccionar...</option>
                         <option value="ortopedico">Ortopédico</option>
                         <option value="neurologico">Neurológico</option>
                         <option value="musculoesqueletico">Musculoesquelético</option>
@@ -83,83 +437,271 @@
                         <option value="deportivo">Deportivo</option>
                         <option value="__otra__">Otra especialidad...</option>
                     </select>
-                    <input id="especialidad_custom" type="text" class="field-input" placeholder="Escribe la especialidad"
-                        style="display:none; margin-top:8px;">
+                    <input id="especialidad_custom" type="text" placeholder="Escribe la especialidad">
+                    <span class="field-error">Selecciona o escribe la especialidad</span>
                 </div>
-                <div class="field-group">
-                    <label class="field-label" for="cedula">Cédula profesional</label>
-                    <input id="cedula" type="text" class="field-input" placeholder="Número de cédula" required>
+                <div class="field" id="f-cedula">
+                    <label for="cedula">Cédula profesional <span class="req">*</span></label>
+                    <input id="cedula" type="text" placeholder="7 u 8 dígitos" maxlength="8">
+                    <span class="field-error">Debe tener 7 u 8 dígitos numéricos</span>
+                </div>
+                <div class="field">
+                    <label for="anios_experiencia">Años de experiencia</label>
+                    <input id="anios_experiencia" type="number" min="0" max="60" placeholder="0">
+                </div>
+                <div class="field">
+                    <label for="institucion_egreso">Institución de egreso</label>
+                    <input id="institucion_egreso" type="text" placeholder="Universidad...">
+                </div>
+                <div class="field" style="grid-column: 1 / -1; max-width: 50%;">
+                    <label for="turno">Turno</label>
+                    <select id="turno">
+                        <option value="">Sin turno asignado</option>
+                        <option value="mañana">Mañana</option>
+                        <option value="tarde">Tarde</option>
+                        <option value="noche">Noche</option>
+                    </select>
                 </div>
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="field-group">
-                    <label class="field-label" for="anios_experiencia">Años de experiencia</label>
-                    <input id="anios_experiencia" type="number" min="0" class="field-input" placeholder="0">
-                </div>
-                <div class="field-group">
-                    <label class="field-label" for="institucion_egreso">Institución de egreso</label>
-                    <input id="institucion_egreso" type="text" class="field-input" placeholder="Universidad...">
-                </div>
+        <!-- Footer -->
+        <div class="card-footer">
+            <a href="./MostrarFisioterapeutas.html" class="btn-cancel">Cancelar</a>
+            <button class="btn-submit" id="btn-registrar" onclick="registrarFisioterapeuta()">
+                <span class="spinner"></span>
+                <span class="btn-text">Registrar fisioterapeuta</span>
+            </button>
+        </div>
+
+    </div>
+</main>
+
+<!-- Modal de credenciales -->
+<div class="modal-overlay" id="modal-credenciales">
+    <div class="modal">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+            </svg>
+        </div>
+        <h2>¡Fisioterapeuta registrado!</h2>
+        <p>Guarda estas credenciales y compártelas con el fisioterapeuta para que pueda iniciar sesión.</p>
+
+        <div class="cred-box">
+            <div class="cred-row">
+                <span class="cred-label">Correo de acceso</span>
+                <span class="cred-value" id="cred-email">—</span>
             </div>
-
-            <div class="field-group">
-                <label class="field-label" for="turno">Turno (opcional)</label>
-                <select id="turno" class="field-select">
-                    <option value="">Seleccionar turno</option>
-                    <option value="mañana">Mañana</option>
-                    <option value="tarde">Tarde</option>
-                    <option value="noche">Noche</option>
-                </select>
+            <div class="cred-row">
+                <span class="cred-label">Contraseña</span>
+                <span class="cred-value" id="cred-password">—</span>
             </div>
+        </div>
 
-            <div class="form-actions">
-                <a href="./MostrarFisioterapeutas.html" class="btn-cancelar">Cancelar</a>
-                <button type="button" class="submit" onclick="registrarFisioterapeuta()">
-                    Registrar fisioterapeuta
-                </button>
-            </div>
+        <div class="modal-actions">
+            <button class="btn-copy" onclick="copiarCredenciales()">Copiar</button>
+            <button class="btn-done" onclick="cerrarModal()">Listo</button>
+        </div>
+    </div>
+</div>
 
-        </form>
-    </main>
+<script>
+    // ── Config ────────────────────────────────────────────────────
+    const API_URL = "https://integradora-production-f593.up.railway.app/api/fisioterapeutas";
+    emailjs.init("OO8krxAYwy7wFtUOX");
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>emailjs.init("OO8krxAYwy7wFtUOX");</script>
-    <script>
-        fetch('../../Navbar/Navbar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('navbar').innerHTML = html;
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = '/admin/Navbar/Navbar.js';
-                document.body.appendChild(script);
+    // ── Helpers de UI ─────────────────────────────────────────────
+    function mostrarAlerta(mensaje, tipo = "danger") {
+        const icon = tipo === "success"
+            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        document.getElementById('alert-container').innerHTML =
+            `<div class="alert alert-${tipo}">${icon} ${mensaje}</div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limpiarAlerta() {
+        document.getElementById('alert-container').innerHTML = '';
+    }
+
+    function setFieldError(id, show) {
+        const wrapper = document.getElementById('f-' + id);
+        if (!wrapper) return;
+        const input = document.getElementById(id);
+        wrapper.classList.toggle('has-error', show);
+        input?.classList.toggle('error', show);
+    }
+
+    function limpiarErrores() {
+        document.querySelectorAll('.field.has-error').forEach(f => f.classList.remove('has-error'));
+        document.querySelectorAll('.field input.error, .field select.error')
+            .forEach(i => i.classList.remove('error'));
+    }
+
+    function setBtnLoading(loading) {
+        const btn = document.getElementById('btn-registrar');
+        btn.disabled = loading;
+        btn.classList.toggle('loading', loading);
+    }
+
+    // ── Especialidad custom ───────────────────────────────────────
+    function toggleEspecialidadCustom(sel) {
+        const custom = document.getElementById('especialidad_custom');
+        if (sel.value === '__otra__') {
+            custom.style.display = 'block';
+            custom.required = true;
+            custom.focus();
+        } else {
+            custom.style.display = 'none';
+            custom.required = false;
+            custom.value = '';
+        }
+    }
+
+    function getEspecialidad() {
+        const sel = document.getElementById('especialidad');
+        if (sel.value === '__otra__') {
+            return document.getElementById('especialidad_custom').value.trim();
+        }
+        return sel.value;
+    }
+
+    // ── Validación frontend ───────────────────────────────────────
+    function validar(campos) {
+        let ok = true;
+        limpiarErrores();
+
+        if (!campos.nombre || !/^[a-zA-ZÀ-ÿ\s]+$/.test(campos.nombre)) {
+            setFieldError('nombre', true); ok = false;
+        }
+        if (!campos.emailContacto || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campos.emailContacto)) {
+            setFieldError('email', true); ok = false;
+        }
+        if (!campos.apellidoPaterno || !/^[a-zA-ZÀ-ÿ\s]+$/.test(campos.apellidoPaterno)) {
+            setFieldError('apellido_paterno', true); ok = false;
+        }
+        if (campos.telefono && !/^\d{10}$/.test(campos.telefono)) {
+            setFieldError('telefono', true); ok = false;
+        }
+        if (campos.fechaNacimiento) {
+            const edad = Math.floor((Date.now() - new Date(campos.fechaNacimiento)) / (365.25*24*60*60*1000));
+            if (edad < 18) { setFieldError('fecha_naci', true); ok = false; }
+        }
+        if (!campos.especialidad) {
+            setFieldError('especialidad', true); ok = false;
+        }
+        if (!campos.cedula || !/^\d{7,8}$/.test(campos.cedula)) {
+            setFieldError('cedula', true); ok = false;
+        }
+        return ok;
+    }
+
+    // ── Registro ──────────────────────────────────────────────────
+    async function registrarFisioterapeuta() {
+        limpiarAlerta();
+
+        const campos = {
+            emailContacto:   document.getElementById('email').value.trim(),
+            nombre:          document.getElementById('nombre').value.trim(),
+            apellidoPaterno: document.getElementById('apellido_paterno').value.trim(),
+            apellidoMaterno: document.getElementById('apellido_materno').value.trim() || null,
+            telefono:        document.getElementById('telefono').value.trim() || null,
+            fechaNacimiento: document.getElementById('fecha_naci').value || null,
+            cedula:          document.getElementById('cedula').value.trim(),
+            especialidad:    getEspecialidad(),
+            aniosExperiencia:document.getElementById('anios_experiencia').value || null,
+            institucionEgreso:document.getElementById('institucion_egreso').value.trim() || null,
+            turno:           document.getElementById('turno').value || null,
+        };
+
+        if (!validar(campos)) {
+            mostrarAlerta("Por favor corrige los campos marcados en rojo.");
+            return;
+        }
+
+        setBtnLoading(true);
+
+        try {
+            // Obtener token del localStorage (ajusta el key si es diferente)
+            const token = localStorage.getItem('token')
+                       || localStorage.getItem('access_token')
+                       || sessionStorage.getItem('token');
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(campos)
             });
-    </script>
-<script src="../../../backend/src/routes/fisioterapeutas.js"></script>
-    <script>
-        function toggleEspecialidadCustom(sel) {
-            const custom = document.getElementById('especialidad_custom');
-            if (sel.value === '__otra__') {
-                custom.style.display = 'block';
-                custom.required = true;
-                custom.focus();
-            } else {
-                custom.style.display = 'none';
-                custom.required = false;
-                custom.value = '';
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                mostrarAlerta(data.error || "Error al registrar el fisioterapeuta.");
+                return;
             }
-        }
-        // Helper para obtener el valor final de especialidad
-        function getEspecialidad() {
-            const sel = document.getElementById('especialidad');
-            if (sel.value === '__otra__') {
-                return document.getElementById('especialidad_custom').value.trim();
+
+            // Intentar enviar credenciales por email (opcional)
+            try {
+                await emailjs.send("service_motricare", "template_credenciales", {
+                    to_email:    campos.emailContacto,
+                    to_name:     `${campos.nombre} ${campos.apellidoPaterno}`,
+                    email_login: data.emailLogin,
+                    password:    data.password
+                });
+            } catch (ejsErr) {
+                console.warn("EmailJS no configurado o falló:", ejsErr);
+                // No interrumpimos — el modal igual muestra las credenciales
             }
-            return sel.value;
+
+            // Mostrar modal con credenciales
+            document.getElementById('cred-email').textContent    = data.emailLogin;
+            document.getElementById('cred-password').textContent = data.password;
+            document.getElementById('modal-credenciales').classList.add('open');
+
+            // Limpiar formulario
+            document.getElementById('form-data').reset?.();
+            limpiarErrores();
+            limpiarAlerta();
+
+        } catch (err) {
+            mostrarAlerta("Error de conexión: " + err.message);
+        } finally {
+            setBtnLoading(false);
         }
-    </script>
+    }
+
+    // ── Modal ─────────────────────────────────────────────────────
+    function cerrarModal() {
+        document.getElementById('modal-credenciales').classList.remove('open');
+        // Limpiar campos manualmente
+        ['email','nombre','apellido_paterno','apellido_materno',
+         'telefono','fecha_naci','cedula','anios_experiencia',
+         'institucion_egreso'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+         });
+        document.getElementById('especialidad').value = '';
+        document.getElementById('turno').value = '';
+        document.getElementById('especialidad_custom').style.display = 'none';
+    }
+
+    function copiarCredenciales() {
+        const email = document.getElementById('cred-email').textContent;
+        const pwd   = document.getElementById('cred-password').textContent;
+        navigator.clipboard.writeText(`Correo: ${email}\nContraseña: ${pwd}`)
+            .then(() => alert('Credenciales copiadas al portapapeles'))
+            .catch(() => alert('No se pudo copiar. Cópialas manualmente.'));
+    }
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('modal-credenciales').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+</script>
 
 </body>
 </html>
