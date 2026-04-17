@@ -2,15 +2,6 @@ import { supabase } from "../../../auth.js";
 
 /* ══════════════════════════════════════════════════════════════
    CONFIGURACIÓN DE SUPABASE STORAGE
-   
-   STORAGE_URL: URL base para construir URLs públicas de imágenes
-   almacenadas en Supabase Storage.
-   
-   Si url_foto en la tabla usuario es solo un nombre de archivo
-   (ej: "9a9ecd4b-...jpeg"), se construye la URL completa así:
-   https://<project>.supabase.co/storage/v1/object/public/<bucket>/<filename>
-   
-   ⚠️ CAMBIA 'avatares' por el nombre real de tu bucket en Supabase.
 ══════════════════════════════════════════════════════════════ */
 const SUPABASE_PROJECT_URL = 'https://qhrennyqjhngysortocu.supabase.co';
 const STORAGE_BUCKET = 'perfil_pacientes';
@@ -324,9 +315,6 @@ async function cargarListaPacientes(fisioId) {
    
    Genera el HTML de cada ítem de paciente y lo inserta en el DOM.
    
-   ✅ FIX FOTO: url_foto pasa por buildFotoUrl() antes de usarse
-   en el <img>, así funciona tanto si es URL completa como si es
-   solo nombre de archivo del bucket de Supabase Storage.
 ══════════════════════════════════════════════════════════════ */
 function renderListaPacientes(lista) {
     const container = document.getElementById('listaPacientes');
@@ -344,7 +332,7 @@ function renderListaPacientes(lista) {
         const nom = c.usuario?.us_nom || 'Sin nombre';
         const iniciales = getIniciales(nom);
 
-        // ✅ Construir URL completa de la foto antes de renderizar
+        // Construir URL completa de la foto antes de renderizar
         const fotoUrl = buildFotoUrl(c.usuario?.url_foto);
 
         // Badge de estado de la cita más reciente
