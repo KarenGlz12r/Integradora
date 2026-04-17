@@ -47,11 +47,11 @@ function formatearFechaBloque(isoDate) {
 // Etiqueta legible para estados de cita
 function etiquetaEstado(estado) {
     const mapa = {
-        confirmada:     "confirmada",
-        completada:     "completada",
+        confirmada: "confirmada",
+        completada: "completada",
         pendiente_pago: "pendiente pago",
-        cancelada:      "cancelada",
-        no_asistio:     "no asistió"
+        cancelada: "cancelada",
+        no_asistio: "no asistió"
     };
     return mapa[estado] ?? estado;
 }
@@ -82,7 +82,7 @@ async function cargarKpiPacientes(fisioId) {
 // ── KPI: NUEVOS ESTE MES ─────────────────────────────────────────
 
 async function cargarKpiNuevos(fisioId) {
-    const ahora     = new Date();
+    const ahora = new Date();
     const primerDia = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-01`;
     const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
     const ultimoDiaISO = fechaLocalISO(ultimoDia);
@@ -121,7 +121,7 @@ async function cargarKpiPendientes(fisioId) {
         .eq("estado_pago", "procesado");
 
     const pagadasSet = new Set(pagados?.map(p => p.cita_id) ?? []);
-    const sinPagar   = ids.filter(id => !pagadasSet.has(id));
+    const sinPagar = ids.filter(id => !pagadasSet.has(id));
 
     document.getElementById("kpi-pendientes").textContent = sinPagar.length;
 }
@@ -199,7 +199,7 @@ async function cargarCitasHoy(fisioId) {
 async function cargarAlertas(fisioId) {
     const hace7Dias = new Date();
     hace7Dias.setDate(hace7Dias.getDate() - 7);
-    const fechaLimite = fechaLocalISO(hace7Dias); 
+    const fechaLimite = fechaLocalISO(hace7Dias);
 
     const { data: pendientes } = await supabase
         .from("citas")
@@ -210,20 +210,39 @@ async function cargarAlertas(fisioId) {
         .order("fecha", { ascending: true })
         .limit(5);
 
-const { data: noAsistieron, error: errorNoAsistieron } = await supabase
+    // const { data: noAsistieron, error: errorNoAsistieron } = await supabase
+    //         .from("citas")
+    //         .select(`id, fecha, usuario(us_nom)`)
+    //         .eq("fisioterapeuta_id", fisioId)
+    //         .eq("estado", "no_asistio")
+    //         .gte("fecha", fechaLimite)
+    //         .lte("fecha", HOY)
+    //         .order("fecha", { ascending: false })
+    //         .limit(3);
+
+    //         console.log("Los que no asistieron", noAsistieron);
+    //         console.log("Pagos pendientes", pendientes);
+    const { data: inasistencias } = await supabase
         .from("citas")
-        .select(`id, fecha, usuario(us_nom)`)
+        .select(`id, fecha, hora_inicio, usuario!citas_usuario_id_fkey(us_nom)`)
         .eq("fisioterapeuta_id", fisioId)
-        .eq("estado", "no_asistio")
+        .in("estado", ["no_asistio", "cancelada"])   // ambos estados
         .gte("fecha", fechaLimite)
         .lte("fecha", HOY)
         .order("fecha", { ascending: false })
-        .limit(3);
-
-        console.log("Los que no asistieron", noAsistieron);
-        console.log("Pagos pendientes", pendientes);
+        .limit(6);
 
     const alertas = [];
+
+
+    (inasistencias ?? []).forEach(c => {
+        const esCancelada = c.estado === "cancelada";
+        alertas.push({
+            tipo: "danger",
+            titulo: `${c.usuario?.us_nom ?? "Paciente"} — ${esCancelada ? "canceló su cita" : "no asistió"}`,
+            subtitulo: `El ${formatearFechaBadge(c.fecha)} · ${c.hora_inicio.slice(0, 5)}`
+        });
+    });
 
     (pendientes ?? []).forEach(c => {
         alertas.push({
@@ -233,16 +252,10 @@ const { data: noAsistieron, error: errorNoAsistieron } = await supabase
         });
     });
 
-    (noAsistieron ?? []).forEach(c => {
-        alertas.push({
-            tipo: "danger",
-            titulo: `${c.usuario?.us_nom ?? "Paciente"} — no asistió`,
-            subtitulo: `El ${formatearFechaBadge(c.fecha)}`
-        });
-    });
+
 
     const contenedor = document.getElementById("lista-alertas");
-    const badge      = document.getElementById("badge-alertas");
+    const badge = document.getElementById("badge-alertas");
 
     badge.textContent = `${alertas.length} activa${alertas.length !== 1 ? "s" : ""}`;
 
