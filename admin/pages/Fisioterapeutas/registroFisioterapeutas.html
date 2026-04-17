@@ -137,8 +137,80 @@
                 document.body.appendChild(script);
             });
     </script>
-<script src="../../../backend/src/routes/fisioterapeutas.js"></script>
+
     <script>
+        // Agrega esto dentro de tu etiqueta <script> en el HTML, o en un archivo JS del frontend
+
+async function registrarFisioterapeuta() {
+    // 1. Obtener los valores del formulario HTML
+    const emailContacto = document.getElementById('email').value.trim();
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellidoPaterno = document.getElementById('apellido_paterno').value.trim();
+    const apellidoMaterno = document.getElementById('apellido_materno').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const fechaNacimiento = document.getElementById('fecha_naci').value;
+    const cedula = document.getElementById('cedula').value.trim();
+    const aniosExperiencia = parseInt(document.getElementById('anios_experiencia').value);
+    const institucionEgreso = document.getElementById('institucion_egreso').value.trim();
+    const turno = document.getElementById('turno').value;
+    const especialidad = getEspecialidad(); // Tu función existente
+
+    // 2. Validación súper básica (las fuertes están en tu backend)
+    if (!emailContacto || !nombre || !apellidoPaterno || !cedula || !especialidad) {
+        alert("Por favor, completa todos los campos obligatorios.");
+        return;
+    }
+
+    // 3. Preparar los datos en el formato que tu Backend (Express) espera
+    const bodyData = {
+        emailContacto, 
+        nombre, 
+        apellidoPaterno, 
+        apellidoMaterno,
+        cedula, 
+        especialidad, 
+        telefono, 
+        aniosExperiencia: isNaN(aniosExperiencia) ? null : aniosExperiencia,
+        institucionEgreso, 
+        fechaNacimiento, 
+        turno
+    };
+
+    try {
+        // 4. Enviar los datos al Backend (Ruta POST /api/fisioterapeutas)
+        // OJO: Si usas 'apiFetch' en tu proyecto, úsalo aquí. 
+        // Si usas fetch nativo, recuerda mandar el token JWT en los headers.
+        
+        // Ajusta la URL base según cómo corra tu servidor local (ej. http://localhost:3000)
+        const response = await fetch("/api/fisioterapeutas", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                // "Authorization": `Bearer ${localStorage.getItem('tu_token_jwt')}` // Descomenta si usas JWT manual
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        const result = await response.json();
+
+        // 5. Manejar la respuesta del servidor
+        if (response.ok && result.ok) {
+            alert("¡Fisioterapeuta registrado con éxito!");
+            
+            // Opcional: Aquí es donde usarías EmailJS para enviar el correo 
+            // usando las contraseñas generadas que te devuelve el backend
+            console.log("Credenciales generadas (Enviar por email):", result.emailLogin, result.password);
+            
+            // Limpiar el formulario
+            document.getElementById('form-registro').reset();
+        } else {
+            alert("Error: " + (result.error || "No se pudo registrar"));
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
+        alert("Error de conexión con el servidor.");
+    }
+}
         function toggleEspecialidadCustom(sel) {
             const custom = document.getElementById('especialidad_custom');
             if (sel.value === '__otra__') {
