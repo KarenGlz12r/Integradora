@@ -239,7 +239,7 @@ async function cargarAlertas(fisioId) {
         const esCancelada = c.estado === "cancelada";
         alertas.push({
             tipo: "danger",
-            titulo: `${c.usuario?.us_nom ?? "Paciente"} — ${esCancelada ? "canceló su cita" : "no asistió"}`,
+            titulo: `${c.usuario?.us_nom ?? "Paciente"} — ${esCancelada ? "canceló su cita" : "no asistió"}`, //Si el estado es ca
             subtitulo: `El ${formatearFechaBadge(c.fecha)} · ${c.hora_inicio.slice(0, 5)}`
         });
     });
@@ -326,7 +326,12 @@ async function cargarProximas(fisioId) {
 function activarTiempoReal(fisioId) {
     supabase
         .channel("dashboard-citas")
-        .on("postgres_changes", { event: "*", schema: "public", table: "citas" }, () => {
+        .on("postgres_changes", { 
+            event: "*", 
+            schema: "public", 
+            table: "citas",
+            filter: `fisioterapeuta_id=eq.${fisioId}`  // PERMITE EL FILTRADO POR FISIOTERAPEUTA
+        }, () => {
             cargarKpiPacientes(fisioId);
             cargarKpiNuevos(fisioId);
             cargarKpiPendientes(fisioId);
@@ -337,13 +342,18 @@ function activarTiempoReal(fisioId) {
         })
         .subscribe();
 
-    supabase
-        .channel("dashboard-pagos")
-        .on("postgres_changes", { event: "*", schema: "public", table: "pagos" }, () => {
-            cargarKpiPendientes(fisioId);
-            cargarAlertas(fisioId);
-        })
-        .subscribe();
+    // supabase
+    //     .channel("dashboard-pagos")
+    //     .on("postgres_changes", { 
+    //         event: "*", 
+    //         schema: "public", 
+    //         table: "pagos"
+    //         // pagos no tiene fisioterapeuta_id, así que aquí no se puede filtrar directamente
+    //     }, () => {
+    //         cargarKpiPendientes(fisioId);
+    //         cargarAlertas(fisioId);
+    //     })
+    //     .subscribe();
 }
 
 // ── INICIALIZAR ──────────────────────────────────────────────────
