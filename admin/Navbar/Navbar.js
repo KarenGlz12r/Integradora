@@ -1,7 +1,6 @@
-
 import supabase, { apiFetch, limpiarSesion } from "../auth.js";
-// ADMIN/NAVBAR
 
+// ── ADMIN/NAVBAR ─────────────────────────────────────────────────
 
 const menu = document.getElementById('menu');
 const sidebar = document.getElementById('sidebar');
@@ -9,35 +8,28 @@ const mainContent = document.querySelector('.main-content');
 const container = document.querySelector('.container');
 const containerm = document.querySelector('.containerm');
 
+// Agregar el listener solo si el menú existe en el DOM actual
+if (menu) {
+    menu.addEventListener('click', () => {
+        sidebar?.classList.toggle('menu-toggle');
+        menu?.classList.toggle('menu-toggle');
+        mainContent?.classList.toggle('menu-toggle');
+        container?.classList.toggle('menu-toggle');
+        containerm?.classList.toggle('menu-toggle');
+    });
+}
 
-menu.addEventListener('click', () => {
-    sidebar.classList.toggle('menu-toggle');
-    menu.classList.toggle('menu-toggle');
-    mainContent?.classList.toggle('menu-toggle');
-    container?.classList.toggle('menu-toggle');
-    containerm?.classList.toggle('menu-toggle');
-});
-
-
-// FUNCION DEL DROPDOWN
+// ── FUNCIONES DE LA INTERFAZ ─────────────────────────────────────
 
 function toggleDropdown() {
-    document.getElementById("dropdown").classList.toggle("active");
+    document.getElementById("dropdown")?.classList.toggle("active");
 }
-// CERRAR AL HACER CLICK AFUERA
-
-document.addEventListener("click", (e) => {
-    const userMenu = document.querySelector(".user-menu");
-    if (userMenu && !userMenu.contains(e.target)) {
-        document.getElementById("dropdown")?.classList.remove("active");
-    }
-});
-
-// FOTO DE PERFIL
 
 function abrirSelectorFoto() {
-    document.getElementById("input-foto").click();
+    document.getElementById("input-foto")?.click();
 }
+
+// ── LÓGICA DE FOTO Y USUARIO ─────────────────────────────────────
 
 // SUBIR FOTO
 async function subirFoto(event) {
@@ -51,7 +43,6 @@ async function subirFoto(event) {
     const nombreArchivo = `${user.id}.${extension}`;
 
     // SUBIR A SUPABASE STORAGE
-
     const { error } = await supabase.storage
         .from("avatars")
         .upload(nombreArchivo, archivo, { upsert: true });
@@ -62,7 +53,6 @@ async function subirFoto(event) {
     }
 
     // OBTENER URL PÚBLICA
-
     const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(nombreArchivo);
@@ -71,17 +61,16 @@ async function subirFoto(event) {
     const urlConTimestamp = `${urlData.publicUrl}?t=${Date.now()}`;
 
     // MOSTRAR EN EL NAVBAR
-    document.getElementById("user-foto").src = urlConTimestamp;
+    const userFoto = document.getElementById("user-foto");
+    if(userFoto) userFoto.src = urlConTimestamp;
 
     // GUARDAR EN LA TABLA SEGUN EL ROL
-
     await supabase.from("perfiles").update({ foto_url: urlConTimestamp }).eq("id", user.id);
-    document.getElementById("dropdown").classList.remove("active");
+    document.getElementById("dropdown")?.classList.remove("active");
 
     const fotoDashboard = document.getElementById("foto-doctor");
     if (fotoDashboard) {
         fotoDashboard.src = urlConTimestamp;
-
     }
 }
 
@@ -100,16 +89,18 @@ async function cargarFotoPerfil() {
         const url = perfil.foto_url.includes("?t=")
             ? perfil.foto_url
             : `${perfil.foto_url}?t=${Date.now()}`;
-        document.getElementById("user-foto").src = url;
+        
+        const userFoto = document.getElementById("user-foto");
+        if(userFoto) userFoto.src = url;
 
         // ACTUALIZA LA FOTO DEL DASHBOARD SI EXISTE
         const fotoDashboard = document.getElementById("foto-doctor");
         if (fotoDashboard) fotoDashboard.src = url;
     }
 }
+
 async function cargarNombre() {
     const { data: { user } } = await supabase.auth.getUser();
-    console.log("Usuario:", user); // ¿Hay sesión activa?
     if (!user) return;
 
     const { data: dataUser, error: errorUser } = await supabase
@@ -118,28 +109,22 @@ async function cargarNombre() {
         .eq("user_id", user.id)
         .single();
 
-    console.log("Data:", dataUser, "Error:", errorUser); // ¿Llegan los datos?
-
-    if (errorUser) return;
-    if (!dataUser) return;
+    if (errorUser || !dataUser) return;
 
     const el = document.getElementById("name-user");
-    console.log("Elemento:", el); // ¿Encuentra el H2?
-
-    el.textContent = `${dataUser.nombre} ${dataUser.apellido_paterno}`;
+    if (el) el.textContent = `${dataUser.nombre} ${dataUser.apellido_paterno}`;
 }
+
 // MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
 function marcarEnlaceActivo() {
     const urlActual = window.location.pathname;
-
     const enlaces = document.querySelectorAll(".sidebar nav ul li a");
 
     enlaces.forEach(enlace => {
         enlace.classList.remove("selected");
-
         const href = enlace.getAttribute("href");
 
-        //  SI LA URL ACTUAL CONTIENE LA RUTA DEL ENLACE
+        // SI LA URL ACTUAL CONTIENE LA RUTA DEL ENLACE
         if (href && urlActual.includes(href)) {
             enlace.classList.add("selected");
         }
@@ -147,36 +132,26 @@ function marcarEnlaceActivo() {
 
     // CASO ESPECIAL: DASHBOARD ES LA RAÍZ
     if (urlActual === "/admin/dashboard.html" || urlActual === "/admin/") {
-        document.querySelector('a[href="/admin/dashboard.html"]')
-            ?.classList.add("selected");
+        document.querySelector('a[href="/admin/dashboard.html"]')?.classList.add("selected");
     }
 }
 
+// Ejecutar funciones de carga
 marcarEnlaceActivo();
 cargarFotoPerfil();
 cargarNombre();
 
 // ── MODAL CERRAR SESIÓN ──────────────────────────────────────────
- 
+
 function abrirModalCerrarSesion() {
     document.getElementById("dropdown")?.classList.remove("active");
-    document.getElementById("modal-logout").classList.add("active");
+    document.getElementById("modal-logout")?.classList.add("active");
 }
- 
+
 function cerrarModal() {
-    document.getElementById("modal-logout").classList.remove("active");
+    document.getElementById("modal-logout")?.classList.remove("active");
 }
- 
-// Cerrar modal al hacer clic en el overlay (fuera de la card)
-document.getElementById("modal-logout").addEventListener("click", (e) => {
-    if (e.target === document.getElementById("modal-logout")) cerrarModal();
-});
- 
-// Cerrar modal con Escape
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") cerrarModal();
-});
- 
+
 async function cerrarSesion() {
     // Llamar al backend para invalidar el token
     await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -186,9 +161,16 @@ async function cerrarSesion() {
     window.location.href = "/index.html";
 }
 
-// En lugar de window.toggleDropdown = toggleDropdown, etc.
-// Usa event delegation para todos los clicks del navbar
+// ── EVENT DELEGATION (El "cerebro" de los clics) ─────────────────
 
+// 1. Escuchar cuando se seleccione una imagen
+document.addEventListener('change', (e) => {
+    if (e.target?.id === 'input-foto') {
+        subirFoto(e);
+    }
+});
+
+// 2. Escuchar todos los clics del documento
 document.addEventListener('click', (e) => {
     // Toggle dropdown al hacer clic en el avatar
     if (e.target.closest('.user-avatar')) {
@@ -225,15 +207,14 @@ document.addEventListener('click', (e) => {
     if (userMenu && !userMenu.contains(e.target)) {
         document.getElementById('dropdown')?.classList.remove('active');
     }
+
+    // Cerrar modal al hacer clic en el overlay (fuera de la card)
+    if (e.target?.id === 'modal-logout') {
+        cerrarModal();
+    }
 });
 
-// Modal overlay click para cerrar
-document.addEventListener('click', (e) => {
-    if (e.target?.id === 'modal-logout') cerrarModal();
+// Cerrar modal con Escape
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
 });
-window.abrirSelectorFoto       = abrirSelectorFoto;
-window.subirFoto               = subirFoto;
-window.abrirModalCerrarSesion  = abrirModalCerrarSesion;
-window.cerrarModal             = cerrarModal;
-window.cerrarSesion            = cerrarSesion;
-window.cargarNombre            = cargarNombre;
