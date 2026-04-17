@@ -1,164 +1,175 @@
-import supabase, { apiFetch, limpiarSesion } from "../auth.js";
+// ══════════════════════════════════════════════════════════════
+// Navbar.js — Funcionalidad del navbar de Motricare (fisioterapeuta)
+// ══════════════════════════════════════════════════════════════
 
-export default async function init() {
+// ── PROTEGER LA RUTA ──
+import { protegerRuta } from "../../proteger.js";
+await protegerRuta("fisioterapeuta");
 
-    // ── MENÚ HAMBURGUESA ──────────────────────────────────────────
-    const menu        = document.getElementById('menu');
-    const sidebar     = document.getElementById('sidebar');
-    const mainContent = document.querySelector('.main-content');
-    const container   = document.querySelector('.container');
-    const containerm  = document.querySelector('.containerm');
+import supabase, { apiFetch, limpiarSesion } from "../../auth.js";
 
-    if (menu) {
-        menu.addEventListener('click', () => {
-            sidebar?.classList.toggle('menu-toggle');
-            menu?.classList.toggle('menu-toggle');
-            mainContent?.classList.toggle('menu-toggle');
-            container?.classList.toggle('menu-toggle');
-            containerm?.classList.toggle('menu-toggle');
-        });
-    }
 
-    // ── FUNCIONES ─────────────────────────────────────────────────
+// ── MENÚ HAMBURGUESA / SIDEBAR ──
+const menu        = document.getElementById('menu');
+const sidebar     = document.getElementById('sidebar');
+const mainContent = document.querySelector('.main-content');
 
-    function toggleDropdown() {
-        document.getElementById("dropdown")?.classList.toggle("active");
-    }
+menu.addEventListener('click', () => {
+    sidebar.classList.toggle('menu-toggle');
+    menu.classList.toggle('menu-toggle');
+    mainContent.classList.toggle('menu-toggle');
+});
 
-    function abrirSelectorFoto() {
-        document.getElementById("input-foto")?.click();
-    }
 
-    async function subirFoto(event) {
-        const archivo = event.target.files[0];
-        if (!archivo) return;
+// ── DROPDOWN DEL USUARIO ──
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const extension     = archivo.name.split(".").pop();
-        const nombreArchivo = `${user.id}.${extension}`;
-
-        const { error } = await supabase.storage
-            .from("avatars")
-            .upload(nombreArchivo, archivo, { upsert: true });
-
-        if (error) { console.error("Error al subir la foto", error); return; }
-
-        const { data: urlData } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(nombreArchivo);
-
-        const urlConTimestamp = `${urlData.publicUrl}?t=${Date.now()}`;
-
-        const userFoto = document.getElementById("user-foto");
-        if (userFoto) userFoto.src = urlConTimestamp;
-
-        await supabase.from("perfiles").update({ foto_url: urlConTimestamp }).eq("id", user.id);
-        document.getElementById("dropdown")?.classList.remove("active");
-
-        const fotoDashboard = document.getElementById("foto-doctor");
-        if (fotoDashboard) fotoDashboard.src = urlConTimestamp;
-    }
-
-    async function cargarFotoPerfil() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: perfil } = await supabase
-            .from("perfiles")
-            .select("foto_url")
-            .eq("id", user.id)
-            .single();
-
-        if (perfil?.foto_url) {
-            const url = perfil.foto_url.includes("?t=")
-                ? perfil.foto_url
-                : `${perfil.foto_url}?t=${Date.now()}`;
-
-            const userFoto = document.getElementById("user-foto");
-            if (userFoto) userFoto.src = url;
-
-            const fotoDashboard = document.getElementById("foto-doctor");
-            if (fotoDashboard) fotoDashboard.src = url;
-        }
-    }
-
-    async function cargarNombre() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: dataUser, error: errorUser } = await supabase
-            .from("administradores")
-            .select("nombre, apellido_paterno")
-            .eq("user_id", user.id)
-            .single();
-
-        if (errorUser || !dataUser) return;
-
-        const el = document.getElementById("name-user");
-        if (el) el.textContent = `${dataUser.nombre} ${dataUser.apellido_paterno}`;
-    }
-
-    function marcarEnlaceActivo() {
-        const urlActual = window.location.pathname;
-        const enlaces   = document.querySelectorAll(".sidebar nav ul li a");
-
-        enlaces.forEach(enlace => {
-            enlace.classList.remove("selected");
-            const href = enlace.getAttribute("href");
-            if (href && urlActual.includes(href)) {
-                enlace.classList.add("selected");
-            }
-        });
-
-        if (urlActual === "/admin/dashboard.html" || urlActual === "/admin/") {
-            document.querySelector('a[href="/admin/dashboard.html"]')?.classList.add("selected");
-        }
-    }
-
-    function abrirModalCerrarSesion() {
-        document.getElementById("dropdown")?.classList.remove("active");
-        document.getElementById("modal-logout")?.classList.add("active");
-    }
-
-    function cerrarModal() {
-        document.getElementById("modal-logout")?.classList.remove("active");
-    }
-
-    async function cerrarSesion() {
-        await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-        limpiarSesion();
-        await supabase.auth.signOut();
-        window.location.href = "/index.html";
-    }
-
-    // ── EVENT DELEGATION ──────────────────────────────────────────
-
-    document.addEventListener('change', (e) => {
-        if (e.target?.id === 'input-foto') subirFoto(e);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.user-avatar'))              { toggleDropdown(); return; }
-        if (e.target.closest('li[data-action="foto"]'))    { abrirSelectorFoto(); return; }
-        if (e.target.closest('li[data-action="logout"]'))  { abrirModalCerrarSesion(); return; }
-        if (e.target.closest('.btn-confirmar'))            { cerrarSesion(); return; }
-        if (e.target.closest('.btn-cancelar'))             { cerrarModal(); return; }
-        if (e.target?.id === 'modal-logout')               { cerrarModal(); return; }
-
-        const userMenu = document.querySelector('.user-menu');
-        if (userMenu && !userMenu.contains(e.target)) {
-            document.getElementById('dropdown')?.classList.remove('active');
-        }
-    });
-
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") cerrarModal();
-    });
-
-    // ── INICIALIZAR ───────────────────────────────────────────────
-    marcarEnlaceActivo();
-    cargarFotoPerfil();
-    cargarNombre();
+function toggleDropdown() {
+    document.getElementById("dropdown").classList.toggle("active");
 }
+
+// Cerrar dropdown al hacer clic fuera de él
+document.addEventListener("click", (e) => {
+    const userMenu = document.querySelector(".user-menu");
+    if (userMenu && !userMenu.contains(e.target)) {
+        document.getElementById("dropdown")?.classList.remove("active");
+    }
+});
+
+
+// ── FOTO DE PERFIL ──
+
+function abrirSelectorFoto() {
+    document.getElementById("input-foto").click();
+}
+
+async function subirFoto(event) {
+    const archivo = event.target.files[0];
+    if (!archivo) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const extension     = archivo.name.split(".").pop();
+    const nombreArchivo = `${user.id}.${extension}`;
+
+    // Subir la foto al bucket "avatars" (upsert sobreescribe si ya existe)
+    const { error } = await supabase.storage
+        .from("avatars")
+        .upload(nombreArchivo, archivo, { upsert: true });
+
+    if (error) { console.error("Error al subir la foto", error); return; }
+
+    // Obtener la URL pública con timestamp para evitar caché
+    const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(nombreArchivo);
+
+    const urlConTimestamp = `${urlData.publicUrl}?t=${Date.now()}`;
+
+    // Actualizar la foto en el navbar
+    document.getElementById("user-foto").src = urlConTimestamp;
+
+    // Guardar la nueva URL en la tabla de perfiles
+    await supabase.from("perfiles").update({ foto_url: urlConTimestamp }).eq("id", user.id);
+    document.getElementById("dropdown").classList.remove("active");
+
+    // Actualizar también la foto en el dashboard si existe
+    const fotoDashboard = document.getElementById("foto-doctor");
+    if (fotoDashboard) fotoDashboard.src = urlConTimestamp;
+}
+
+async function cargarFotoPerfil() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Obtener la foto guardada en la tabla de perfiles
+    const { data: perfil } = await supabase
+        .from("perfiles")
+        .select("foto_url")
+        .eq("id", user.id)
+        .single();
+
+    if (perfil?.foto_url) {
+        // Agregar timestamp solo si la URL no lo tiene ya
+        const url = perfil.foto_url.includes("?t=")
+            ? perfil.foto_url
+            : `${perfil.foto_url}?t=${Date.now()}`;
+
+        document.getElementById("user-foto").src = url;
+
+        // Actualizar también la foto en el dashboard si existe
+        const fotoDashboard = document.getElementById("foto-doctor");
+        if (fotoDashboard) fotoDashboard.src = url;
+    }
+}
+
+cargarFotoPerfil();
+
+
+// ── ENLACE ACTIVO EN EL SIDEBAR ──
+
+function marcarEnlaceActivo() {
+    const urlActual = window.location.pathname;
+    const enlaces   = document.querySelectorAll(".sidebar nav ul li a");
+
+    // Quitar "selected" de todos y aplicarlo al que coincida con la URL actual
+    enlaces.forEach(enlace => {
+        enlace.classList.remove("selected");
+        const href = enlace.getAttribute("href");
+        if (href && urlActual.includes(href)) {
+            enlace.classList.add("selected");
+        }
+    });
+
+    // Caso especial: raíz del dashboard del cliente
+    if (urlActual === "/admin/dashboard.html" || urlActual === "/admin/") {
+        document.querySelector('a[href="/admin/dashboard.html"]')
+            ?.classList.add("selected");
+    }
+}
+
+marcarEnlaceActivo();
+
+
+// ── MODAL CERRAR SESIÓN ──
+
+function abrirModalCerrarSesion() {
+    // Cerrar el dropdown antes de abrir el modal
+    document.getElementById("dropdown")?.classList.remove("active");
+    document.getElementById("modal-logout").classList.add("active");
+}
+
+function cerrarModal() {
+    document.getElementById("modal-logout").classList.remove("active");
+}
+
+// Cerrar el modal al hacer clic en el fondo oscuro
+document.getElementById("modal-logout").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("modal-logout")) cerrarModal();
+});
+
+// Cerrar el modal con la tecla Escape
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
+});
+
+async function cerrarSesion() {
+    // Invalidar la sesión en el servidor y limpiar localmente
+    await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    limpiarSesion();
+    await supabase.auth.signOut();
+    window.location.href = "/index.html";
+}
+
+
+
+iniciarCampana();
+
+
+// ── EXPONER FUNCIONES GLOBALES ──
+window.toggleDropdown         = toggleDropdown;
+window.abrirSelectorFoto      = abrirSelectorFoto;
+window.subirFoto              = subirFoto;
+window.abrirModalCerrarSesion = abrirModalCerrarSesion;
+window.cerrarModal            = cerrarModal;
+window.cerrarSesion           = cerrarSesion;
