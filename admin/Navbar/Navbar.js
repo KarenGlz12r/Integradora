@@ -1,4 +1,4 @@
-import supabase, { apiFetch, limpiarSesion } from "../auth.js";
+import supabase, { apiFetch, limpiarSesion } from "../../auth.js";
 
 // ── REFERENCIAS AL DOM ──
 const menu = document.getElementById('menu');
