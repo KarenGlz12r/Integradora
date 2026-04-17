@@ -186,7 +186,51 @@ async function cerrarSesion() {
     window.location.href = "/index.html";
 }
 
-window.toggleDropdown          = toggleDropdown;
+// En lugar de window.toggleDropdown = toggleDropdown, etc.
+// Usa event delegation para todos los clicks del navbar
+
+document.addEventListener('click', (e) => {
+    // Toggle dropdown al hacer clic en el avatar
+    if (e.target.closest('.user-avatar')) {
+        toggleDropdown();
+        return;
+    }
+
+    // Editar foto de perfil
+    if (e.target.closest('li[data-action="foto"]')) {
+        abrirSelectorFoto();
+        return;
+    }
+
+    // Abrir modal cerrar sesión
+    if (e.target.closest('li[data-action="logout"]')) {
+        abrirModalCerrarSesion();
+        return;
+    }
+
+    // Confirmar cerrar sesión
+    if (e.target.closest('.btn-confirmar')) {
+        cerrarSesion();
+        return;
+    }
+
+    // Cancelar modal
+    if (e.target.closest('.btn-cancelar')) {
+        cerrarModal();
+        return;
+    }
+
+    // Cerrar dropdown al clicar fuera
+    const userMenu = document.querySelector('.user-menu');
+    if (userMenu && !userMenu.contains(e.target)) {
+        document.getElementById('dropdown')?.classList.remove('active');
+    }
+});
+
+// Modal overlay click para cerrar
+document.addEventListener('click', (e) => {
+    if (e.target?.id === 'modal-logout') cerrarModal();
+});
 window.abrirSelectorFoto       = abrirSelectorFoto;
 window.subirFoto               = subirFoto;
 window.abrirModalCerrarSesion  = abrirModalCerrarSesion;
